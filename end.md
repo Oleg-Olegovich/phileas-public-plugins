@@ -1,9 +1,9 @@
 # Phileas plugins
 
 [Boosty](https://boosty.to/phileas)
-[Patreon](https://www.patreon.com/treeverse_games)
-[Telegram](https://t.me/treeverse_games)
-[RPG Maker Union](https://rpgmakerunion.ru/id/phileas)
+| [Patreon](https://www.patreon.com/treeverse_games)
+| [Telegram](https://t.me/treeverse_games)
+| [RPG Maker Union](https://rpgmakerunion.ru/id/phileas)
 
 Skipping messages (fast forward the message)
 Customizing the Message Window
