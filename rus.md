@@ -1,8 +1,5 @@
 # Плагины Phileas`а
 
-| [Boosty](https://boosty.to/phileas) | [Patreon](https://www.patreon.com/treeverse_games) | [Telegram](https://t.me/treeverse_games) | [RPG Maker Union](https://rpgmakerunion.ru/id/phileas) |
-| --- | --- | --- | --- |
-
 | Название | Описание | Код | Форум |
 | --- | --- | --- | --- |
 | **Phileas's Skipping Messages** | Быстрая промотка сообщений | [Код]() | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-skipping-messages.294) |
