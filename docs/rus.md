@@ -38,6 +38,12 @@
 | **Phileas's Pictures Collision** | Определение коллизии (пересечения) картинок  | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_PicturesCollision.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-pictures-collision.683) |
 
 #### Модификации чужих плагинов
-| Название | Описание | Код | Форум |
-| --- | --- | --- | --- |
-| **Ramza Plugins - Pre-Title Splash Events (Phileas mod)** | Дисклеймер, заставки (картинки, видео) перед титульным экраном  | [MV](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Ramza_PreTitleSplash_MV.js) [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Ramza_PreTitleSplash_MZ.js) | [Тема](https://rpgmakerunion.ru/thread/mvmz-ramzapretitlesplash-phileas-mod.523) |
+| Название | Описание | Код | Форум | Оригинал |
+| --- | --- | --- | --- | --- |
+| **Ramza Plugins - Pre-Title Splash Events (Phileas mod)** | Дисклеймер, заставки (картинки, видео) перед титульным экраном  | [MV](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Ramza_PreTitleSplash_MV.js); [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Ramza_PreTitleSplash_MZ.js) | [Тема](https://rpgmakerunion.ru/thread/mvmz-ramzapretitlesplash-phileas-mod.523) | [Itch.io](https://capnrammo.itch.io/mvmz-pre-title-splash-videos)
+
+#### Модификации чужих скриптов для VX Ace
+| Название | Описание | Код | Форум | Оригинал |
+| --- | --- | --- | --- | --- |
+| **Shaz - SUPER SIMPLE MOUSE SCRIPT (Phileas and Dmy mod)** | Скрипт мыши  | [VX Ace](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/scripts/shaz_mouse.rb) | [Тема](https://rpgmakerunion.ru/thread/mvmz-ramzapretitlesplash-phileas-mod.523) | [Тема](https://forums.rpgmakerweb.com/index.php?threads/super-simple-mouse-script.16520/) |
+| **CSCA Toast Manager (Phileas mod)** | Всплывающие уведомления  | [Core](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/scripts/csca_core.rb); [VX Ace](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/scripts/csca_toast_manager.rb) | [Тема](https://rpgmakerunion.ru/thread/vx-ace-csca-toast-manager-remeyk.298) | [Тема](https://www.rpgmakercentral.com/topic/13960-csca-toast-manager/) |
