@@ -45,5 +45,5 @@
 #### Модификации чужих скриптов для VX Ace
 | Название | Описание | Код | Форум | Оригинал |
 | --- | --- | --- | --- | --- |
-| **Shaz - SUPER SIMPLE MOUSE SCRIPT (Phileas and Dmy mod)** | Скрипт мыши  | [VX Ace](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/scripts/shaz_mouse.rb) | [Тема](https://rpgmakerunion.ru/thread/mvmz-ramzapretitlesplash-phileas-mod.523) | [Тема](https://forums.rpgmakerweb.com/index.php?threads/super-simple-mouse-script.16520/) |
+| **Shaz - SUPER SIMPLE MOUSE SCRIPT (Phileas and Dmy mod)** | Скрипт мыши  | [VX Ace](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/scripts/shaz_mouse.rb) | [Тема]([https://rpgmakerunion.ru/thread/mvmz-ramzapretitlesplash-phileas-mod.523](https://rpgmakerunion.ru/thread/vx-ace-fiks-skripta-myshi.297)) | [Тема](https://forums.rpgmakerweb.com/index.php?threads/super-simple-mouse-script.16520/) |
 | **CSCA Toast Manager (Phileas mod)** | Всплывающие уведомления  | [Core](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/scripts/csca_core.rb); [VX Ace](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/scripts/csca_toast_manager.rb) | [Тема](https://rpgmakerunion.ru/thread/vx-ace-csca-toast-manager-remeyk.298) | [Тема](https://www.rpgmakercentral.com/topic/13960-csca-toast-manager/) |
