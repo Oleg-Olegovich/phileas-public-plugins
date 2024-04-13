@@ -1,6 +1,7 @@
 # Phileas's plugins
 
 Some of the plugins for MZ can work on MV. But I haven't tested it. Write to [me](https://t.me/olekolegovich) if you need a separate version for MV.
+[All contacts are here](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/README.md).
 
 #### Input
 | Name | Description | Code | Forum |
