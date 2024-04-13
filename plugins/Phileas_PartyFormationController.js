@@ -185,7 +185,7 @@
             && lockedPositions.includes(this.index() + 1) === true) {
             
             SoundManager.playBuzzer();
-            return;
+            return false;
         }
     
         return Origin_isCurrentItemEnabled.call(this);
