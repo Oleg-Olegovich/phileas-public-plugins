@@ -1,6 +1,6 @@
 # Плагины Phileas`а
 
-Некоторые из плагинов для MZ могут работать на MV. Но я не тестировал это. Пишите [мне](https://t.me/olekolegovich), если вам нужна отдельная версия для MV.
+Некоторые из плагинов для MZ могут работать на MV. Но я не тестировал это. Пишите [мне](https://t.me/olekolegovich), если вам нужна отдельная версия для MV.  
 [Все контакты тут](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/README.md).
 
 #### Ввод
