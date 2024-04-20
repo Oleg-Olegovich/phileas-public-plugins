@@ -7,6 +7,7 @@
 // 2023.July.07 Ver1.1.1 Fix
 // 2023.July.18 Ver1.2.0 Added image display.
 // 2023.December.16 Ver1.2.1 Fixed checking the player's direction.
+// 2024.April.20 Ver1.2.2 Fixed event command.
 
 /*:
  * @target MZ

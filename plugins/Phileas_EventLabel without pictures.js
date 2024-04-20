@@ -5,6 +5,7 @@
 // 2023.July.05 Ver1.0.0 First Release
 // 2023.July.07 Ver1.1.0 Added a player label and hiding invisible event labels
 // 2023.July.07 Ver1.1.1 Fix
+// 2024.April.20 Ver1.1.2 Fixed event command.
 
 /*:
  * @target MZ
