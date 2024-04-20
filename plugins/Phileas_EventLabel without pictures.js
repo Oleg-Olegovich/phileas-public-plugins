@@ -80,7 +80,7 @@
  * @text Text
  * @type string
  * @desc Input text. If you input an empty line, the label will not be displayed. It can be used to hide a label.
- * @default String
+ * @default <LabelText:text>
  *
  * @command setPlayerLabelText
  * @text Set the player label text
@@ -89,7 +89,7 @@
  * @text Text
  * @type string
  * @desc Input text. If you input an empty line, the label will not be displayed. It can be used to hide a label.
- * @default String
+ * @default <LabelText:text>
  *
  * @command showPlayerLabel
  * @text Show the player label
