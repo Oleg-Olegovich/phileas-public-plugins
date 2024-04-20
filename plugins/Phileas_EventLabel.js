@@ -470,7 +470,7 @@
     function setPhileasEventLabelText(params) {
         let scene = SceneManager._scene;
         let eventId = Number(params["eventId"]);
-        if (!(scene instanceof Scene_Map) || eventId < 1 || eventId > $gameMap.events().length) {
+        if (!(scene instanceof Scene_Map) || eventId < 1) {
             return;
         }
         
