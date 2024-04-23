@@ -38,6 +38,7 @@ Some of the plugins for MZ can work on MV. But I haven't tested it. Write to [me
 #### Others
 | Name | Description | Code | Forum |
 | --- | --- | --- | --- |
+| **Phileas's Custom Fonts** | Assigns custom fonts to custom font families | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_CustomFonts.js) | [Thread](https://forums.rpgmakerweb.com/index.php?threads/mz-phileass-custom-fonts.167944/) |
 | **Phileas's Pictures Collision** | Determining the collision (intersection) of images | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_PicturesCollision.js) | [Thread](https://forums.rpgmakerweb.com/index.php?threads/phileass-pictures-collision.166705/) |
 
 #### Modifications of other author's plugins
