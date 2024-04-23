@@ -9,6 +9,7 @@
 // 2023.December.16 Ver1.2.1 Fixed checking the player's direction.
 // 2024.April.20 Ver1.2.2 Fixed event command.
 // 2024.April.20 Ver1.2.3 Added saving settings from commands.
+// 2024.April.20 Ver1.2.4 Custom line spacing.
 
 /*:
  * @target MZ
@@ -34,6 +35,13 @@
  * @type number
  * @default 26
  * @desc Applies if the parameter is not specified via the tag.
+ * 
+ * @param Default line spacing
+ * @type number
+ * @default 0
+ * @min -1000
+ * @max 1000
+ * @desc Allows to decrease or increase the height of the line
  *
  * @param Default distance
  * @type number
@@ -117,6 +125,7 @@
  * There you can enter one or more of the following tags:
  * <LabelText:Name> - shows the label "Name". Standard engine control symbols are supported here (\C, \V, etc).
  * <LabelFontSize:26> - sets the font size for a specific label.
+ * <LabelLineSpacing:-10> - reduces or increases the line spacing.
  * <LabelImage:Actor1> - displays the picture "Actor1.png".
  * <LabelImagePositionLeft:yes> - if "yes", the image will be displayed to the left of the label text.
  * <LabelXOffset:0> - sets the horizontal offset for a specific label.
@@ -176,6 +185,14 @@
  * @type number
  * @default 26
  * @desc Применяется если параметр не задан тегом.
+ * 
+ * @param Default line spacing
+ * @text Межстрочный интервал по умолчанию
+ * @type number
+ * @default 0
+ * @min -1000
+ * @max 1000
+ * @desc Позволяет уменьшить или увеличить высоту строки
  *
  * @param Default distance
  * @text Расстояние по умолчанию
@@ -265,6 +282,7 @@
  * Там вы можете ввести один или больше из следующих тегов:
  * <LabelText:Name> - показывает надпись "Name". Здесь поддерживаются стандартные символы управления движка (\C, \V и т.д.).
  * <LabelFontSize:26> - устанавливает размер шрифта для конкретной надписи.
+ * <LabelLineSpacing:-10> - уменьшает или увеличивает междустрочный интервал.
  * <LabelImage:Actor1> - показывает картинку "Actor1.png".
  * <LabelImagePositionLeft:yes> - если "yes", картинка будет показана слева от текста надписи.
  * <LabelXOffset:0> - указывает горизонтальное смещение для конкретной надписи.
@@ -314,13 +332,14 @@
         PhileasEventLabelSettings.defaultXOffset = parameters["Default x offset"] || 0;
         PhileasEventLabelSettings.defaultYOffset = parameters["Default y offset"] || 25;
         PhileasEventLabelSettings.defaultFontSize = parameters["Default font size"] || 26;
+        PhileasEventLabelSettings.defaultLineSpacing = parameters["Default line spacing"] || 0;
         PhileasEventLabelSettings.defaultDistance = parameters["Default distance"] || 500;
         PhileasEventLabelSettings.defaultCheckDirection = (parameters["Default check direction"] || "false") == "true";
         PhileasEventLabelSettings.minWidth = parameters["Minimum width"] || 130;
         PhileasEventLabelSettings.defaultPlayerLabel = parameters["Default player label"] || "";
         PhileasEventLabelSettings.hideInvisibleCharacterLabel = (parameters["Hide the invisible character label"] || "true") == "true";
         PhileasEventLabelSettings.defaultPicturePositionIsLeft = (parameters["Default picture position is on the left"] || "true") == "true";
-        PhileasEventLabelSettings.tags = ["LabelText", "LabelFontSize", "LabelXOffset", "LabelYOffset", "LabelDistance", "LabelCheckDirection", "LabelHideInvisible", "LabelImage", "LabelImagePositionLeft"];
+        PhileasEventLabelSettings.tags = ["LabelText", "LabelFontSize", "LabelLineSpacing", "LabelXOffset", "LabelYOffset", "LabelDistance", "LabelCheckDirection", "LabelHideInvisible", "LabelImage", "LabelImagePositionLeft"];
         
         var playerLabelWindow = null;
     
@@ -334,6 +353,7 @@
             this.LabelXOffset = PhileasEventLabelSettings.defaultXOffset;
             this.LabelYOffset = PhileasEventLabelSettings.defaultYOffset;
             this.LabelFontSize = PhileasEventLabelSettings.defaultFontSize;
+            this.LabelLineSpacing = PhileasEventLabelSettings.defaultLineSpacing;
             this.LabelDistance = PhileasEventLabelSettings.defaultDistance;
             this.LabelCheckDirection = PhileasEventLabelSettings.defaultCheckDirection;
             this.LabelHideInvisible = PhileasEventLabelSettings.hideInvisibleCharacterLabel;
@@ -365,7 +385,7 @@
         };
         
         Window_PhileasEventLabel.prototype.lineHeight = function() {
-            return this.phileasEventLabelData.LabelFontSize;
+            return Window_Base.prototype.lineHeight.call(this) + this.phileasEventLabelData.LabelLineSpacing;
         };
         
         function getMeta(data) {
@@ -401,6 +421,7 @@
             }
             
             this.phileasEventLabelData.LabelFontSize = Number(this.phileasEventLabelData.LabelFontSize);
+            this.phileasEventLabelData.LabelLineSpacing = Number(this.phileasEventLabelData.LabelLineSpacing);
             this.phileasEventLabelData.LabelXOffset = Number(this.phileasEventLabelData.LabelXOffset);
             this.phileasEventLabelData.LabelYOffset = Number(this.phileasEventLabelData.LabelYOffset);
             this.phileasEventLabelData.LabelDistance = Number(this.phileasEventLabelData.LabelDistance);
@@ -733,4 +754,4 @@
             playerLabelText = contents.phileasPlayerLabelText || null;
             commandEventLabels = contents.phileasCommandEventLabels || {};
         };
-    }());
+}());
