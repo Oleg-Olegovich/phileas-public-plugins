@@ -40,6 +40,7 @@
 | --- | --- | --- | --- |
 | **Phileas's Custom Fonts** | Назначение кастомных шрифтов кастомным семействам шрифтов | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_CustomFonts.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-custom-fonts.746) |
 | **Phileas's Pictures Collision** | Определение коллизии (пересечения) картинок | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_PicturesCollision.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-pictures-collision.683) |
+| **Phileas's Picture Outline** | Чёткие обводки картинок | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_PictureOutline.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-picture-outline.767) |
 
 #### Модификации чужих плагинов
 | Название | Описание | Код | Форум | Оригинал |
