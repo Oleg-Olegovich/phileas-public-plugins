@@ -4,7 +4,7 @@
 // [Update History]
 // 2024.January.30 Ver1.0.0 First Release
 // 2024.May.01 Ver1.0.1 Fixed keyboard input
-// 2024.May.01 Ver1.0.2 Improved keyboard input
+// 2024.May.05 Ver1.0.2 Improved keyboard input
 
 /*:
  * @target MZ
