@@ -118,6 +118,12 @@
  * @type number
  * @min 1
  * @default 1 
+ *
+ * @arg thickness
+ * @text Толщина
+ * @type number
+ * @min 1
+ * @default 4
  * 
  * @arg color
  * @text Цвет
@@ -143,6 +149,12 @@
  * @type number[]
  * @min 1
  * @default 1 
+ *
+ * @arg thickness
+ * @text Толщина
+ * @type number
+ * @min 1
+ * @default 4
  * 
  * @arg color
  * @text Цвет
@@ -157,6 +169,7 @@
  * @type number[]
  * @min 1
  * @default 1 
+ *
  * 
  * @command eraseAll
  * @text Удалить все обводки
@@ -347,4 +360,3 @@
     /*# sourceMappingURL=pixi-filters.js.map*/
 
 }());
-    
