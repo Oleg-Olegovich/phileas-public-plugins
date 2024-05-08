@@ -4,6 +4,7 @@
 // [Update History]
 // 2024.May.04 Ver1.0.0 First Release
 // 2024.May.05 Ver1.0.1 Fixed pixi compatibility
+// 2024.May.05 Ver1.1.0 Faces and saves
 
 /*:
  * @target MZ
@@ -75,6 +76,26 @@
  * @command eraseAll
  * @text Erase all outlines
  * @desc 
+ * 
+ * 
+ * @command setFace
+ * @text Set faces outline
+ * @desc 
+ * 
+ * @arg thickness
+ * @text Thickness
+ * @type number
+ * @min 1
+ * @default 4
+ * 
+ * @arg color
+ * @text Color
+ * @default 0xffffff
+ * 
+ * 
+ * @command eraseFace
+ * @text Erase faces outline
+ * @desc 
  *
  * 
  * @help
@@ -88,6 +109,8 @@
  * - "Set several outlines"
  * - "Erase several outlines"
  * - "Erase all outlines"
+ * - "Set faces outline"
+ * - "Erase faces outline"
  * 
  * You can always write to the author if you need other features or even plugins.
  * Boosty: https://boosty.to/phileas
@@ -118,6 +141,12 @@
  * @type number
  * @min 1
  * @default 1 
+ *
+ * @arg thickness
+ * @text Толщина
+ * @type number
+ * @min 1
+ * @default 4
  * 
  * @arg color
  * @text Цвет
@@ -143,6 +172,12 @@
  * @type number[]
  * @min 1
  * @default 1 
+ *
+ * @arg thickness
+ * @text Толщина
+ * @type number
+ * @min 1
+ * @default 4
  * 
  * @arg color
  * @text Цвет
@@ -157,9 +192,30 @@
  * @type number[]
  * @min 1
  * @default 1 
+ *
  * 
  * @command eraseAll
  * @text Удалить все обводки
+ * @desc 
+ * 
+ * 
+ * @command setFace
+ * @text Установить обводку лиц
+ * @desc 
+ * 
+ * @arg thickness
+ * @text Толщина
+ * @type number
+ * @min 1
+ * @default 4
+ * 
+ * @arg color
+ * @text Цвет
+ * @default 0xffffff
+ * 
+ * 
+ * @command eraseFace
+ * @text Удалить обводку лиц
  * @desc 
  *
  * 
@@ -174,6 +230,8 @@
  * - "Установить несколько обводок"
  * - "Удалить несколько обводок"
  * - "Удалить все обводки"
+ * - "Установить обводку лиц"
+ * - "Удалить обводку лиц"
  *
  * Вы всегда можете написать автору, если вам нужны другие функции или даже плагины.
  * Boosty: https://boosty.to/phileas
@@ -201,17 +259,65 @@
     PluginManager.registerCommand("Phileas_PictureOutline", "setSeveral", setSeveral);
     PluginManager.registerCommand("Phileas_PictureOutline", "eraseSeveral", eraseSeveral);
     PluginManager.registerCommand("Phileas_PictureOutline", "eraseAll", eraseAll);
+    PluginManager.registerCommand("Phileas_PictureOutline", "setFace", setFace);
+    PluginManager.registerCommand("Phileas_PictureOutline", "eraseFace", eraseFace);
 
     var phileasOutlineFilters = [];
+    var phileasFaceFilter = null;
     
 //-----------------------------------------------------------------------------
 // My code
     
-    function createFilter(params, pictureNumbers) {
+    function saveFilterData(filter) {
+        let data = {};
+        data.thickness = filter.thickness;
+        data.color = filter.color;
+        return data;
+    }
+
+    function savePhileasFilterData(filter) {
+        let data = saveFilterData(filter);
+        data.phileasPictureNumbers = filter.phileasPictureNumbers;
+        return data;
+    }
+
+    function savePictureFiltersData() {
+        let data = [];
+        for (let i = 0; i < phileasOutlineFilters.length; ++i) {
+            data.push(savePhileasFilterData(phileasOutlineFilters[i]));
+        }
+
+        return data;
+    }
+
+    function loadFilterData(data) {
+        const thickness = data.thickness;
+        const color = data.color;
+        return new PIXI.filters.OutlineFilter(thickness, color);
+    }
+
+    function loadPhileasFilterData(data) {
+        let filter = loadFilterData(data);
+        filter.phileasPictureOutline = true;
+        filter.phileasPictureNumbers = data.phileasPictureNumbers;
+        phileasOutlineFilters.push(filter);
+        return filter;
+    }
+
+    function loadPictureFiltersData(data) {
+        for (let i = 0; i < data.length; ++i) {
+            loadPhileasFilterData(data[i]);
+        }
+    }
+
+    function createFilter(params) {
         const thickness = Number(params["thickness"]);
         const color = Number(params["color"]);
+        return new PIXI.filters.OutlineFilter(thickness, color);
+    }
 
-        const filter = new PIXI.filters.OutlineFilter(thickness, color);
+    function createPhileasFilter(params, pictureNumbers) {
+        const filter = createFilter(params);
         filter.phileasPictureOutline = true;
         filter.phileasPictureNumbers = pictureNumbers;
 
@@ -242,7 +348,7 @@
     
     function set(params) {
         const pictureNumbers = [Number(params["pictureNumber"])];
-        createFilter(params, pictureNumbers);
+        createPhileasFilter(params, pictureNumbers);
     }
 
     function erase(params) {
@@ -256,7 +362,7 @@
             pictureNumbers[i] = Number(pictureNumbers[i]);
         }
 
-        createFilter(params, pictureNumbers);
+        createPhileasFilter(params, pictureNumbers);
     }
     
     function eraseSeveral(params) {
@@ -282,6 +388,14 @@
             arr = arr.filter(item => item.phileasPictureOutline !== true);
             targets[j].filters = arr;
         }
+    }
+
+    function setFace(params) {
+        phileasFaceFilter = createFilter(params);
+    }
+
+    function eraseFace() {
+        phileasFaceFilter = null;
     }
     
     Scene_Base.prototype.getTargets = function(targetIds) {
@@ -328,6 +442,50 @@
     Scene_Battle.prototype.update = function() {
         Origin_update.call(this);
         this.updateOutlines();
+    };
+
+    const Origin_loadFace = ImageManager.loadFace;
+    ImageManager.loadFace = function(filename) {
+        const faceBitmap = Origin_loadFace.call(this, filename);
+        if (phileasFaceFilter == null) {
+            return faceBitmap;
+        }
+
+        const sprite = new Sprite(faceBitmap);
+        sprite.filters = [phileasFaceFilter];
+
+        const renderTexture = PIXI.RenderTexture.create({ width: sprite.width, height: sprite.height });
+        Graphics.app.renderer.render(sprite, renderTexture);
+
+        const newBitmap = new Bitmap(sprite.width, sprite.height);
+        const canvas = Graphics.app.renderer.extract.canvas(renderTexture);
+        newBitmap.context.drawImage(canvas, 0, 0);
+        newBitmap.baseTexture.update();
+
+        return newBitmap;
+    };
+
+    const Origin_makeSaveContents = DataManager.makeSaveContents;
+    DataManager.makeSaveContents = function() {
+        let contents = Origin_makeSaveContents.call(this);
+        contents.phileasOutlinePictureFilters = savePictureFiltersData();
+        if (phileasFaceFilter != null) {
+            contents.phileasOutlineFacePicture = saveFilterData(phileasFaceFilter);
+        }
+
+        return contents;
+    };
+    
+    const Origin_extractSaveContents = DataManager.extractSaveContents;
+    DataManager.extractSaveContents = function(contents) {
+        Origin_extractSaveContents.call(this, contents);
+        if (contents.phileasOutlinePictureFilters != undefined) {
+            loadPictureFiltersData(contents.phileasOutlinePictureFilters);
+        }
+
+        if (contents.phileasOutlineFacePicture != undefined) {
+            phileasFaceFilter = loadFilterData(contents.phileasOutlineFacePicture);
+        }
     };
 
 //-----------------------------------------------------------------------------
