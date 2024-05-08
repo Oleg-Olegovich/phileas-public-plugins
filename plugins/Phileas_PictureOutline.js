@@ -505,4 +505,3 @@
     /*# sourceMappingURL=pixi-filters.js.map*/
 
 }());
-    
