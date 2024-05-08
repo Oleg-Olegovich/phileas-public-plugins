@@ -10,6 +10,7 @@
 // 2023.Oct.06 Ver1.3.0 Added window state option
 // 2023.November.22 Ver1.3.0 Fixed arrow keys
 // 2024.January.29 Ver1.3.2 Fixed compatibility with PKD_ExtendedLoot
+// 2024.May.8 Ver1.3.3 Switch labels
 
 /*
 Title: Phileas_OptionsManager
@@ -228,6 +229,14 @@ E-mail: olek.olegovich@gmail.com
  * @type switch
  * @desc If the option should control the switch, select it here. Otherwise, do not assign a switch to the option in any case.
  * 
+ * @param switchOnText
+ * @text Switch On Label
+ * @desc Leave the field empty for the default value.
+ * 
+ * @param switchOffText
+ * @text Switch Off Label
+ * @desc Leave the field empty for the default value.
+ * 
  * @param Option variable
  * @type variable
  * @desc If the option should control the variable, select it here.
@@ -271,6 +280,14 @@ E-mail: olek.olegovich@gmail.com
  * @type switch
  * @desc Если опция должна управлять переключателем, выберите его здесь. Иначе ни в коем случае не назначайте переключатель для этой опции.
  * 
+ * @param switchOnText
+ * @text Переключатель включён
+ * @desc Надпись состояния. Оставьте поле пустым для значения по умолчанию.
+ * 
+ * @param switchOffText
+ * @text Переключателя выключен
+ * @desc Надпись состояния. Оставьте поле пустым для значения по умолчанию.
+ * 
  * @param Option variable
  * @text Переменная опции
  * @type variable
@@ -289,7 +306,7 @@ E-mail: olek.olegovich@gmail.com
  * @default 100
  *
  * @param Variable offset
- * @text Название опции
+ * @text Измененеи переменной
  * @type number
  * @desc Если опция управляет переменной. Значение, на которое изменяется переменная за один клик.
  * @default 20
@@ -606,13 +623,15 @@ E-mail: olek.olegovich@gmail.com
             let tag = "phileasCustomOption" + i;
             let isSwitchOption = opt["Option switch"] != "" && opt["Option switch"] != "0";
             opt["Option switch"] = Number(opt["Option switch"]);
+            opt["switchOnText"] = opt["switchOnText"] || "";
+            opt["switchOffText"] = opt["switchOffText"] || "";
             opt["Option variable"] = Number(opt["Option variable"]);
             opt["Variable min value"] = Number(opt["Variable min value"]);
             opt["Variable max value"] = Number(opt["Variable max value"]);
             opt["Variable offset"] = Number(opt["Variable offset"]);
             if (isSwitchOption) {
                 tag += "Switch";
-                dict[tag] = [true, opt["Option switch"]];
+                dict[tag] = [true, opt["Option switch"], opt["switchOnText"], opt["switchOffText"]];
             }
             else {
                 tag += "Volume";
@@ -811,11 +830,24 @@ E-mail: olek.olegovich@gmail.com
         }
         
         const value = this.getConfigValue(symbol);
+        let opt = customOptions[symbol];
+
         if (this.isVolumeSymbol(symbol)) {
-            let opt = customOptions[symbol];
             return opt != undefined ? value + opt[5] : this.volumeStatusText(value);
         }
-        
+
+        if (opt == undefined) {
+            return this.booleanStatusText(value);
+        }
+
+        if (value && opt[2] != "") {
+            return opt[2];
+        }
+
+        if (!value && opt[3] != "") {
+            return opt[3];
+        }
+
         return this.booleanStatusText(value);
     };
     
