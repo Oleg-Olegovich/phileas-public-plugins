@@ -5,6 +5,7 @@
 // 2024.May.04 Ver1.0.0 First Release
 // 2024.May.05 Ver1.0.1 Fixed pixi compatibility
 // 2024.May.05 Ver1.1.0 Faces and saves
+// 2024.May.05 Ver1.1.1 Prettier faces
 
 /*:
  * @target MZ
@@ -397,6 +398,27 @@
     function eraseFace() {
         phileasFaceFilter = null;
     }
+
+    function addBitmapOutline(faceBitmap) {
+        const sprite = new Sprite(faceBitmap);
+        sprite.filters = [phileasFaceFilter];
+
+        const renderTexture = PIXI.RenderTexture.create({ width: sprite.width, height: sprite.height });
+        Graphics.app.renderer.render(sprite, renderTexture);
+
+        const newBitmap = new Bitmap(sprite.width, sprite.height);
+        const canvas = Graphics.app.renderer.extract.canvas(renderTexture);
+        newBitmap.context.drawImage(canvas, 0, 0);
+        newBitmap.baseTexture.update();
+
+        return newBitmap;
+    }
+
+    function processFaceBitmap(bitmap, sx, sy, sw, sh) {
+        let newBitmap = new Bitmap(sw, sh);
+        newBitmap.blt(bitmap, sx, sy, sw, sh, 0, 0);
+        return addBitmapOutline(newBitmap);
+    }
     
     Scene_Base.prototype.getTargets = function(targetIds) {
         const targets = [];
@@ -444,25 +466,25 @@
         this.updateOutlines();
     };
 
-    const Origin_loadFace = ImageManager.loadFace;
-    ImageManager.loadFace = function(filename) {
-        const faceBitmap = Origin_loadFace.call(this, filename);
-        if (phileasFaceFilter == null) {
-            return faceBitmap;
+    Window_Base.prototype.drawFace = function(faceName, faceIndex, x, y, width, height) {
+        width = width || ImageManager.faceWidth;
+        height = height || ImageManager.faceHeight;
+        let bitmap = ImageManager.loadFace(faceName);
+        const pw = ImageManager.faceWidth;
+        const ph = ImageManager.faceHeight;
+        const sw = Math.min(width, pw);
+        const sh = Math.min(height, ph);
+        const dx = Math.floor(x + Math.max(width - pw, 0) / 2);
+        const dy = Math.floor(y + Math.max(height - ph, 0) / 2);
+        let sx = Math.floor((faceIndex % 4) * pw + (pw - sw) / 2);
+        let sy = Math.floor(Math.floor(faceIndex / 4) * ph + (ph - sh) / 2);
+
+        if (phileasFaceFilter != null) {
+            bitmap = processFaceBitmap(bitmap, sx, sy, sw, sh);
+            sx = sy = 0;
         }
 
-        const sprite = new Sprite(faceBitmap);
-        sprite.filters = [phileasFaceFilter];
-
-        const renderTexture = PIXI.RenderTexture.create({ width: sprite.width, height: sprite.height });
-        Graphics.app.renderer.render(sprite, renderTexture);
-
-        const newBitmap = new Bitmap(sprite.width, sprite.height);
-        const canvas = Graphics.app.renderer.extract.canvas(renderTexture);
-        newBitmap.context.drawImage(canvas, 0, 0);
-        newBitmap.baseTexture.update();
-
-        return newBitmap;
+        this.contents.blt(bitmap, sx, sy, sw, sh, dx, dy);
     };
 
     const Origin_makeSaveContents = DataManager.makeSaveContents;
@@ -505,3 +527,4 @@
     /*# sourceMappingURL=pixi-filters.js.map*/
 
 }());
+    
