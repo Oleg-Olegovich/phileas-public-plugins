@@ -10,6 +10,7 @@
 // 2024.March.16 Ver1.3.0 Offset, battle cursor, menu cursor, click picture, animation
 // 2024.March.18 Ver1.3.1 Preloading, optimization
 // 2024.March.19 Ver1.3.2 Optimization
+// 2024.May.11 Ver1.3.3 Turning event cursors on/off
 
 /*:
  * @target MZ
@@ -153,6 +154,14 @@
  * @arg cursorEventData
  * @text Configuration
  * @type struct<CursorEventDataStruct>
+ * 
+ * @command disableEventCursors
+ * @text Disable event cursors
+ * @desc The cursor configuration for the event will not be applied, it includes graphics and click/hover.
+ *
+ * @command enableEventCursors
+ * @text Enable event cursors
+ * @desc The cursor configuration for the event will be applied, includes graphics and click/hover.
  *
  * 
  * @help
@@ -458,6 +467,14 @@
  * @arg cursorEventData
  * @text Настройки
  * @type struct<CursorEventDataStruct>
+ * 
+ * @command disableEventCursors
+ * @text Отключить курсоры событий
+ * @desc Конфигурация курсора для события не будет применяться, включает графику и клик/наведение.
+ *
+ * @command enableEventCursors
+ * @text Включить курсоры событий
+ * @desc Конфигурация курсора для события будет применяться, включает графику и клик/наведение.
  *
  * 
  * @help
@@ -760,8 +777,6 @@
 // Data
 
     const base_url = "./img/system/";
-    const x_offset = 0;
-    const y_offset = 0;
     const fallbackStyle = "pointer";
     const phileasMouseKeyMap = {
         "left": 0,
@@ -788,6 +803,7 @@
     battleCursor.setFromParams(parameters["battleCursor"]);
     var menuCursor = new PhileasCursorData();
     menuCursor.setFromParams(parameters["menuCursor"]);
+    var eventCursorsEnabled = true;
     var currentHidden = false;
     var currentClick = false;
     var lastFrameIncrementTime = 0; // milliseconds
@@ -808,6 +824,8 @@
     PluginManager.registerCommand("Phileas_Cursor", "show", show);
     PluginManager.registerCommand("Phileas_Cursor", "setEventCursorData", setEventCursorData);
     PluginManager.registerCommand("Phileas_Cursor", "setGlobalEventCursorData", setGlobalEventCursorData);
+    PluginManager.registerCommand("Phileas_Cursor", "disableEventCursors", disableEventCursors);
+    PluginManager.registerCommand("Phileas_Cursor", "enableEventCursors", enableEventCursors);
     
     // key - mapId, value = dictionary<eventId, PhileasEventCursorData>
     var phileasGlobalEventCursorData = {};
@@ -1064,6 +1082,14 @@
         const mapId = Number(params["mapId"]);
         updateEventCursorData(mapId, params);
     }
+
+    function disableEventCursors() {
+        eventCursorsEnabled = false;
+    }
+
+    function enableEventCursors() {
+        eventCursorsEnabled = true;
+    }
     
     function switchHide() {
         if (currentHidden) {
@@ -1157,6 +1183,10 @@
     };
     
     Scene_Map.prototype.phileasCheckEventCursors = function(x, y) {
+        if (!eventCursorsEnabled) {
+            return;
+        }
+
         const mapX = $gameMap.canvasToMapX(x);
         const mapY = $gameMap.canvasToMapY(y);
         const events = $gameMap.eventsXy(mapX, mapY);
@@ -1224,6 +1254,7 @@
         contents.phileasBattleCursor = battleCursor;
         contents.phileasMenuCursor = menuCursor;
         contents.phileasCursorHidden = currentHidden;
+        contents.eventCursorsEnabled = eventCursorsEnabled;
         contents.phileasGlobalEventCursorData = phileasGlobalEventCursorData;
         return contents;
     };
@@ -1235,6 +1266,7 @@
         battleCursor = contents.phileasBattleCursor || new PhileasCursorData();
         menuCursor = contents.phileasMenuCursor || new PhileasCursorData();
         phileasGlobalEventCursorData = contents.phileasGlobalEventCursorData || {};
+        eventCursorsEnabled = contents.eventCursorsEnabled;
         changeCursorToBasic();
         if (contents.phileasCursorHidden || false) {
             hide();
