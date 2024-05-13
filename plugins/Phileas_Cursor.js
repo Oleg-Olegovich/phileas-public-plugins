@@ -1211,6 +1211,10 @@
     };
     
     TouchInput.phileasCheckClickEventCursors = function(x, y) {
+        if (!eventCursorsEnabled) {
+            return;
+        }
+
         const scene = SceneManager._scene;
 
         if (!(scene instanceof Scene_Map) || !scene.isActive() || $gameMessage.isBusy()) {
