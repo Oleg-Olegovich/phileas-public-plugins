@@ -11,6 +11,7 @@
 // 2024.March.18 Ver1.3.1 Preloading, optimization
 // 2024.March.19 Ver1.3.2 Optimization
 // 2024.May.11 Ver1.3.3 Turning event cursors on/off
+// 2024.May.13 Ver1.3.4 Fixed menu/battle cursor switch
 
 /*:
  * @target MZ
@@ -1009,15 +1010,15 @@
     }
 
     function setDefaultCursor(params) {
-        defaultCursor.setFromParams(params);
+        defaultCursor.setFromParams(params["cursorData"]);
     }
     
     function setBattleCursor(params) {
-        battleCursor.setFromParams(params);
+        battleCursor.setFromParams(params["cursorData"]);
     }
     
     function setMenuCursor(params) {
-        menuCursor.setFromParams(params);
+        menuCursor.setFromParams(params["cursorData"]);
     }
     
     function changeCursorToBasic() {
@@ -1085,6 +1086,7 @@
 
     function disableEventCursors() {
         eventCursorsEnabled = false;
+        changeCursorToBasic();
     }
 
     function enableEventCursors() {
@@ -1193,6 +1195,7 @@
 
         if (events.length === 0) {
             changeCursorToBasic();
+            return;
         }
         
         for (let i = 0; i < events.length; ++i) {
@@ -1331,4 +1334,22 @@
             Origin_CommonEventInitialize.call(commonEventId);
         };
     }
+
+    const Origin_battleStart = Scene_Battle.prototype.start;
+    Scene_Battle.prototype.start = function() {
+        Origin_battleStart.call(this);
+        changeCursorToBasic();
+    };
+
+    const Origin_menuStart = Scene_MenuBase.prototype.start;
+    Scene_MenuBase.prototype.start = function() {
+        Origin_menuStart.call(this);
+        changeCursorToBasic();
+    };
+
+    const Origin_mapStart = Scene_Map.prototype.start;
+    Scene_Map.prototype.start = function() {
+        Origin_mapStart.call(this);
+        changeCursorToBasic();
+    };
 }());
