@@ -12,6 +12,7 @@
 // 2024.March.19 Ver1.3.2 Optimization
 // 2024.May.11 Ver1.3.3 Turning event cursors on/off
 // 2024.May.13 Ver1.3.4 Fixed menu/battle cursor switch
+// 2024.May.28 Ver1.3.5 Fixed save loading
 
 /*:
  * @target MZ
@@ -681,18 +682,26 @@
     
     PhileasCursorData.prototype.constructor = PhileasCursorData;
     
-    PhileasCursorData.prototype.setFromParams = function(params) {
-        if (params == "") {
+    PhileasCursorData.prototype.setFromJson = function(params) {
+        if (params == undefined) {
             return;
         }
         
-        params = JSON.parse(params);
         this.CursorPicture = params["CursorPicture"] || "";
         this.CursorPictureOnClick = params["CursorPictureOnClick"] || "";
         this.CursorXOffset = Number(params["CursorXOffset"]);
         this.CursorYOffset = Number(params["CursorYOffset"]);
         this.CursorFramesNumber = Number(params["CursorFramesNumber"]);
         this.CursorClickFramesNumber = Number(params["CursorClickFramesNumber"]);
+    }
+
+    PhileasCursorData.prototype.setFromParams = function(params) {
+        if (params == "") {
+            return;
+        }
+        
+        params = JSON.parse(params);
+        this.setFromJson(params);
     }
     
     PhileasCursorData.prototype.equals = function(cursorData) {
@@ -742,12 +751,11 @@
         this.CursorStartOnHover = this.CursorStartOnHover != undefined;
     };
     
-    PhileasEventCursorData.prototype.setFromParams = function(params) {
-        if (params == "") {
+    PhileasEventCursorData.prototype.setFromJson = function(params) {
+        if (params == undefined) {
             return;
         }
         
-        params = JSON.parse(params);
         this.CursorPicture = params["CursorPicture"] || "";
         this.CursorPictureOnClick = params["CursorPictureOnClick"] || "";
         this.CursorXOffset = Number(params["CursorXOffset"]);
@@ -756,6 +764,15 @@
         this.CursorClickFramesNumber = Number(params["CursorClickFramesNumber"]);
         this.CursorStartOnClick = params["CursorStartOnClick"] == "true";
         this.CursorStartOnHover = params["CursorStartOnHover"] == "true";
+    }
+
+    PhileasEventCursorData.prototype.setFromParams = function(params) {
+        if (params == "") {
+            return;
+        }
+        
+        params = JSON.parse(params);
+        this.setFromJson(params);
     }
     
     PhileasEventCursorData.prototype.equals = function(cursorData) {
@@ -1269,10 +1286,27 @@
     const Origin_extractSaveContents = DataManager.extractSaveContents;
     DataManager.extractSaveContents = function(contents) {
         Origin_extractSaveContents.call(this, contents);
-        defaultCursor = contents.phileasDefaultCursor || new PhileasCursorData();
-        battleCursor = contents.phileasBattleCursor || new PhileasCursorData();
-        menuCursor = contents.phileasMenuCursor || new PhileasCursorData();
-        phileasGlobalEventCursorData = contents.phileasGlobalEventCursorData || {};
+        defaultCursor = new PhileasCursorData();
+        defaultCursor.setFromJson(contents.phileasDefaultCursor);
+        battleCursor = new PhileasCursorData();
+        battleCursor.setFromJson(contents.phileasBattleCursor);
+        menuCursor = new PhileasCursorData();
+        menuCursor.setFromJson(contents.phileasMenuCursor);
+        phileasGlobalEventCursorData = {};
+        const data = contents.phileasGlobalEventCursorData || {};
+        for (const mapId in data) {
+            const localData = data[mapId];
+            for (const eventId in localData) {
+                var ecd = new PhileasEventCursorData();
+                ecd.setFromJson(localData[eventId]);
+                if (phileasGlobalEventCursorData[mapId] == undefined) {
+                    phileasGlobalEventCursorData[mapId] = {};
+                }
+                
+                phileasGlobalEventCursorData[mapId][eventId] = ecd;
+            }
+        }
+
         eventCursorsEnabled = contents.eventCursorsEnabled;
         changeCursorToBasic();
         if (contents.phileasCursorHidden || false) {
