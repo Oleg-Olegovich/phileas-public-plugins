@@ -57,8 +57,8 @@
  * @desc Если true, состояние инверсии будет восстаналиваться при загрузке сохранения.
  *
  * @command switchInversion
- * @text Switch the inversion
- * @desc Enables or disables movement inversion.
+ * @text Переключить инверсию
+ * @desc Включает или выключает инверсию.
  *
  * @arg horizontalInversion
  * @text Horizontal inversion
