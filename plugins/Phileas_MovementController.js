@@ -88,7 +88,7 @@
  
 /*:ru
  * @target MZ
- * @plugindesc Запретить движение чаракта игрока
+ * @plugindesc Контроль движения игрока и событий
  * @author Phileas
  *
  * @param playerMovementSwitch
