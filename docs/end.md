@@ -41,6 +41,8 @@ Some of the plugins for MZ can work on MV. But I haven't tested it. Write to [me
 | **Phileas's Picture Outline** | Clear picture outlines | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_PictureOutline.js) | [Thread](https://forums.rpgmakerweb.com/index.php?threads/mz-phileass-picture-outline-clear-picture-outlines.168355/) |
 
 #### Obsolete
+| Name | Description | Code | Forum |
+| --- | --- | --- | --- |
 | **Phileas's Fullscreen Option** | Fullscreen in the Options Menu (, the functionality has been significantly expanded in the **Phileas's Options Manager**) | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_FullscreenOption.js) | [Thread](https://forums.rpgmakerweb.com/index.php?threads/phileass-fullscreen-option-mz-fullscreen-toggle-option.158532/) |
 | **Phileas's Player Immobilizer** | Player movement control (stopping movement by command or switch) | [MV](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_PlayerImmobilizer_MV.js)<br/> [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_PlayerImmobilizer.js) | [Thread](https://forums.rpgmakerweb.com/index.php?threads/mz-phileass-player-immobilizer-mz-player-movement-manager-controller.158533/) |
 | **Phileas's Player Movement Inversion** | Inversion of the player's movement | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_PlayerMovementInversion.js) | [Thread](https://forums.rpgmakerweb.com/index.php?threads/phileass-player-movement-inversion-mz-player-movement-manager-controller.160218/) |
