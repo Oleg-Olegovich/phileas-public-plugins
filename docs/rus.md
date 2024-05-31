@@ -8,8 +8,7 @@
 | --- | --- | --- | --- |
 | **Phileas's Cursor** | Плагин курсора (мыши, указателя) | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_Cursor.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-cursor.377) |
 | **Phileas's Game Hot Keys** | Горячие клавиши: назначение общих событий и переключателей на клавиши клавиатуры, геймпада и мыши | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_GameHotKeys.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-game-hot-keys.327) |
-| **Phileas's Player Immobilizer** | Управление движением игрока (прекращение движения по команде или переключателю) | [MV](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_PlayerImmobilizer_MV.js)<br/> [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_PlayerImmobilizer.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-player-immobilizer.301) |
-| **Phileas's Player Movement Inversion** | Инверсия движения игрока | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_PlayerMovementInversion.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-player-movement-inversion.356) |
+| **Phileas's Movement Controller** | Контроль движения игрока и событий | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_MovementController.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-movement-controller.809) |
 | **Phileas's Pointer Picture Trigger** | Триггер переключателя/общего события при действиях указателя с картинкой | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_PointerPictureTrigger.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-pointer-picture-trigger.508) |
 | **Phileas's Update Pointer Position** | Запись текущего положения указателя (курсора) в переменные | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_UpdatePointerPosition.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-update-pointer-position.343) |
 
@@ -22,7 +21,6 @@
 #### Меню
 | Название | Описание | Код | Форум |
 | --- | --- | --- | --- |
-| **Phileas's Fullscreen Option** | Полный экран в меню настроек (морально устарел, функционал значительно расширен в "Кастомизации меню опций") | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_FullscreenOption.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-fullscreen-option.296) |
 | **Phileas's Name Input Window Rect Settings** | Настройка окна ввода имени | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_NameInputWindowRectSettings.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-name-input-window-rect-settings.351) |
 | **Phileas's Options Manager** | Кастомизация меню опций | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_OptionsManager.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-options-manager.333) |
 | **Phileas's Party Formation Controller** | Управление перестановкой героев | [MV](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_PartyFormationController_MV.js)<br/> [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_PartyFormationController.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-party-formation-controller.727) |
@@ -41,6 +39,13 @@
 | **Phileas's Custom Fonts** | Назначение кастомных шрифтов кастомным семействам шрифтов | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_CustomFonts.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-custom-fonts.746) |
 | **Phileas's Pictures Collision** | Определение коллизии (пересечения) картинок | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_PicturesCollision.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-pictures-collision.683) |
 | **Phileas's Picture Outline** | Чёткие обводки картинок | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_PictureOutline.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-picture-outline.767) |
+
+#### Устаревшее
+| Название | Описание | Код | Форум |
+| --- | --- | --- | --- |
+| **Phileas's Fullscreen Option** | Полный экран в меню настроек (функционал значительно расширен в Phileas's Options Manager"Кастомизации меню опций") | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_FullscreenOption.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-fullscreen-option.296) |
+| **Phileas's Player Immobilizer** | Управление движением игрока (функционал расширен в Phileas's Movement Controller) | [MV](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_PlayerImmobilizer_MV.js)<br/> [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_PlayerImmobilizer.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-player-immobilizer.301) |
+| **Phileas's Player Movement Inversion** | Инверсия движения игрока (функционал расширен в Phileas's Movement Controller) | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_PlayerMovementInversion.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-player-movement-inversion.356) |
 
 #### Модификации чужих плагинов
 | Название | Описание | Код | Форум | Оригинал |
