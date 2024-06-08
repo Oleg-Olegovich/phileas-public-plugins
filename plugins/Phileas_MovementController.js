@@ -3,19 +3,20 @@
 //=============================================================================
 // [Update History]
 // 2024.May.30 Ver1.0.0 First Release
+// 2024.May.30 Ver1.0.1 Fixed switch parameters
 
 /*:
  * @target MZ
  * @plugindesc Controls the movement of the player and events
  * @author Phileas
  *
- * @param playerplayerMovementSwitch
+ * @param playerMovementSwitch
  * @text Player movement switch
  * @type switch
  * @default 0
  * @desc If this switch is on, the player will not move.
  * 
- * @param eventsplayerMovementSwitch
+ * @param eventsMovementSwitch
  * @text Events movement switch
  * @type switch
  * @default 0
