@@ -5,13 +5,14 @@
 // 2023.December.12 Ver1.0.0 First Release
 // 2023.December.16 Ver1.1.0 Expanded functionality
 // 2024.June.18 Ver1.2.0 Added picture number variable
+// 2024.June.18 Ver1.3.0 Added global action
 
 /*
 Title: Phileas_PointerPictureTrigger
 Author: Phileas
 Site: https://boosty.to/phileas
 E-mail: olek.olegovich@gmail.com
-Version: 1.1.0
+Version: 1.3.0
 */
 
 /*ru
@@ -19,7 +20,7 @@ Version: 1.1.0
 Автор: Phileas
 Сайт: https://boosty.to/phileas
 E-mail: olek.olegovich@gmail.com
-Версия: 1.1.0
+Версия: 1.3.0
 */
 
 /*:
@@ -110,6 +111,75 @@ E-mail: olek.olegovich@gmail.com
  * @type number
  * @default 1
  *
+ * @command assignGlobal
+ * @text Assign global action
+ * @desc Binds a switch, a variable, and a general event to a single action.
+ *
+ * @arg switchId
+ * @text Switch ID
+ * @type switch
+ * @default 0
+ *
+ * @arg switchState
+ * @text Switch state
+ * @type boolean
+ * @desc The value that will be written to the switch when the action is performed.
+ * @default true
+ *
+ * @arg variableId
+ * @text Variable ID
+ * @type variable
+ * @default 0
+ *
+ * @arg variableDelta
+ * @text Variable delta
+ * @type number
+ * @min -9999999
+ * @desc The value that will be added to the variable when the action is performed.
+ * @default 0
+ * 
+ * @arg variableExactValue
+ * @text Variable exact value
+ * @type number
+ * @min -9999999
+ * @desc The value that will be assigned to the variable when the action is performed if the "Variable delta" is 0.
+ * @default 0
+ * 
+ * @arg pictureVariableId
+ * @text Picture number variable
+ * @type variable
+ * @default 0
+ * @desc The number of the picture will be written to this variable when the action is performed.
+ *
+ * @arg commonEventId
+ * @text Common event ID
+ * @type common_event
+ * @default 0
+ *
+ * @arg action
+ * @text Action
+ * @type combo
+ * @option Enter
+ * @option Exit
+ * @option Press
+ * @option Click
+ * @default Enter
+ *
+ * @command eraseGlobal
+ * @text Erase global action
+ * @desc Remove the binding to a single global action.
+ * @arg action
+ * @text Action
+ * @type combo
+ * @option Enter
+ * @option Exit
+ * @option Press
+ * @option Click
+ * @default Enter
+ *
+ * @command eraseAllGlobal
+ * @text Erase all global actions
+ * @desc Removes bindings to all global actions.
  *
  * @help
  * Triggering of a switch or a common event when the pointer with the picture acts:
@@ -119,6 +189,8 @@ E-mail: olek.olegovich@gmail.com
  * 0) Assign - assigns a handler to one type of action with an picture.
  * 1) Erase action - removes the handler of a single action with an picture.
  * 2) Erase all actions - removes all picture handlers.
+ * 
+ * Similar global commands are also provided, allowing to set triggers for all pictures.
  *
  * You can assign your own handler for each type of action, they will work independently.
  * For example, you can assign two switches to one picture: to Enter and to Click.
@@ -226,14 +298,84 @@ E-mail: olek.olegovich@gmail.com
  * @type number
  * @default 1
  * 
+ * @command assignGlobal
+ * @text Назначить глобально
+ * @desc Привязывает переключатель, переменную и общее событие к одному действию для всех картинок.
+ *
+ * @arg switchId
+ * @text ID переключателя
+ * @type switch
+ * @default 0
+ *
+ * @arg switchState
+ * @text Состояние переключателя
+ * @type boolean
+ * @desc Значение, которое будет записано в переключатель при совершении действия.
+ * @default true
+ *
+ * @arg variableId
+ * @text ID переменной
+ * @type variable
+ * @default 0
+ *
+ * @arg variableDelta
+ * @text Дельта переменной
+ * @type number
+ * @desc Значение, которое будет прибавлено к переменной при совершении действия.
+ * @default 0
+ * 
+ * @arg variableExactValue
+ * @text Точное значение пременной
+ * @type number
+ * @desc Значение, которое будет присвоено в переменную при совершении действия, если "Дельта перменной" равна 0.
+ * @default 0
+ * 
+ * @arg pictureVariableId
+ * @text Переменная номера картинки
+ * @type variable
+ * @default 0
+ * @desc В эту переменную будет записываться номер картинки при совершении действия.
+ *
+ * @arg commonEventId
+ * @text ID общего события
+ * @type common_event
+ * @default 0
+ *
+ * @arg action
+ * @text Действие
+ * @type combo
+ * @option Enter
+ * @option Exit
+ * @option Press
+ * @option Click
+ * @default Enter
+ *
+ * @command eraseGlobal
+ * @text Удалить глобальное действие
+ * @desc Удалить привязку к одному глобальному действию.
+ * @arg action
+ * @text Действие
+ * @type combo
+ * @option Enter
+ * @option Exit
+ * @option Press
+ * @option Click
+ * @default Enter
+ *
+ * @command eraseAllAction
+ * @text Удалить все глобальные действия
+ * @desc Удаляет привязки ко всем глобальным действиям.
+ * 
  * @help
- * Срабатывание переключателя или общего события при действиях указателя с картинкой:
+ * Срабатывание переключателя, переменной или общего события при действиях указателя с картинкой:
  * наведение, уведение, клик, нажатие.
  *
  * Плагин предоставляет команды: 
  * 0) Назначить - назначает обработчик на один тип действия с картинкой.
  * 1) Удалить действие - удаляет обработчик одного действия с картинкой.
  * 2) Удалить все действия - удаляет все обработчики картинки.
+ * 
+ * Также предоставляются аналогичные глобальные команды, позволяющие задать триггеры для всех картинок.
  *
  * На каждый тип действия можно назначить свой обработчик, они будут работать независимо. 
  * Например, можно на одну картинку назначить два переключателя: на Enter и на Click.
@@ -261,6 +403,11 @@ E-mail: olek.olegovich@gmail.com
     PluginManager.registerCommand("Phileas_PointerPictureTrigger", "assign", assignAction);
     PluginManager.registerCommand("Phileas_PointerPictureTrigger", "eraseAction", eraseAction);
     PluginManager.registerCommand("Phileas_PointerPictureTrigger", "eraseAllAction", eraseAllAction);
+    PluginManager.registerCommand("Phileas_PointerPictureTrigger", "assignGlobal", assignGlobal);
+    PluginManager.registerCommand("Phileas_PointerPictureTrigger", "eraseGlobal", eraseGlobal);
+    PluginManager.registerCommand("Phileas_PointerPictureTrigger", "eraseAllGlobal", eraseAllGlobal);
+
+    var globalPhileasPictureTrigger = {};
     
     function assignAction(params) {
         const pictureId = Number(params["pictureId"]) || 1;
@@ -276,7 +423,6 @@ E-mail: olek.olegovich@gmail.com
         const picture = $gameScreen.picture(pictureId);
         if (picture) {
             let act = {};
-            act.pictureId = pictureId;
             act.switchId = switchId;
             act.switchState = switchState;
             act.variableId = variableId;
@@ -298,7 +444,7 @@ E-mail: olek.olegovich@gmail.com
         const action = params["action"];
         const picture = $gameScreen.picture(pictureId);
         if (picture) {
-            picture.phileasPictureTrigger[action] = {};
+            picture.phileasPictureTrigger[action] = undefined;
         }
     }
     
@@ -309,14 +455,39 @@ E-mail: olek.olegovich@gmail.com
             picture.phileasPictureTrigger = {};
         }
     }
+
+    function assignGlobal(params) {
+        const switchId = Number(params["switchId"]);
+        const switchState = params["switchState"] == "true";
+        const variableId = Number(params["variableId"]);
+        const pictureVariableId = Number(params["pictureVariableId"]);
+        const variableDelta = Number(params["variableDelta"]) || 0;
+        const variableExactValue = Number(params["variableExactValue"]) || 0;
+        const commonEventId = Number(params["commonEventId"]);
+        const action = params["action"];
+        
+        let act = {};
+        act.switchId = switchId;
+        act.switchState = switchState;
+        act.variableId = variableId;
+        act.pictureVariableId = pictureVariableId;
+        act.variableDelta = variableDelta;
+        act.variableExactValue = variableExactValue;
+        act.commonEventId = commonEventId;
+            
+        globalPhileasPictureTrigger[action] = act;
+    }
+
+    function eraseGlobal(params) {
+        const action = params["action"];
+        globalPhileasPictureTrigger[action] = undefined;
+    }
     
-    function tryTrigger(picture, action) {
-        if (picture == undefined || picture.phileasPictureTrigger == undefined) {
-            return;
-        }
-        
-        const act = picture.phileasPictureTrigger[action];
-        
+    function eraseAllGlobal() {
+        globalPhileasPictureTrigger = {};
+    }
+
+    function tryAct(act, pictureId) {
         if (act == undefined) {
             return;
         }
@@ -343,37 +514,47 @@ E-mail: olek.olegovich@gmail.com
         if (act.pictureVariableId != undefined && act.pictureVariableId > 0) {
             $gameVariables.setValue(
                 act.pictureVariableId,
-                act.pictureId);
+                pictureId);
         }
         
         if (act.commonEventId != undefined) {
             $gameTemp.reserveCommonEvent(act.commonEventId);
         }
     }
+    
+    function tryTrigger(pictureId, action) {
+        const picture = $gameScreen.picture(pictureId);
+
+        if (picture != undefined && picture.phileasPictureTrigger != undefined) {
+            tryAct(picture.phileasPictureTrigger[action], pictureId);
+        }
+        
+        tryAct(globalPhileasPictureTrigger[action], pictureId);
+    }
 
 //--------CHANGED CORE:
 
     const Origin_onMouseEnter = Sprite_Picture.prototype.onMouseEnter;
     Sprite_Picture.prototype.onMouseEnter = function() {
-        tryTrigger(this.picture(), "Enter");
+        tryTrigger(this._pictureId, "Enter");
         Origin_onMouseEnter.call(this);
     };
     
     const Origin_onMouseExit = Sprite_Picture.prototype.onMouseExit;
     Sprite_Picture.prototype.onMouseExit = function() {
-        tryTrigger(this.picture(), "Exit");
+        tryTrigger(this._pictureId, "Exit");
         Origin_onMouseExit.call(this);
     };
     
     const Origin_onPress = Sprite_Picture.prototype.onPress;
     Sprite_Picture.prototype.onPress = function() {
-        tryTrigger(this.picture(), "Press");
+        tryTrigger(this._pictureId, "Press");
         Origin_onPress.call(this);
     };
     
     const Origin_onClick = Sprite_Picture.prototype.onClick;
     Sprite_Picture.prototype.onClick = function() {
-        tryTrigger(this.picture(), "Click");
+        tryTrigger(this._pictureId, "Click");
         Origin_onClick.call(this);
     };
 }());
