@@ -4,6 +4,7 @@
 // [Update History]
 // 2023.December.12 Ver1.0.0 First Release
 // 2023.December.16 Ver1.1.0 Expanded functionality
+// 2024.June.18 Ver1.2.0 Added picture number variable
 
 /*
 Title: Phileas_PointerPictureTrigger
@@ -54,8 +55,22 @@ E-mail: olek.olegovich@gmail.com
  * @arg variableDelta
  * @text Variable delta
  * @type number
+ * @min -9999999
  * @desc The value that will be added to the variable when the action is performed.
- * @default 1
+ * @default 0
+ * 
+ * @arg variableExactValue
+ * @text Variable exact value
+ * @type number
+ * @min -9999999
+ * @desc The value that will be assigned to the variable when the action is performed if the "Variable delta" is 0.
+ * @default 0
+ * 
+ * @arg pictureVariableId
+ * @text Picture number variable
+ * @type variable
+ * @default 0
+ * @desc The number of the picture will be written to this variable when the action is performed.
  *
  * @arg commonEventId
  * @text Common event ID
@@ -159,7 +174,19 @@ E-mail: olek.olegovich@gmail.com
  * @text Дельта переменной
  * @type number
  * @desc Значение, которое будет прибавлено к переменной при совершении действия.
- * @default 1
+ * @default 0
+ * 
+ * @arg variableExactValue
+ * @text Точное значение пременной
+ * @type number
+ * @desc Значение, которое будет присвоено в переменную при совершении действия, если "Дельта перменной" равна 0.
+ * @default 0
+ * 
+ * @arg pictureVariableId
+ * @text Переменная номера картинки
+ * @type variable
+ * @default 0
+ * @desc В эту переменную будет записываться номер картинки при совершении действия.
  *
  * @arg commonEventId
  * @text ID общего события
@@ -240,17 +267,22 @@ E-mail: olek.olegovich@gmail.com
         const switchId = Number(params["switchId"]);
         const switchState = params["switchState"] == "true";
         const variableId = Number(params["variableId"]);
-        const variableDelta = Number(params["variableDelta"]) || 1;
+        const pictureVariableId = Number(params["pictureVariableId"]);
+        const variableDelta = Number(params["variableDelta"]) || 0;
+        const variableExactValue = Number(params["variableExactValue"]) || 0;
         const commonEventId = Number(params["commonEventId"]);
         const action = params["action"];
         
         const picture = $gameScreen.picture(pictureId);
         if (picture) {
             let act = {};
+            act.pictureId = pictureId;
             act.switchId = switchId;
             act.switchState = switchState;
             act.variableId = variableId;
+            act.pictureVariableId = pictureVariableId;
             act.variableDelta = variableDelta;
+            act.variableExactValue = variableExactValue;
             act.commonEventId = commonEventId;
             
             if (picture.phileasPictureTrigger == undefined) {
@@ -295,11 +327,23 @@ E-mail: olek.olegovich@gmail.com
                 act.switchState);
         }
         
-        if (act.variableId != undefined && act.variableId > 0 && act.variableDelta != undefined) {
-            const current = $gameVariables.value(act.variableId);
+        if (act.variableId != undefined && act.variableId > 0) {
+            if (act.variableDelta != undefined && act.variableDelta != 0) {
+                const current = $gameVariables.value(act.variableId);
+                $gameVariables.setValue(
+                    act.variableId,
+                    current + act.variableDelta);
+            } else if (act.variableExactValue != undefined) {
+                $gameVariables.setValue(
+                    act.variableId,
+                    act.variableExactValue);
+            }
+        }
+
+        if (act.pictureVariableId != undefined && act.pictureVariableId > 0) {
             $gameVariables.setValue(
-                act.variableId,
-                current + act.variableDelta);
+                act.pictureVariableId,
+                act.pictureId);
         }
         
         if (act.commonEventId != undefined) {
