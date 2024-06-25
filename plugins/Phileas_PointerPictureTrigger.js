@@ -30,7 +30,7 @@ E-mail: olek.olegovich@gmail.com
  *
  * @command assign
  * @text Assign
- * @desc Binds a switch, a variable, and a general event to a single action.
+ * @desc Binds a switch, a variable, and a common event to a single action.
  *
  * @arg pictureId
  * @text Picture ID
@@ -113,7 +113,7 @@ E-mail: olek.olegovich@gmail.com
  *
  * @command assignGlobal
  * @text Assign global action
- * @desc Binds a switch, a variable, and a general event to a single action.
+ * @desc Binds a switch, a variable, and a common event to a single action.
  *
  * @arg switchId
  * @text Switch ID
