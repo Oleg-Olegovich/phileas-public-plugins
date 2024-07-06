@@ -5,6 +5,7 @@
 // 2024.January.30 Ver1.0.0 First Release
 // 2024.May.01 Ver1.0.1 Fixed keyboard input
 // 2024.May.05 Ver1.0.2 Improved keyboard input
+// 2024.July.06 Ver1.0.3 Fixed russian keyboard
 
 /*:
  * @target MZ
@@ -365,35 +366,37 @@ const CONFIRM_CHAR = "✓";
 
 const PHILEAS_KEYBOARD_ENGLISH_UPPERCASE =
     ["A", "B", "C", "D", "E",
-        "F", "G", "H", "I", "J",
-        "K", "L", "M", "N", "O",
-        "P", "Q", "R", "S", "T",
-        "U", "V", "W", "X", "Y",
-        "Z", SPACE_CHAR, BACKSPACE_CHAR, CONFIRM_CHAR];
+     "F", "G", "H", "I", "J",
+     "K", "L", "M", "N", "O",
+     "P", "Q", "R", "S", "T",
+     "U", "V", "W", "X", "Y",
+     "Z", SPACE_CHAR, BACKSPACE_CHAR, CONFIRM_CHAR];
 
 const PHILEAS_KEYBOARD_ENGLISH_LOWERCASE =
     ["a", "b", "c", "d", "e",
-        "f", "g", "h", "i", "j",
-        "k", "l", "m", "n", "o",
-        "p", "q", "r", "s", "t",
-        "u", "v", "w", "x", "y",
-        "z", SPACE_CHAR, BACKSPACE_CHAR, CONFIRM_CHAR];
+     "f", "g", "h", "i", "j",
+     "k", "l", "m", "n", "o",
+     "p", "q", "r", "s", "t",
+     "u", "v", "w", "x", "y",
+     "z", SPACE_CHAR, BACKSPACE_CHAR, CONFIRM_CHAR];
 
 const PHILEAS_KEYBOARD_RUSSIAN_UPPERCASE =
-    ["А", "Б", "В", "Г", "Д", "Е",
-        "Ё", "Ж", "З", "И", "Й", "К",
-        "Л", "М", "Н", "О", "П", "Р",
-        "С", "Т", "У", "Ф", "Х", "Ц",
-        "Ч", "Ш", "Щ", "Ъ", "Ы", "Ь",
-        "Э", "Ю", "Я", SPACE_CHAR, BACKSPACE_CHAR, CONFIRM_CHAR];
+    ["А", "Б", "В", "Г", "Д",
+     "Е", "Ж", "З", "И", "Й",
+     "К", "Л", "М", "Н", "О",
+     "П", "Р", "С", "Т", "У",
+     "Ф","Х", "Ц", "Ч", "Ш",
+     "Щ", "Ъ", "Ы", "Ь", "Э",
+     "Ю", "Я", SPACE_CHAR, "Ё", BACKSPACE_CHAR, CONFIRM_CHAR];
 
 const PHILEAS_KEYBOARD_RUSSIAN_LOWERCASE =
-    ["а", "б", "в", "г", "д", "е",
-        "ё", "ж", "з", "и", "й", "к",
-        "л", "м", "н", "о", "п", "р",
-        "с", "т", "у", "ф", "х", "ц",
-        "ч", "ш", "щ", "ъ", "ы", "ь",
-        "э", "ю", "я", SPACE_CHAR, BACKSPACE_CHAR, CONFIRM_CHAR];
+    ["а", "б", "в", "г", "д",
+     "е", "ж", "з", "и", "й",
+     "к", "л", "м", "н", "о",
+     "п", "р", "с", "т", "у",
+     "ф", "х", "ц", "ч", "ш",
+     "щ", "ъ", "ы", "ь", "э",
+     "ю", "я", SPACE_CHAR, "ё", BACKSPACE_CHAR, CONFIRM_CHAR];
 
 const PHILEAS_KEYBOARD_JAPANESE =
     ["あ", "い", "う", "え", "お", "が", "ぎ", "ぐ", "げ", "ご",
@@ -415,7 +418,14 @@ const PHILEAS_MIN_WINDOW_WIDTH = 300;
 
 const PHILEAS_FACE_PADDING = 20;
 
-(function () {
+const PHILEAD_EN_RU_MAP = {
+    "q": "й", "w": "ц", "e": "у", "r": "к", "t": "е", "y": "н", "u": "г", "i": "ш", "o": "щ", "p": "з", 
+    "[": "х", "]": "ъ", "a": "ф", "s": "ы", "d": "в", "f": "а", "g": "п", "h": "р", "j": "о", "k": "л", 
+    "l": "д", ";": "ж", "\"": "э", "z": "я", "x": "ч", "c": "с", "v": "м", "b": "и", "n": "т", "m": "ь", 
+    ",": "б", ".": "ю", "`": "ё", "~": "ё", "{": "х", "}": "ъ", ":": "ж", "\'": "э", "<": "б", ">": "ю"
+};
+
+(function() {
 
     //--------DATA:
     PluginManager.registerCommand("Phileas_SimpleInputWindow", "nameInput", nameInput);
@@ -464,11 +474,11 @@ function Scene_PhileasInput() {
 Scene_PhileasInput.prototype = Object.create(Scene_MenuBase.prototype);
 Scene_PhileasInput.prototype.constructor = Scene_PhileasInput;
 
-Scene_PhileasInput.prototype.initialize = function () {
+Scene_PhileasInput.prototype.initialize = function() {
     Scene_MenuBase.prototype.initialize.call(this);
 };
 
-Scene_PhileasInput.prototype.prepare = function (actorId, showFace,
+Scene_PhileasInput.prototype.prepare = function(actorId, showFace,
     variableId, language, keyMap, minLength, maxLength, allowCancel,
     allowSpace, keyboardInput, firstIsUpper, clear) {
 
@@ -490,7 +500,7 @@ Scene_PhileasInput.prototype.prepare = function (actorId, showFace,
     this._inputRowsNumber = Math.ceil(table.length / columnsNumber);
 };
 
-Scene_PhileasInput.prototype.create = function () {
+Scene_PhileasInput.prototype.create = function() {
     Scene_MenuBase.prototype.create.call(this);
     this._actor = this._actorId == undefined
         ? undefined
@@ -499,12 +509,12 @@ Scene_PhileasInput.prototype.create = function () {
     this.createInputWindow();
 };
 
-Scene_PhileasInput.prototype.start = function () {
+Scene_PhileasInput.prototype.start = function() {
     Scene_MenuBase.prototype.start.call(this);
     this._editWindow.refresh();
 };
 
-Scene_PhileasInput.prototype.editWindowRect = function () {
+Scene_PhileasInput.prototype.editWindowRect = function() {
     const calcWindow = new Window_PhileasEdit(new Rectangle(0, 0, 0, 0));
 
     const padding = $gameSystem.windowPadding();
@@ -522,14 +532,14 @@ Scene_PhileasInput.prototype.editWindowRect = function () {
     return new Rectangle(wx, wy, ww, wh);
 };
 
-Scene_PhileasInput.prototype.createEditWindow = function () {
+Scene_PhileasInput.prototype.createEditWindow = function() {
     const rect = this.editWindowRect();
     this._editWindow = new Window_PhileasEdit(rect, this._showFace);
     this._editWindow.setup(this._actor, this._variableId, this._maxLength, this._clear);
     this.addWindow(this._editWindow);
 };
 
-Scene_PhileasInput.prototype.inputWindowRect = function () {
+Scene_PhileasInput.prototype.inputWindowRect = function() {
     const wx = this._editWindow.x;
     const wy = this._editWindow.y + this._editWindow.height + 8;
     const ww = this._editWindow.width;
@@ -537,7 +547,7 @@ Scene_PhileasInput.prototype.inputWindowRect = function () {
     return new Rectangle(wx, wy, ww, wh);
 };
 
-Scene_PhileasInput.prototype.createInputWindow = function () {
+Scene_PhileasInput.prototype.createInputWindow = function() {
     const rect = this.inputWindowRect();
     this._inputWindow
         = new Window_PhileasInput(rect, this._language, this._keyMap,
@@ -548,7 +558,7 @@ Scene_PhileasInput.prototype.createInputWindow = function () {
     this.addWindow(this._inputWindow);
 };
 
-Scene_PhileasInput.prototype.onInputOk = function () {
+Scene_PhileasInput.prototype.onInputOk = function() {
     let value = this._editWindow.name();
     if (this._firstIsUpper) {
         value = value.charAt(0).toUpperCase() + value.slice(1);
@@ -569,7 +579,7 @@ Scene_PhileasInput.prototype.onInputOk = function () {
     this.popScene();
 };
 
-Scene_PhileasInput.prototype.onInputCancel = function () {
+Scene_PhileasInput.prototype.onInputCancel = function() {
     this._inputWindow.deactivate();
     this._inputWindow.phileasExit();
     this.popScene();
@@ -586,7 +596,7 @@ Window_PhileasInput.prototype = Object.create(Window_Selectable.prototype);
 Window_PhileasInput.prototype.constructor = Window_PhileasInput;
 
 Window_PhileasInput.prototype.initialize
-    = function (rect, language, keyMap, keyboardInput,
+    = function(rect, language, keyMap, keyboardInput,
         allowCancel, allowSpace, minLength) {
 
         this.upArrowVisible = false;
@@ -597,6 +607,7 @@ Window_PhileasInput.prototype.initialize
 
         this._editWindow = null;
         this._index = 0;
+        this._language = language;
         this._table = Window_PhileasInput.table(language, keyMap);
         this._columnsNumber = Math.ceil(Math.sqrt(this._table.length));
         this._rowsNumber = Math.ceil(this._table.length / this._columnsNumber);
@@ -606,7 +617,7 @@ Window_PhileasInput.prototype.initialize
         Window_Selectable.prototype.initialize.call(this, rect);
     };
 
-Window_PhileasInput.prototype.activate = function () {
+Window_PhileasInput.prototype.activate = function() {
     Window_Selectable.prototype.activate.call(this);
     this._keyDownHandlerBind = this.keyDownHandler.bind(this);
     document.addEventListener("keydown", this._keyDownHandlerBind);
@@ -619,7 +630,7 @@ Window_PhileasInput.prototype.activate = function () {
     }
 };
 
-Window_PhileasInput.prototype.phileasExit = function () {
+Window_PhileasInput.prototype.phileasExit = function() {
     document.removeEventListener("keydown", this._keyDownHandlerBind);
     this._keyDownHandlerBind = undefined;
 
@@ -629,14 +640,14 @@ Window_PhileasInput.prototype.phileasExit = function () {
     }
 };
 
-Window_PhileasInput.prototype.setEditWindow = function (editWindow) {
+Window_PhileasInput.prototype.setEditWindow = function(editWindow) {
     this._editWindow = editWindow;
     this.refresh();
     this.updateCursor();
     this.activate();
 };
 
-Window_PhileasInput.table = function (language, keyMap) {
+Window_PhileasInput.table = function(language, keyMap) {
     if (keyMap == "uppercase") {
         if (language == "en") {
             return PHILEAS_KEYBOARD_ENGLISH_UPPERCASE;
@@ -658,19 +669,19 @@ Window_PhileasInput.table = function (language, keyMap) {
     }
 };
 
-Window_PhileasInput.prototype.maxItems = function () {
+Window_PhileasInput.prototype.maxItems = function() {
     return this._table.length;
 };
 
-Window_PhileasInput.prototype.maxVisibleItems = function () {
+Window_PhileasInput.prototype.maxVisibleItems = function() {
     return this.maxItems();
 };
 
-Window_PhileasInput.prototype.itemWidth = function () {
+Window_PhileasInput.prototype.itemWidth = function() {
     return Math.floor(this.innerWidth / this._columnsNumber);
 };
 
-Window_PhileasInput.prototype.character = function () {
+Window_PhileasInput.prototype.character = function() {
     if (!this._allowSpace && this._index + 3 == this._table.length) {
         this.playBuzzerSound();
         return;
@@ -679,7 +690,7 @@ Window_PhileasInput.prototype.character = function () {
     return this._index + 2 < this._table.length ? this._table[this._index] : "";
 };
 
-Window_PhileasInput.prototype.itemRect = function (index) {
+Window_PhileasInput.prototype.itemRect = function(index) {
     const row = Math.floor(index / this._columnsNumber);
     const column = index % this._columnsNumber;
 
@@ -696,28 +707,28 @@ Window_PhileasInput.prototype.itemRect = function (index) {
     return new Rectangle(x, y, width, height);
 };
 
-Window_PhileasInput.prototype.drawItem = function (index) {
+Window_PhileasInput.prototype.drawItem = function(index) {
     const character = this._table[index];
     const rect = this.itemLineRect(index);
     this.drawText(character, rect.x, rect.y, rect.width, "center");
 };
 
-Window_PhileasInput.prototype.updateCursor = function () {
+Window_PhileasInput.prototype.updateCursor = function() {
     const rect = this.itemRect(this._index);
     this.setCursorRect(rect.x, rect.y, rect.width, rect.height);
 };
 
-Window_PhileasInput.prototype.isCursorMovable = function () {
+Window_PhileasInput.prototype.isCursorMovable = function() {
     return this.active;
 };
 
-Window_PhileasInput.prototype.cursorDown = function (wrap) {
+Window_PhileasInput.prototype.cursorDown = function(wrap) {
     if (this._index < this._table.length - this._columnsNumber || wrap) {
         this._index = (this._index + this._columnsNumber) % this._table.length;
     }
 };
 
-Window_PhileasInput.prototype.cursorUp = function (wrap) {
+Window_PhileasInput.prototype.cursorUp = function(wrap) {
     if (this._index >= this._columnsNumber || wrap) {
         this._index
             = (this._index + this._table.length - this._columnsNumber)
@@ -725,7 +736,7 @@ Window_PhileasInput.prototype.cursorUp = function (wrap) {
     }
 };
 
-Window_PhileasInput.prototype.cursorRight = function (wrap) {
+Window_PhileasInput.prototype.cursorRight = function(wrap) {
     if (this._index % this._columnsNumber < this._rowsNumber) {
         this._index++;
     } else if (wrap) {
@@ -733,7 +744,7 @@ Window_PhileasInput.prototype.cursorRight = function (wrap) {
     }
 };
 
-Window_PhileasInput.prototype.cursorLeft = function (wrap) {
+Window_PhileasInput.prototype.cursorLeft = function(wrap) {
     if (this._index % this._columnsNumber > 0) {
         this._index--;
     } else if (wrap) {
@@ -741,12 +752,12 @@ Window_PhileasInput.prototype.cursorLeft = function (wrap) {
     }
 };
 
-Window_PhileasInput.prototype.processCursorMove = function () {
+Window_PhileasInput.prototype.processCursorMove = function() {
     Window_Selectable.prototype.processCursorMove.call(this);
     this.updateCursor();
 };
 
-Window_PhileasInput.prototype.keyDownHandler = function (event) {
+Window_PhileasInput.prototype.keyDownHandler = function(event) {
     if (!this.isOpen() || !this.active) {
         return;
     }
@@ -783,7 +794,15 @@ Window_PhileasInput.prototype.keyDownHandler = function (event) {
         return;
     }
 
-    const letterCode = event.keyCode - 65;
+    let letterCode = event.keyCode - 65;
+
+    if (this._language == "ru") {
+        const key = String.fromCharCode(event.keyCode).toLocaleLowerCase();
+        const rukey = PHILEAD_EN_RU_MAP[key] || PHILEAD_EN_RU_MAP[event.key] || event.key.toLocaleLowerCase();
+
+        letterCode = rukey.charCodeAt(0) - this._table[0].toLowerCase().charCodeAt(0);
+    }
+
     if (letterCode < 0 || letterCode >= this._table.length) {
         return;
     }
@@ -797,7 +816,7 @@ Window_PhileasInput.prototype.keyDownHandler = function (event) {
     }
 };
 
-Window_PhileasInput.prototype.processHandling = function () {
+Window_PhileasInput.prototype.processHandling = function() {
     if (this.isOpen() && this.active) {
         if (this.isCancelEnabled() && Input.isRepeated("cancel")) {
             this.processCancel();
@@ -805,32 +824,32 @@ Window_PhileasInput.prototype.processHandling = function () {
     }
 };
 
-Window_PhileasInput.prototype.isCancelEnabled = function () {
+Window_PhileasInput.prototype.isCancelEnabled = function() {
     return this._allowCancel;
 };
 
-Window_PhileasInput.prototype.processJump = function () {
+Window_PhileasInput.prototype.processJump = function() {
     if (this._index !== this) {
         this._index = this._table.length - 1;
         this.playCursorSound();
     }
 };
 
-Window_PhileasInput.prototype.processBack = function () {
+Window_PhileasInput.prototype.processBack = function() {
     if (this._editWindow.back()) {
         SoundManager.playCancel();
     }
 };
 
-Window_PhileasInput.prototype.isOk = function () {
+Window_PhileasInput.prototype.isOk = function() {
     return this._index + 1 === this._table.length;
 };
 
-Window_PhileasInput.prototype.isBackspace = function () {
+Window_PhileasInput.prototype.isBackspace = function() {
     return this._index + 2 === this._table.length;
 };
 
-Window_PhileasInput.prototype.processOk = function () {
+Window_PhileasInput.prototype.processOk = function() {
     this.playOkSound();
     if (this.character()) {
         this.onNameAdd();
@@ -841,7 +860,7 @@ Window_PhileasInput.prototype.processOk = function () {
     }
 };
 
-Window_PhileasInput.prototype.onNameAdd = function () {
+Window_PhileasInput.prototype.onNameAdd = function() {
     if (this._editWindow.add(this.character())) {
         this.playOkSound();
     } else {
@@ -849,7 +868,7 @@ Window_PhileasInput.prototype.onNameAdd = function () {
     }
 };
 
-Window_PhileasInput.prototype.onNameOk = function () {
+Window_PhileasInput.prototype.onNameOk = function() {
     const word = this._editWindow.name();
     if (word.length < this._minLength) {
         this.playBuzzerSound();
@@ -868,11 +887,11 @@ Window_PhileasInput.prototype.onNameOk = function () {
     }
 };
 
-Window_PhileasInput.prototype.scrollTo = function () {
+Window_PhileasInput.prototype.scrollTo = function() {
 
 }
 
-Window_PhileasInput.prototype.updateArrows = function () {
+Window_PhileasInput.prototype.updateArrows = function() {
 
 };
 
@@ -886,14 +905,14 @@ function Window_PhileasEdit() {
 Window_PhileasEdit.prototype = Object.create(Window_NameEdit.prototype);
 Window_PhileasEdit.prototype.constructor = Window_PhileasEdit;
 
-Window_PhileasEdit.prototype.initialize = function (rect, showFace) {
+Window_PhileasEdit.prototype.initialize = function(rect, showFace) {
     Window_NameEdit.prototype.initialize.call(this, rect);
     this._rectWidth = rect.width;
     this._showFace = showFace;
     this._left = 0;
 };
 
-Window_PhileasEdit.prototype.setup = function (actor, variableId, maxLength, clear) {
+Window_PhileasEdit.prototype.setup = function(actor, variableId, maxLength, clear) {
     this._actor = actor;
     this._maxLength = maxLength;
     if (clear === true) {
@@ -916,7 +935,7 @@ Window_PhileasEdit.prototype.setup = function (actor, variableId, maxLength, cle
     }
 };
 
-Window_PhileasEdit.prototype.drawActorFace = function (
+Window_PhileasEdit.prototype.drawActorFace = function(
     actor, x, y, width, height) {
 
     if (this._showFace == false) {
@@ -926,6 +945,6 @@ Window_PhileasEdit.prototype.drawActorFace = function (
     this.drawFace(actor.faceName(), actor.faceIndex(), x, y, width, height);
 };
 
-Window_PhileasEdit.prototype.left = function () {
+Window_PhileasEdit.prototype.left = function() {
     return this._left;
 };
