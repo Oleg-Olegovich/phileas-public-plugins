@@ -7,6 +7,7 @@
 // 2024.June.18 Ver1.2.0 Added picture number variable
 // 2024.June.18 Ver1.3.0 Added global action
 // 2024.July.16 Ver1.4.0 Added self switch support
+// 2024.July.16 Ver1.4.1 Added alpha pixel check
 
 /*
 Title: Phileas_PointerPictureTrigger
@@ -60,6 +61,11 @@ E-mail: olek.olegovich@gmail.com
  * @text Common event ID
  * @type common_event
  * @default 0
+ * 
+ * @arg ignoreTransparentPixels
+ * @text Ignore transparent pixels
+ * @type boolean
+ * @default true
  *
  * @arg action
  * @text Action
@@ -504,6 +510,7 @@ E-mail: olek.olegovich@gmail.com
         
         const pictureVariableId = Number(params["pictureVariableId"]);
         const commonEventId = Number(params["commonEventId"]);
+        const ignoreTransparentPixels = params["ignoreTransparentPixels"] == "true";
 
         let act = {};
         act.switchData = switchData;
@@ -511,6 +518,7 @@ E-mail: olek.olegovich@gmail.com
         act.variableData = variableData;
         act.pictureVariableId = pictureVariableId;
         act.commonEventId = commonEventId;
+        act.ignoreTransparentPixels = ignoreTransparentPixels;
 
         return act;
     }
@@ -609,6 +617,25 @@ E-mail: olek.olegovich@gmail.com
         tryAct(globalPhileasPictureTrigger[action], pictureId);
     }
 
+    function checkPixel(sprite, act) {
+        if (act == undefined) {
+            return true;
+        }
+
+        if (act.ignoreTransparentPixels === true) {
+            const touchPos = new Point(TouchInput.x, TouchInput.y);
+            const localPos = sprite.worldTransform.applyInverse(touchPos);
+            const bitmap = sprite._bitmap;
+            const alpha = bitmap.getAlphaPixel(localPos.x, localPos.y);
+
+            if (alpha === 0) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
 //--------CHANGED CORE:
 
     const Origin_onMouseEnter = Sprite_Picture.prototype.onMouseEnter;
@@ -616,22 +643,68 @@ E-mail: olek.olegovich@gmail.com
         tryTrigger(this._pictureId, "Enter");
         Origin_onMouseEnter.call(this);
     };
-    
+
     const Origin_onMouseExit = Sprite_Picture.prototype.onMouseExit;
     Sprite_Picture.prototype.onMouseExit = function() {
         tryTrigger(this._pictureId, "Exit");
         Origin_onMouseExit.call(this);
     };
-    
+
     const Origin_onPress = Sprite_Picture.prototype.onPress;
     Sprite_Picture.prototype.onPress = function() {
         tryTrigger(this._pictureId, "Press");
         Origin_onPress.call(this);
     };
-    
+
     const Origin_onClick = Sprite_Picture.prototype.onClick;
     Sprite_Picture.prototype.onClick = function() {
         tryTrigger(this._pictureId, "Click");
         Origin_onClick.call(this);
+    };
+
+    const Origin_processTouch = Sprite_Picture.prototype.processTouch;
+    Sprite_Picture.prototype.processTouch = function() {
+        const picture = $gameScreen.picture(this._pictureId);
+
+        if (picture == undefined || picture.phileasPictureTrigger == undefined
+            || picture.phileasPictureTrigger["Enter"] == undefined
+            && picture.phileasPictureTrigger["Exit"] == undefined
+            && picture.phileasPictureTrigger["Press"] == undefined
+            && picture.phileasPictureTrigger["Click"] == undefined) {
+
+            Origin_processTouch.call(this);
+            return;
+        }
+        
+        enterAct = picture.phileasPictureTrigger["Enter"];
+        exitAct = picture.phileasPictureTrigger["Exit"];
+        pressAct = picture.phileasPictureTrigger["Press"];
+        clickAct = picture.phileasPictureTrigger["Click"];
+
+        if (this.isClickEnabled()) {
+            if (this.isBeingTouched()) {
+                if (!this._hovered && TouchInput.isHovered() && checkPixel(this, enterAct)) {
+                    this._hovered = true;
+                    this.onMouseEnter();
+                }
+                if (TouchInput.isTriggered() && checkPixel(this, pressAct)) {
+                    this._pressed = true;
+                    this.onPress();
+                }
+            } else {
+                if (this._hovered && (clickAct == undefined || !checkPixel(this, clickAct))) {
+                    this.onMouseExit();
+                }
+                this._pressed = false;
+                this._hovered = false;
+            }
+            if (this._pressed && TouchInput.isReleased() && checkPixel(this, clickAct)) {
+                this._pressed = false;
+                this.onClick();
+            }
+        } else {
+            this._pressed = false;
+            this._hovered = false;
+        }
     };
 }());
