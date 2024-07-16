@@ -6,13 +6,14 @@
 // 2023.December.16 Ver1.1.0 Expanded functionality
 // 2024.June.18 Ver1.2.0 Added picture number variable
 // 2024.June.18 Ver1.3.0 Added global action
+// 2024.July.16 Ver1.4.0 Added self switch support
 
 /*
 Title: Phileas_PointerPictureTrigger
 Author: Phileas
 Site: https://boosty.to/phileas
 E-mail: olek.olegovich@gmail.com
-Version: 1.3.0
+Version: 1.4.0
 */
 
 /*ru
@@ -20,7 +21,7 @@ Version: 1.3.0
 Автор: Phileas
 Сайт: https://boosty.to/phileas
 E-mail: olek.olegovich@gmail.com
-Версия: 1.3.0
+Версия: 1.4.0
 */
 
 /*:
@@ -37,35 +38,17 @@ E-mail: olek.olegovich@gmail.com
  * @type number
  * @default 1
  *
- * @arg switchId
- * @text Switch ID
- * @type switch
- * @default 0
- *
- * @arg switchState
- * @text Switch state
- * @type boolean
- * @desc The value that will be written to the switch when the action is performed.
- * @default true
- *
- * @arg variableId
- * @text Variable ID
- * @type variable
- * @default 0
- *
- * @arg variableDelta
- * @text Variable delta
- * @type number
- * @min -9999999
- * @desc The value that will be added to the variable when the action is performed.
- * @default 0
+ * @arg switch
+ * @text Switch
+ * @type struct<SwitchDataStruct>
  * 
- * @arg variableExactValue
- * @text Variable exact value
- * @type number
- * @min -9999999
- * @desc The value that will be assigned to the variable when the action is performed if the "Variable delta" is 0.
- * @default 0
+ * @arg selfSwitch
+ * @text Self Switch
+ * @type struct<SelfSwitchDataStruct>
+ *
+ * @arg variable
+ * @text Variable
+ * @type struct<VariableDataStruct>
  * 
  * @arg pictureVariableId
  * @text Picture number variable
@@ -115,35 +98,17 @@ E-mail: olek.olegovich@gmail.com
  * @text Assign global action
  * @desc Binds a switch, a variable, and a common event to a single action.
  *
- * @arg switchId
- * @text Switch ID
- * @type switch
- * @default 0
+ * @arg switch
+ * @text Switch
+ * @type struct<SwitchDataStruct>
  *
- * @arg switchState
- * @text Switch state
- * @type boolean
- * @desc The value that will be written to the switch when the action is performed.
- * @default true
+ * @arg selfSwitch
+ * @text Self Switch
+ * @type struct<SelfSwitchDataStruct>
  *
- * @arg variableId
- * @text Variable ID
- * @type variable
- * @default 0
- *
- * @arg variableDelta
- * @text Variable delta
- * @type number
- * @min -9999999
- * @desc The value that will be added to the variable when the action is performed.
- * @default 0
- * 
- * @arg variableExactValue
- * @text Variable exact value
- * @type number
- * @min -9999999
- * @desc The value that will be assigned to the variable when the action is performed if the "Variable delta" is 0.
- * @default 0
+ * @arg variable
+ * @text Variable
+ * @type struct<VariableDataStruct>
  * 
  * @arg pictureVariableId
  * @text Picture number variable
@@ -211,6 +176,67 @@ E-mail: olek.olegovich@gmail.com
  * This means that you can freely use the plugin in non-commercial and commercial games and even edit it.
  * But be sure to include me in the credits!
  */
+
+/*~struct~SwitchDataStruct:
+ * @param switchId
+ * @text Switch ID
+ * @type switch
+ * @default 0
+ *
+ * @param switchState
+ * @text Switch state
+ * @type boolean
+ * @desc The value that will be written to the switch when the action is performed.
+ * @default true
+ */
+
+/*~struct~SelfSwitchDataStruct:
+ * @param mapId
+ * @text Map ID
+ * @type number
+ * @default 0
+ * 
+ * @param eventId
+ * @text Event ID
+ * @type number
+ * @default 0
+ * 
+ * @param selfSwitchId
+ * @text Self Switch ID
+ * @type combo
+ * @option A
+ * @option B
+ * @option C
+ * @option D
+ * @default A
+ *
+ * @param switchState
+ * @text Switch state
+ * @type boolean
+ * @desc The value that will be written to the switch when the action is performed.
+ * @default true
+ */
+
+/*~struct~VariableDataStruct:
+ * @param variableId
+ * @text Variable ID
+ * @type variable
+ * @default 0
+ *
+ * @param variableDelta
+ * @text Variable delta
+ * @type number
+ * @min -9999999
+ * @desc The value that will be added to the variable when the action is performed.
+ * @default 0
+ * 
+ * @param variableExactValue
+ * @text Variable exact value
+ * @type number
+ * @min -9999999
+ * @desc The value that will be assigned to the variable when the action is performed if the "Variable delta" is 0.
+ * @default 0
+ */
  
 /*:ru
  * @target MZ
@@ -226,33 +252,17 @@ E-mail: olek.olegovich@gmail.com
  * @type number
  * @default 1
  *
- * @arg switchId
- * @text ID переключателя
- * @type switch
- * @default 0
- *
- * @arg switchState
- * @text Состояние переключателя
- * @type boolean
- * @desc Значение, которое будет записано в переключатель при совершении действия.
- * @default true
- *
- * @arg variableId
- * @text ID переменной
- * @type variable
- * @default 0
- *
- * @arg variableDelta
- * @text Дельта переменной
- * @type number
- * @desc Значение, которое будет прибавлено к переменной при совершении действия.
- * @default 0
+ * @arg switch
+ * @text Переключатель
+ * @type struct<SwitchDataStruct>
  * 
- * @arg variableExactValue
- * @text Точное значение пременной
- * @type number
- * @desc Значение, которое будет присвоено в переменную при совершении действия, если "Дельта перменной" равна 0.
- * @default 0
+ * @arg selfSwitch
+ * @text Локальный переключатель
+ * @type struct<SelfSwitchDataStruct>
+ *
+ * @arg variable
+ * @text Переменная
+ * @type struct<VariableDataStruct>
  * 
  * @arg pictureVariableId
  * @text Переменная номера картинки
@@ -302,33 +312,17 @@ E-mail: olek.olegovich@gmail.com
  * @text Назначить глобально
  * @desc Привязывает переключатель, переменную и общее событие к одному действию для всех картинок.
  *
- * @arg switchId
- * @text ID переключателя
- * @type switch
- * @default 0
- *
- * @arg switchState
- * @text Состояние переключателя
- * @type boolean
- * @desc Значение, которое будет записано в переключатель при совершении действия.
- * @default true
- *
- * @arg variableId
- * @text ID переменной
- * @type variable
- * @default 0
- *
- * @arg variableDelta
- * @text Дельта переменной
- * @type number
- * @desc Значение, которое будет прибавлено к переменной при совершении действия.
- * @default 0
+ * @arg switch
+ * @text Переключатель
+ * @type struct<SwitchDataStruct>
  * 
- * @arg variableExactValue
- * @text Точное значение пременной
- * @type number
- * @desc Значение, которое будет присвоено в переменную при совершении действия, если "Дельта перменной" равна 0.
- * @default 0
+ * @arg selfSwitch
+ * @text Локальный переключатель
+ * @type struct<SelfSwitchDataStruct>
+ *
+ * @arg variable
+ * @text Переменная
+ * @type struct<VariableDataStruct>
  * 
  * @arg pictureVariableId
  * @text Переменная номера картинки
@@ -397,6 +391,65 @@ E-mail: olek.olegovich@gmail.com
  * Но обязательно укажите меня в титрах!
  */
 
+/*~struct~SwitchDataStruct:ru
+ * @param switchId
+ * @text ID переключателя
+ * @type switch
+ * @default 0
+ *
+ * @param switchState
+ * @text Состояние переключателя
+ * @type boolean
+ * @desc Значение, которое будет записано в переключатель при совершении действия.
+ * @default true
+ */
+
+/*~struct~SelfSwitchDataStruct:ru
+ * @param mapId
+ * @text ID карты
+ * @type number
+ * @default 0
+ * 
+ * @param eventId
+ * @text ID события
+ * @type number
+ * @default 0
+ * 
+ * @param selfSwitchId
+ * @text ID локального переключателя
+ * @type combo
+ * @option A
+ * @option B
+ * @option C
+ * @option D
+ * @default A
+ *
+ * @param switchState
+ * @text Состояние переключателя
+ * @type boolean
+ * @desc Значение, которое будет записано в переключатель при совершении действия.
+ * @default true
+ */
+
+/*~struct~VariableDataStruct:ru
+ * @param variableId
+ * @text ID переменной
+ * @type variable
+ * @default 0
+ *
+ * @param variableDelta
+ * @text Дельта переменной
+ * @type number
+ * @desc Значение, которое будет прибавлено к переменной при совершении действия.
+ * @default 0
+ * 
+ * @param variableExactValue
+ * @text Точное значение пременной
+ * @type number
+ * @desc Значение, которое будет присвоено в переменную при совершении действия, если "Дельта перменной" равна 0.
+ * @default 0
+ */
+
 (function() {
 
 //--------MY CODE:    
@@ -409,33 +462,69 @@ E-mail: olek.olegovich@gmail.com
 
     var globalPhileasPictureTrigger = {};
     
+    function getAct(params) {
+        let switchData = {
+            id: 0,
+            state: false
+        }
+
+        let selfSwitchData = {
+            mapId: 0,
+            eventId: 0,
+            id: "",
+            state: false
+        }
+
+        let variableData = {
+            id: 0,
+            delta: 0,
+            exactValue: 0
+        }
+
+        if (params["switch"] != undefined && params["switch"] != "") {
+            const data = JSON.parse(params["switch"]);
+            switchData.id = Number(data["switchId"]);
+            switchData.state = data["switchState"] == "true";
+        }
+
+        if (params["selfSwitch"] != undefined && params["selfSwitch"] != "") {
+            const data = JSON.parse(params["selfSwitch"]);
+            selfSwitchData.mapId = Number(data["mapId"]);
+            selfSwitchData.eventId = Number(data["eventId"]);
+            selfSwitchData.id = data["selfSwitchId"];
+            selfSwitchData.state = data["switchState"] == "true";
+        }
+
+        if (params["variable"] != undefined && params["variable"] != "") {
+            const data = JSON.parse(params["variable"]);
+            variableData.id = Number(data["variableId"]);
+            variableData.delta = Number(data["variableDelta"]) || 0;
+            variableData.exactValue = Number(data["variableExactValue"]) || 0;
+        }
+        
+        const pictureVariableId = Number(params["pictureVariableId"]);
+        const commonEventId = Number(params["commonEventId"]);
+
+        let act = {};
+        act.switchData = switchData;
+        act.selfSwitchData = selfSwitchData;
+        act.variableData = variableData;
+        act.pictureVariableId = pictureVariableId;
+        act.commonEventId = commonEventId;
+
+        return act;
+    }
+
     function assignAction(params) {
         const pictureId = Number(params["pictureId"]) || 1;
-        const switchId = Number(params["switchId"]);
-        const switchState = params["switchState"] == "true";
-        const variableId = Number(params["variableId"]);
-        const pictureVariableId = Number(params["pictureVariableId"]);
-        const variableDelta = Number(params["variableDelta"]) || 0;
-        const variableExactValue = Number(params["variableExactValue"]) || 0;
-        const commonEventId = Number(params["commonEventId"]);
-        const action = params["action"];
-        
         const picture = $gameScreen.picture(pictureId);
         if (picture) {
-            let act = {};
-            act.switchId = switchId;
-            act.switchState = switchState;
-            act.variableId = variableId;
-            act.pictureVariableId = pictureVariableId;
-            act.variableDelta = variableDelta;
-            act.variableExactValue = variableExactValue;
-            act.commonEventId = commonEventId;
-            
             if (picture.phileasPictureTrigger == undefined) {
                 picture.phileasPictureTrigger = {};
             }
             
-            picture.phileasPictureTrigger[action] = act;
+            const action = params["action"];
+            picture.phileasPictureTrigger[action] = getAct(params);
         }
     }
     
@@ -457,25 +546,8 @@ E-mail: olek.olegovich@gmail.com
     }
 
     function assignGlobal(params) {
-        const switchId = Number(params["switchId"]);
-        const switchState = params["switchState"] == "true";
-        const variableId = Number(params["variableId"]);
-        const pictureVariableId = Number(params["pictureVariableId"]);
-        const variableDelta = Number(params["variableDelta"]) || 0;
-        const variableExactValue = Number(params["variableExactValue"]) || 0;
-        const commonEventId = Number(params["commonEventId"]);
         const action = params["action"];
-        
-        let act = {};
-        act.switchId = switchId;
-        act.switchState = switchState;
-        act.variableId = variableId;
-        act.pictureVariableId = pictureVariableId;
-        act.variableDelta = variableDelta;
-        act.variableExactValue = variableExactValue;
-        act.commonEventId = commonEventId;
-            
-        globalPhileasPictureTrigger[action] = act;
+        globalPhileasPictureTrigger[action] = getAct(params);
     }
 
     function eraseGlobal(params) {
@@ -492,22 +564,27 @@ E-mail: olek.olegovich@gmail.com
             return;
         }
         
-        if (act.switchId != undefined && act.switchId > 0 && act.switchState != undefined) {
+        if (act.switchData.id != undefined && act.switchData.id > 0 && act.switchData.state != undefined) {
             $gameSwitches.setValue(
-                act.switchId,
-                act.switchState);
+                act.switchData.id,
+                act.switchData.state);
+        }
+
+        if (act.selfSwitchData.mapId > 0 && act.selfSwitchData.eventId > 0 && act.selfSwitchData.id != "" && act.selfSwitchData.state != undefined) {
+            const key = [act.selfSwitchData.mapId, act.selfSwitchData.eventId, act.selfSwitchData.id];
+            $gameSelfSwitches.setValue(key, act.selfSwitchData.state);
         }
         
-        if (act.variableId != undefined && act.variableId > 0) {
-            if (act.variableDelta != undefined && act.variableDelta != 0) {
-                const current = $gameVariables.value(act.variableId);
+        if (act.variableData.id != undefined && act.variableData.id > 0) {
+            if (act.variableData.delta != undefined && act.variableData.delta != 0) {
+                const current = $gameVariables.value(act.variableData.delta.id);
                 $gameVariables.setValue(
-                    act.variableId,
-                    current + act.variableDelta);
-            } else if (act.variableExactValue != undefined) {
+                    act.variableData.id,
+                    current + act.variableData.delta);
+            } else if (act.variableData.exactValue != undefined) {
                 $gameVariables.setValue(
-                    act.variableId,
-                    act.variableExactValue);
+                    act.variableData.id,
+                    act.variableData.exactValue);
             }
         }
 
