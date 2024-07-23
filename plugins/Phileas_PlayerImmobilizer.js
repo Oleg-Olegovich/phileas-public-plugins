@@ -106,7 +106,7 @@
 
 //--------MY CODE:
     var parameters = PluginManager.parameters("Phileas_PlayerImmobilizer");
-    var movementSwitch = parameters["Movement switch"] || 0;
+    var movementSwitch = Number(parameters["Movement switch"]) || 0;
     var saveState = parameters["saveState"] == "true";
     var stopPlayer = false;
     
