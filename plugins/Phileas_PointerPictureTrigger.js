@@ -557,6 +557,10 @@ E-mail: olek.olegovich@gmail.com
         const action = params["action"];
         const picture = $gameScreen.picture(pictureId);
         if (picture) {
+            if (picture.phileasPictureTrigger == undefined) {
+                picture.phileasPictureTrigger = {};
+            }
+
             picture.phileasPictureTrigger[action] = undefined;
         }
     }
