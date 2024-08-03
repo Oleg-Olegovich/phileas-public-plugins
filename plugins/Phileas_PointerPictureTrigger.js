@@ -8,6 +8,7 @@
 // 2024.June.18 Ver1.3.0 Added global action
 // 2024.July.16 Ver1.4.0 Added self switch support
 // 2024.July.16 Ver1.4.1 Added alpha pixel check
+// 2024.August.3 Ver1.4.2 Fixed localizations
 
 /*
 Title: Phileas_PointerPictureTrigger
@@ -126,6 +127,11 @@ E-mail: olek.olegovich@gmail.com
  * @text Common event ID
  * @type common_event
  * @default 0
+ * 
+ * @arg ignoreTransparentPixels
+ * @text Ignore transparent pixels
+ * @type boolean
+ * @default true
  *
  * @arg action
  * @text Action
@@ -280,6 +286,11 @@ E-mail: olek.olegovich@gmail.com
  * @text ID общего события
  * @type common_event
  * @default 0
+ * 
+ * @arg ignoreTransparentPixels
+ * @text Игнорировать прозрачные пиксели
+ * @type boolean
+ * @default true
  *
  * @arg action
  * @text Действие
@@ -340,6 +351,11 @@ E-mail: olek.olegovich@gmail.com
  * @text ID общего события
  * @type common_event
  * @default 0
+ * 
+ * @arg ignoreTransparentPixels
+ * @text Игнорировать прозрачные пиксели
+ * @type boolean
+ * @default true
  *
  * @arg action
  * @text Действие
