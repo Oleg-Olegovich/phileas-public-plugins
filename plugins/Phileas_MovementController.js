@@ -4,6 +4,7 @@
 // [Update History]
 // 2024.May.30 Ver1.0.0 First Release
 // 2024.May.30 Ver1.0.1 Fixed switch parameters
+// 2024.August.07 Ver1.0.2 Diagonal movement compatibility
 
 /*:
  * @target MZ
@@ -209,6 +210,58 @@
         verticalInversion = params["verticalInversion"] == "true";
     }
 
+    function inverseDir4() {
+        if (horizontalInversion) {
+            if (Input._dir4 == 4) {
+                Input._dir4 = 6;
+            } else if (Input._dir4 == 6) {
+                Input._dir4 = 4;
+            }
+        }
+        
+        if (verticalInversion) {
+            if (Input._dir4 == 8) {
+                Input._dir4 = 2;
+            } else if (Input._dir4 == 2) {
+                Input._dir4 = 8;
+            }
+        }
+    }
+
+    function inverseDir8() {
+        if (horizontalInversion) {
+            if (Input._dir8 == 4) {
+                Input._dir8 = 6;
+            } else if (Input._dir8 == 6) {
+                Input._dir8 = 4;
+            } else if (Input._dir8 == 1) {
+                Input._dir8 = 3;
+            } else if (Input._dir8 == 3) {
+                Input._dir8 = 1;
+            } else if (Input._dir8 == 7) {
+                Input._dir8 = 9;
+            } else if (Input._dir8 == 9) {
+                Input._dir8 = 7;
+            }
+        }
+        
+        if (verticalInversion) {
+            if (Input._dir8 == 8) {
+                Input._dir8 = 2;
+            } else if (Input._dir8 == 2) {
+                Input._dir8 = 8;
+            } else if (Input._dir8 == 7) {
+                Input._dir8 = 1;
+            } else if (Input._dir8 == 1) {
+                Input._dir8 = 7;
+            } else if (Input._dir8 == 9) {
+                Input._dir8 = 3;
+            } else if (Input._dir8 == 3) {
+                Input._dir8 = 9;
+            }
+        }
+    }
+
 //--------CHANGED CORE:
     const Origin_setupNewGame = DataManager.setupNewGame;
     DataManager.setupNewGame = function() {
@@ -249,21 +302,8 @@
             return;
         }
 
-        if (horizontalInversion) {
-            if (Input._dir4 == 4) {
-                Input._dir4 = 6;
-            } else if (Input._dir4 == 6) {
-                Input._dir4 = 4;
-            }
-        }
-        
-        if (verticalInversion) {
-            if (Input._dir4 == 8) {
-                Input._dir4 = 2;
-            } else if (Input._dir4 == 2) {
-                Input._dir4 = 8;
-            }
-        }
+        inverseDir4();
+        inverseDir8();
         
         Origin_moveByInput.call(this);
     };
