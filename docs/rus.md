@@ -6,6 +6,7 @@
 #### Ввод
 | Название | Описание | Код | Форум |
 | --- | --- | --- | --- |
+| **Phileas's Action Button Settings** | Кастомизация функций кнопки действия (OK) | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_ActionButtonSettings.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-action-button-settings.970) |
 | **Phileas's Cursor** | Плагин курсора (мыши, указателя) | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_Cursor.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-cursor.377) |
 | **Phileas's Game Hot Keys** | Горячие клавиши: назначение общих событий и переключателей на клавиши клавиатуры, геймпада и мыши | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_GameHotKeys.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-game-hot-keys.327) |
 | **Phileas's Movement Controller** | Контроль движения игрока и событий | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_MovementController.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-movement-controller.809) |
