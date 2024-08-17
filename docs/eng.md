@@ -6,6 +6,7 @@ Some of the plugins for MZ can work on MV. But I haven't tested it. Write to [me
 #### Input
 | Name | Description | Code | Forum |
 | --- | --- | --- | --- |
+| **Phileas's Action Button Settings** | Customization of action (OK) button features | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_ActionButtonSettings.js) | [Thread](https://forums.rpgmakerweb.com/index.php?threads/phileass-action-button-settings-customization-of-action-ok-button-features.171156/) |
 | **Phileas's Cursor** | Cursor plugin (mouse, pointer) | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_Cursor.js) | [Thread](https://forums.rpgmakerweb.com/index.php?threads/mz-phileass-cursor-mz-cursor-customizer.160470/) |
 | **Phileas's Game Hot Keys** | Shortcuts: assigning common events and switches to keyboard, gamepad, and mouse keys | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_GameHotKeys.js) | [Thread](https://forums.rpgmakerweb.com/index.php?threads/phileass-game-hot-keys-mz-hot-key-map-shortcuts-manager-customizer.159433/) |
 | **Phileas's Movement Controller** | Controls the movement of the player and events | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_MovementController.js) | [Thread](https://forums.rpgmakerweb.com/index.php?threads/mz-phileass-movement-controller.169130/) |
