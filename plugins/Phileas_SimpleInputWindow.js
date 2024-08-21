@@ -6,6 +6,7 @@
 // 2024.May.01 Ver1.0.1 Fixed keyboard input
 // 2024.May.05 Ver1.0.2 Improved keyboard input
 // 2024.July.06 Ver1.0.3 Fixed russian keyboard
+// 2024.August.21 Ver1.1.0 Added message
 
 /*:
  * @target MZ
@@ -86,6 +87,10 @@
  * @option Japanese
  * @value ja
  * @default en
+ * 
+ * @arg message
+ * @text Message
+ * @desc If the message is empty, the message box will not be displayed
  *
  *
  * @command variableInput
@@ -157,6 +162,12 @@
  * @option Japanese
  * @value ja
  * @default en
+ * 
+ * @arg message
+ * @text Message
+ * @type note
+ * @desc If the message is empty, the message box will not be displayed
+ * 
  *
  * @help
  * The plugin allows you to display a minimalistic input window and provides many configuration options.
@@ -262,6 +273,10 @@
  * @option Японский
  * @value ja
  * @default en
+ * 
+ * @arg message
+ * @text Сообщение
+ * @desc Если сообщение пустое, то окно сообщения не будет отображаться
  *
  *
  * @command variableInput
@@ -333,6 +348,11 @@
  * @option Японский
  * @value ja
  * @default en
+ * 
+ * @arg message
+ * @text Сообщение
+ * @desc Если сообщение пустое, то окно сообщения не будет отображаться
+ * 
  *
  * @help
  * Плагин позволяет отображать минималистичное окно ввода и предоставляет множество параметров конфигурации.
@@ -443,11 +463,12 @@ const PHILEAD_EN_RU_MAP = {
         const keyboardInput = params["keyboardInput"] == "true";
         const firstIsUpper = params["firstIsUpper"] == "true";
         const clear = params["clear"] == "true";
+        const message = params["message"] || "";
 
         SceneManager.push(Scene_PhileasInput);
         SceneManager.prepareNextScene(actorId, showFace, variableId, language,
-            keyMap, minLength, maxLength, allowCancel,
-            allowSpace, keyboardInput, firstIsUpper, clear);
+            keyMap, minLength, maxLength, allowCancel, allowSpace,
+            keyboardInput, firstIsUpper, clear, message);
     }
 
     function nameInput(params) {
@@ -480,7 +501,7 @@ Scene_PhileasInput.prototype.initialize = function() {
 
 Scene_PhileasInput.prototype.prepare = function(actorId, showFace,
     variableId, language, keyMap, minLength, maxLength, allowCancel,
-    allowSpace, keyboardInput, firstIsUpper, clear) {
+    allowSpace, keyboardInput, firstIsUpper, clear, message) {
 
     this._actorId = actorId;
     this._showFace = showFace;
@@ -494,6 +515,7 @@ Scene_PhileasInput.prototype.prepare = function(actorId, showFace,
     this._keyboardInput = keyboardInput;
     this._firstIsUpper = firstIsUpper;
     this._clear = clear;
+    this._message = message == "" ? "" : JSON.parse(message);
 
     const table = Window_PhileasInput.table(language, keyMap);
     const columnsNumber = Math.ceil(Math.sqrt(table.length));
@@ -507,6 +529,7 @@ Scene_PhileasInput.prototype.create = function() {
         : $gameActors.actor(this._actorId);
     this.createEditWindow();
     this.createInputWindow();
+    this.createMessageWindow();
 };
 
 Scene_PhileasInput.prototype.start = function() {
@@ -527,7 +550,8 @@ Scene_PhileasInput.prototype.editWindowRect = function() {
     const wh = ImageManager.faceHeight + padding * 2;
     const wx = (Graphics.boxWidth - ww) / 2;
     const inputWindowHeight = this.calcWindowHeight(this._inputRowsNumber, true);
-    const wy = (Graphics.boxHeight - (wh + inputWindowHeight + 8)) / 2;
+    const msgHeight = this._message == "" ? 0 : this.calcWindowHeight(2, false) + 8;
+    const wy = (Graphics.boxHeight - (wh + inputWindowHeight + 8) - msgHeight) / 2;
 
     return new Rectangle(wx, wy, ww, wh);
 };
@@ -556,6 +580,24 @@ Scene_PhileasInput.prototype.createInputWindow = function() {
     this._inputWindow.setHandler("ok", this.onInputOk.bind(this));
     this._inputWindow.setHandler("cancel", this.onInputCancel.bind(this));
     this.addWindow(this._inputWindow);
+};
+
+Scene_PhileasInput.prototype.messageWindowRect = function() {
+    const wx = this._inputWindow.x;
+    const wy = this._inputWindow.y + this._inputWindow.height + 8;
+    const ww = this._inputWindow.width;
+    const wh = this.calcWindowHeight(2, false) + 8;
+    return new Rectangle(wx, wy, ww, wh);
+};
+
+Scene_PhileasInput.prototype.createMessageWindow = function() {
+    if (this._message == "") {
+        return;
+    }
+
+    const rect = this.messageWindowRect();
+    this._messageWindow = new Window_PhileasMessage(rect, this._message);
+    this.addWindow(this._messageWindow);
 };
 
 Scene_PhileasInput.prototype.onInputOk = function() {
@@ -947,4 +989,62 @@ Window_PhileasEdit.prototype.drawActorFace = function(
 
 Window_PhileasEdit.prototype.left = function() {
     return this._left;
+};
+
+
+//-----------------------------------------------------------------------------
+// Window_PhileasMessage
+
+function Window_PhileasMessage() {
+    this.initialize(...arguments);
+}
+
+Window_PhileasMessage.prototype = Object.create(Window_Base.prototype);
+Window_PhileasMessage.prototype.constructor = Window_PhileasMessage;
+
+Window_PhileasMessage.prototype.initialize = function(rect, message) {
+    Window_Base.prototype.initialize.call(this, rect);
+    this._message = message;
+    this._background = $gameMessage.background();
+    this.showMessage();
+};
+
+Window_PhileasMessage.prototype.showMessage = function() {
+    const textState = this.createTextState(this._message, 0, 0, 0);
+    textState.x = this.newLineX(textState);
+    textState.startX = textState.x;
+    this._textState = textState;
+    this.newPage(this._textState);
+    this.open();
+    this.updateMessage();
+};
+
+Window_PhileasMessage.prototype.newLineX = function(textState) {
+    const margin = 4;
+    return textState.rtl ? this.innerWidth - margin : margin;
+};
+
+Window_PhileasMessage.prototype.newPage = function(textState) {
+    this.contents.clear();
+    this.resetFontSettings();
+    textState.x = textState.startX;
+    textState.y = 0;
+    textState.height = this.calcTextHeight(textState);
+};
+
+Window_PhileasMessage.prototype.updateMessage = function() {
+    const textState = this._textState;
+    if (!textState) {
+        return;
+    }
+
+    while (!this.isEndOfText(textState)) {
+        this.processCharacter(textState);
+    }
+
+    this.flushTextState(textState);
+};
+
+Window_PhileasMessage.prototype.isEndOfText = function(textState) {
+    return textState.index >= textState.text.length;
 };
