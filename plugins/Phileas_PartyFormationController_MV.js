@@ -3,6 +3,7 @@
 //=============================================================================
 // [Update History]
 // 2024.April.13 Ver1.0.0 First Release
+// 2024.August.21 Ver1.0.1 Fixed typo
 
 /*:
  * @target MV
@@ -148,7 +149,7 @@
 
     const Origin_isCurrentItemEnabled= Window_MenuStatus.prototype.isCurrentItemEnabled;
     Window_MenuStatus.prototype.isCurrentItemEnabled = function() {
-        if ((enable || enableSwitch > 0 && $gameSwitches.value(movementSwitch) == true)
+        if ((enable || enableSwitch > 0 && $gameSwitches.value(enableSwitch) == true)
             && lockedPositions.includes(this.index() + 1) === true) {
 
             SoundManager.playBuzzer();
