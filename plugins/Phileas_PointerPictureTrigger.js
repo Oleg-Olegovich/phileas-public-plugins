@@ -462,6 +462,7 @@ E-mail: olek.olegovich@gmail.com
  * @param variableDelta
  * @text Дельта переменной
  * @type number
+ * @min -9999999
  * @desc Значение, которое будет прибавлено к переменной при совершении действия.
  * @default 0
  * 
