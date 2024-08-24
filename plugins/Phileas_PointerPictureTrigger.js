@@ -9,6 +9,7 @@
 // 2024.July.16 Ver1.4.0 Added self switch support
 // 2024.July.16 Ver1.4.1 Added alpha pixel check
 // 2024.August.3 Ver1.4.2 Fixed localizations
+// 2024.August.24 Ver1.4.3 Fixed variable delta
 
 /*
 Title: Phileas_PointerPictureTrigger
@@ -606,7 +607,7 @@ E-mail: olek.olegovich@gmail.com
         
         if (act.variableData.id != undefined && act.variableData.id > 0) {
             if (act.variableData.delta != undefined && act.variableData.delta != 0) {
-                const current = $gameVariables.value(act.variableData.delta.id);
+                const current = $gameVariables.value(act.variableData.id);
                 $gameVariables.setValue(
                     act.variableData.id,
                     current + act.variableData.delta);
