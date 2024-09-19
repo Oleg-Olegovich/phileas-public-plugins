@@ -10,6 +10,7 @@
 // 2024.July.16 Ver1.4.1 Added alpha pixel check
 // 2024.August.3 Ver1.4.2 Fixed localizations
 // 2024.August.24 Ver1.4.3 Fixed variable delta
+// 2024.September.24 Ver1.4.4 Blocked player movement when the trigger is triggered
 
 /*
 Title: Phileas_PointerPictureTrigger
@@ -728,5 +729,16 @@ E-mail: olek.olegovich@gmail.com
             this._pressed = false;
             this._hovered = false;
         }
+    };
+
+    Spriteset_Base.prototype.phileasIsAnyPicturePressed = function() {
+        return this._pictureContainer.children.some(sprite =>
+            sprite.isPressed()
+        );
+    };
+
+    const Origin_Scene_Map_isAnyButtonPressed = Scene_Map.prototype.isAnyButtonPressed;
+    Scene_Map.prototype.isAnyButtonPressed = function() {
+        return Origin_Scene_Map_isAnyButtonPressed.call(this) || this._spriteset.phileasIsAnyPicturePressed();
     };
 }());
