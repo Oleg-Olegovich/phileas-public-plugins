@@ -12,22 +12,6 @@
 // 2024.August.24 Ver1.4.3 Fixed variable delta
 // 2024.September.19 Ver1.4.4 Blocked player movement when the trigger is triggered
 
-/*
-Title: Phileas_PointerPictureTrigger
-Author: Phileas
-Site: https://boosty.to/phileas
-E-mail: olek.olegovich@gmail.com
-Version: 1.4.0
-*/
-
-/*ru
-Название: Phileas_PointerPictureTrigger
-Автор: Phileas
-Сайт: https://boosty.to/phileas
-E-mail: olek.olegovich@gmail.com
-Версия: 1.4.0
-*/
-
 /*:
  * @target MZ
  * @plugindesc Triggering of the switch/variable/common event when the pointer acts with the picture
