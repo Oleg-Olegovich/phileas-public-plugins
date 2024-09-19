@@ -10,7 +10,7 @@
 // 2024.July.16 Ver1.4.1 Added alpha pixel check
 // 2024.August.3 Ver1.4.2 Fixed localizations
 // 2024.August.24 Ver1.4.3 Fixed variable delta
-// 2024.September.24 Ver1.4.4 Blocked player movement when the trigger is triggered
+// 2024.September.19 Ver1.4.4 Blocked player movement when the trigger is triggered
 
 /*
 Title: Phileas_PointerPictureTrigger
