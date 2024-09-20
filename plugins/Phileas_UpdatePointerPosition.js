@@ -30,7 +30,6 @@
  * @command switchPlugin
  * @text Switch plugin
  * @arg isEnabled
- * @text Is the plugin enabled?
  * @type boolean
  * @default true
  * 
@@ -75,7 +74,6 @@
  * @command switchPlugin
  * @text Переключить плагин
  * @arg isEnabled
- * @text Плагин включён?
  * @type boolean
  * @default true
  * 
