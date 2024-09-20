@@ -26,6 +26,7 @@
  * @text Update switch
  * @type switch
  * @default 0
+ * @desc The switch will turn on when the coordinates are updated
  *
  * @command switchPlugin
  * @text Switch plugin
@@ -70,6 +71,7 @@
  * @text Переключатель обновления
  * @type switch
  * @default 0
+ * @desc Переключатель будет включаться при обновлении координат
  *
  * @command switchPlugin
  * @text Переключить плагин
