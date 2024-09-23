@@ -17,6 +17,7 @@
 | Название | Описание | Код | Форум |
 | --- | --- | --- | --- |
 | **Phileas's Event Label** | Надписи над событиями, NPC и игроком | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_EventLabel.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-event-label.315) |
+| **Phileas's Event Passability** | Расширенная настройка проходимости событий | [MV](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_EventPassability_MV.js) [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_EventPassability.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-event-passability.1066) |
 | **Phileas's Destination Sprite** | Кастомизация спрайта назначения (белый квадрат при клике по карте) | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_DestinationSprite.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-destination-sprite.733) |
 
 #### Меню
