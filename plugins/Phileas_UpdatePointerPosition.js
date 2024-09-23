@@ -26,11 +26,11 @@
  * @text Update switch
  * @type switch
  * @default 0
+ * @desc The switch will turn on when the coordinates are updated
  *
  * @command switchPlugin
  * @text Switch plugin
  * @arg isEnabled
- * @text Is the plugin enabled?
  * @type boolean
  * @default true
  * 
@@ -71,11 +71,11 @@
  * @text Переключатель обновления
  * @type switch
  * @default 0
+ * @desc Переключатель будет включаться при обновлении координат
  *
  * @command switchPlugin
  * @text Переключить плагин
  * @arg isEnabled
- * @text Плагин включён?
  * @type boolean
  * @default true
  * 
