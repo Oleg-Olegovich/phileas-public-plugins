@@ -11,6 +11,7 @@
 // 2024.August.3 Ver1.4.2 Fixed localizations
 // 2024.August.24 Ver1.4.3 Fixed variable delta
 // 2024.September.19 Ver1.4.4 Blocked player movement when the trigger is triggered
+// 2024.September.23 Ver1.5.0 Commands to enable and disable the plugin
 
 /*:
  * @target MZ
@@ -143,6 +144,13 @@
  * @command eraseAllGlobal
  * @text Erase all global actions
  * @desc Removes bindings to all global actions.
+ * 
+ * @command disablePlugin
+ * @text Disable the plugin
+ * @desc Triggers stop working, but data about them is not deleted
+ * 
+ * @command enablePlugin
+ * @text Enable the plugin
  *
  * @help
  * Triggering of a switch or a common event when the pointer with the picture acts:
@@ -368,6 +376,13 @@
  * @text Удалить все глобальные действия
  * @desc Удаляет привязки ко всем глобальным действиям.
  * 
+ * @command disablePlugin
+ * @text Отключить плагин
+ * @desc Триггеры перестают работать, но данные о них не удаляются
+ * 
+ * @command enablePlugin
+ * @text Включить плагин
+ * 
  * @help
  * Срабатывание переключателя, переменной или общего события при действиях указателя с картинкой:
  * наведение, уведение, клик, нажатие.
@@ -468,8 +483,11 @@
     PluginManager.registerCommand("Phileas_PointerPictureTrigger", "assignGlobal", assignGlobal);
     PluginManager.registerCommand("Phileas_PointerPictureTrigger", "eraseGlobal", eraseGlobal);
     PluginManager.registerCommand("Phileas_PointerPictureTrigger", "eraseAllGlobal", eraseAllGlobal);
+    PluginManager.registerCommand("Phileas_PointerPictureTrigger", "disablePlugin", disablePlugin);
+    PluginManager.registerCommand("Phileas_PointerPictureTrigger", "enablePlugin", enablePlugin);
 
     var globalPhileasPictureTrigger = {};
+    var isPluginEnabled = true;
     
     function getAct(params) {
         let switchData = {
@@ -574,6 +592,14 @@
         globalPhileasPictureTrigger = {};
     }
 
+    function disablePlugin() {
+        isPluginEnabled = false;
+    }
+
+    function enablePlugin() {
+        isPluginEnabled = true;
+    }
+
     function tryAct(act, pictureId) {
         if (act == undefined) {
             return;
@@ -615,6 +641,10 @@
     }
     
     function tryTrigger(pictureId, action) {
+        if (!isPluginEnabled) {
+            return;
+        }
+
         const picture = $gameScreen.picture(pictureId);
 
         if (picture != undefined && picture.phileasPictureTrigger != undefined) {
@@ -671,6 +701,10 @@
 
     const Origin_processTouch = Sprite_Picture.prototype.processTouch;
     Sprite_Picture.prototype.processTouch = function() {
+        if (!isPluginEnabled) {
+            return;
+        }
+
         const picture = $gameScreen.picture(this._pictureId);
 
         if (picture == undefined || picture.phileasPictureTrigger == undefined
@@ -716,6 +750,10 @@
     };
 
     Spriteset_Base.prototype.phileasIsAnyPicturePressed = function() {
+        if (!isPluginEnabled) {
+            return false;
+        }
+
         return this._pictureContainer.children.some(sprite =>
             sprite.isPressed()
         );
@@ -724,5 +762,29 @@
     const Origin_Scene_Map_isAnyButtonPressed = Scene_Map.prototype.isAnyButtonPressed;
     Scene_Map.prototype.isAnyButtonPressed = function() {
         return Origin_Scene_Map_isAnyButtonPressed.call(this) || this._spriteset.phileasIsAnyPicturePressed();
+    };
+
+    const Origin_setupNewGame = DataManager.setupNewGame;
+    DataManager.setupNewGame = function () {
+        Origin_setupNewGame.call(this);
+        isPluginEnabled = true;
+        globalPhileasPictureTrigger = {};
+    };
+
+    const Origin_makeSaveContents = DataManager.makeSaveContents;
+    DataManager.makeSaveContents = function () {
+        let contents = Origin_makeSaveContents.call(this);
+        contents.phileasIsPointerPictureTriggerEnabled = isPluginEnabled;
+        contents.globalPhileasPictureTrigger = globalPhileasPictureTrigger;
+        return contents;
+    };
+
+    const Origin_extractSaveContents = DataManager.extractSaveContents;
+    DataManager.extractSaveContents = function (contents) {
+        Origin_extractSaveContents.call(this, contents);
+        isPluginEnabled = contents.phileasIsPointerPictureTriggerEnabled == undefined
+            ? true
+            : contents.phileasIsPointerPictureTriggerEnabled;
+        globalPhileasPictureTrigger = contents.globalPhileasPictureTrigger;
     };
 }());
