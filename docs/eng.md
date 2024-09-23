@@ -17,6 +17,7 @@ Some of the plugins for MZ can work on MV. But I haven't tested it. Write to [me
 | Name | Description | Code | Forum |
 | --- | --- | --- | --- |
 | **Phileas's Event Label** | Labels above events, NPC and player | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_EventLabel.js) | [Thread](https://forums.rpgmakerweb.com/index.php?threads/phileass-event-label-mz-event-label-label-above-the-events.158999/) |
+| **Phileas's Event Passability** | Advanced event passability settings | [MV](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_EventPassability_MV.js) [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_EventPassability.js) | [Thread](https://forums.rpgmakerweb.com/index.php?threads/mz-phileass-event-passability-advanced-event-passability-settings.172099/) |
 | **Phileas's Destination Sprite** | The destination sprite customization (white square when clicking on the map) | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_DestinationSprite.js) | [Thread](https://forums.rpgmakerweb.com/index.php?threads/phileass-destination-sprite-mz-destination-sprite-customizer.167764/) |
 
 #### Menu
