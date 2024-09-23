@@ -13,6 +13,7 @@
 // 2024.May.11 Ver1.3.3 Turning event cursors on/off
 // 2024.May.13 Ver1.3.4 Fixed menu/battle cursor switch
 // 2024.May.28 Ver1.3.5 Fixed save loading
+// 2024.September.23 Ver1.3.6 Cursor data getting fix
 
 /*:
  * @target MZ
@@ -1217,11 +1218,11 @@
         
         for (let i = 0; i < events.length; ++i) {
             const cursorData = events[i].phileasCursorData;
-            if (cursorData.CursorStartOnHover) {
+            if (cursorData != undefined && cursorData.CursorStartOnHover) {
                 events[i].start();
             }
             
-            if (cursorData.CursorPicture) {
+            if (cursorData != undefined && cursorData.CursorPicture) {
                 setCurrentCursor(cursorData);
             }
         }
@@ -1248,7 +1249,7 @@
             }
             
             const cursorData = events[i].phileasCursorData;
-            if (cursorData.CursorStartOnClick) {
+            if (cursorData != undefined && cursorData.CursorStartOnClick) {
                 events[i].start();
                 return true;
             }
