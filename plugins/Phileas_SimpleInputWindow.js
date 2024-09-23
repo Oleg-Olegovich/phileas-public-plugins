@@ -7,6 +7,7 @@
 // 2024.May.05 Ver1.0.2 Improved keyboard input
 // 2024.July.06 Ver1.0.3 Fixed russian keyboard
 // 2024.August.21 Ver1.1.0 Added message
+// 2024.September.23 Ver1.2.0 Improved Japanese display
 
 /*:
  * @target MZ
@@ -91,6 +92,11 @@
  * @arg message
  * @text Message
  * @desc If the message is empty, the message box will not be displayed
+ * 
+ * @arg widthPadding
+ * @text Width padding
+ * @number 0
+ * @desc The value is added to the width of the windows
  *
  *
  * @command variableInput
@@ -167,6 +173,11 @@
  * @text Message
  * @type note
  * @desc If the message is empty, the message box will not be displayed
+ * 
+ * @arg widthPadding
+ * @text Width padding
+ * @number 0
+ * @desc The value is added to the width of the windows
  * 
  *
  * @help
@@ -277,6 +288,11 @@
  * @arg message
  * @text Сообщение
  * @desc Если сообщение пустое, то окно сообщения не будет отображаться
+ * 
+ * @arg widthPadding
+ * @text Отступ по ширине
+ * @number 0
+ * @desc Значение прибавляется к ширине окон
  *
  *
  * @command variableInput
@@ -352,6 +368,11 @@
  * @arg message
  * @text Сообщение
  * @desc Если сообщение пустое, то окно сообщения не будет отображаться
+ * 
+ * @arg widthPadding
+ * @text Отступ по ширине
+ * @number 0
+ * @desc Значение прибавляется к ширине окон
  * 
  *
  * @help
@@ -434,8 +455,6 @@ const PHILEAS_KEYBOARD_DIGITS =
         "4", "5", "6", "7",
         "8", "9", SPACE_CHAR, BACKSPACE_CHAR, CONFIRM_CHAR];
 
-const PHILEAS_MIN_WINDOW_WIDTH = 300;
-
 const PHILEAS_FACE_PADDING = 20;
 
 const PHILEAD_EN_RU_MAP = {
@@ -464,11 +483,12 @@ const PHILEAD_EN_RU_MAP = {
         const firstIsUpper = params["firstIsUpper"] == "true";
         const clear = params["clear"] == "true";
         const message = params["message"] || "";
+        const widthPadding = Number(params["widthPadding"]) || 0;
 
         SceneManager.push(Scene_PhileasInput);
         SceneManager.prepareNextScene(actorId, showFace, variableId, language,
             keyMap, minLength, maxLength, allowCancel, allowSpace,
-            keyboardInput, firstIsUpper, clear, message);
+            keyboardInput, firstIsUpper, clear, message, widthPadding);
     }
 
     function nameInput(params) {
@@ -501,7 +521,7 @@ Scene_PhileasInput.prototype.initialize = function() {
 
 Scene_PhileasInput.prototype.prepare = function(actorId, showFace,
     variableId, language, keyMap, minLength, maxLength, allowCancel,
-    allowSpace, keyboardInput, firstIsUpper, clear, message) {
+    allowSpace, keyboardInput, firstIsUpper, clear, message, widthPadding) {
 
     this._actorId = actorId;
     this._showFace = showFace;
@@ -516,6 +536,7 @@ Scene_PhileasInput.prototype.prepare = function(actorId, showFace,
     this._firstIsUpper = firstIsUpper;
     this._clear = clear;
     this._message = message == "" ? "" : JSON.parse(message);
+    this._widthPadding = widthPadding;
 
     const table = Window_PhileasInput.table(language, keyMap);
     const columnsNumber = Math.ceil(Math.sqrt(table.length));
@@ -537,12 +558,30 @@ Scene_PhileasInput.prototype.start = function() {
     this._editWindow.refresh();
 };
 
+Scene_PhileasInput.prototype.getMinWindowWidth = function(calcWindow) {
+    let width = 0;
+
+    switch (this._language) {
+        case 'ru':
+            width = 6 * (calcWindow.textWidth("Ж") + 30);
+            break;
+        case 'ja':
+            width = 10 * (calcWindow.textWidth("\uff21") + 30);
+            break;
+        default:
+            width = 6 * (calcWindow.textWidth("A") + 30);
+            break;
+    }
+
+    return width + 20;
+}
+
 Scene_PhileasInput.prototype.editWindowRect = function() {
-    const calcWindow = new Window_PhileasEdit(new Rectangle(0, 0, 0, 0));
+    const calcWindow = new Window_PhileasEdit(new Rectangle(0, 0, 0, 0), this._language);
 
     const padding = $gameSystem.windowPadding();
-    let ww = (this._maxLength + 1) * calcWindow.charWidth() + 2 * padding;
-    ww = Math.max(ww, PHILEAS_MIN_WINDOW_WIDTH);
+    let ww = (this._maxLength + 1) * calcWindow.charWidth() + 2 * padding + this._widthPadding;
+    ww = Math.max(ww, this.getMinWindowWidth(calcWindow));
     if (this._showFace) {
         ww += ImageManager.faceWidth + PHILEAS_FACE_PADDING;
     }
@@ -558,7 +597,7 @@ Scene_PhileasInput.prototype.editWindowRect = function() {
 
 Scene_PhileasInput.prototype.createEditWindow = function() {
     const rect = this.editWindowRect();
-    this._editWindow = new Window_PhileasEdit(rect, this._showFace);
+    this._editWindow = new Window_PhileasEdit(rect, this._showFace, this._language);
     this._editWindow.setup(this._actor, this._variableId, this._maxLength, this._clear);
     this.addWindow(this._editWindow);
 };
@@ -947,11 +986,12 @@ function Window_PhileasEdit() {
 Window_PhileasEdit.prototype = Object.create(Window_NameEdit.prototype);
 Window_PhileasEdit.prototype.constructor = Window_PhileasEdit;
 
-Window_PhileasEdit.prototype.initialize = function(rect, showFace) {
+Window_PhileasEdit.prototype.initialize = function(rect, showFace, language) {
     Window_NameEdit.prototype.initialize.call(this, rect);
     this._rectWidth = rect.width;
     this._showFace = showFace;
     this._left = 0;
+    this.setCharWidth(language);
 };
 
 Window_PhileasEdit.prototype.setup = function(actor, variableId, maxLength, clear) {
@@ -989,6 +1029,24 @@ Window_PhileasEdit.prototype.drawActorFace = function(
 
 Window_PhileasEdit.prototype.left = function() {
     return this._left;
+};
+
+Window_PhileasEdit.prototype.setCharWidth = function(language) {
+    switch (language) {
+        case 'ru':
+            this._charWidth = this.textWidth("Ж");
+            break;
+        case 'ja':
+            this._charWidth = this.textWidth("\uff21");
+            break;
+        default:
+            this._charWidth = this.textWidth("A");
+            break;
+    }
+}
+
+Window_PhileasEdit.prototype.charWidth = function() {
+    return this._charWidth;
 };
 
 
