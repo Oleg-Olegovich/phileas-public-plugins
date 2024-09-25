@@ -12,6 +12,7 @@
 // 2024.August.24 Ver1.4.3 Fixed variable delta
 // 2024.September.19 Ver1.4.4 Blocked player movement when the trigger is triggered
 // 2024.September.23 Ver1.5.0 Commands to enable and disable the plugin
+// 2024.September.25 Ver1.5.1 Fixed exit trigger
 
 /*:
  * @target MZ
@@ -733,7 +734,7 @@
                     this.onPress();
                 }
             } else {
-                if (this._hovered && (clickAct == undefined || !checkPixel(this, clickAct))) {
+                if (this._hovered && (exitAct == undefined || checkPixel(this, exitAct))) {
                     this.onMouseExit();
                 }
                 this._pressed = false;
