@@ -644,751 +644,762 @@
 
 (function() {
 
-//--------MY CODE:
-
-//-----------------------------------------------------------------------------
-// Utils classes
-
-    function getMeta(data) {
-        const regExp = /<([^<>:]+)(:?)([^>]*)>/g;
-        let meta = {};
-        for (;;) {
-            const match = regExp.exec(data);
-            if (match) {
-                if (match[2] === ":") {
-                    meta[match[1]] = match[3];
-                } else {
-                    meta[match[1]] = true;
-                }
-            } else {
-                break;
-            }
-        }
-        
-        return meta;
-    };
-
-    function PhileasCursorData() {
-        this.initialize(...arguments);
-    }
+    //--------MY CODE:
     
-    PhileasCursorData.prototype.initialize = function() {
-        this.CursorPicture = "";
-        this.CursorPictureOnClick = "";
-        this.CursorFramesNumber = 1;
-        this.CursorClickFramesNumber = 1;
-        this.CursorXOffset = 1;
-        this.CursorYOffset = 1;
-    };
+    //-----------------------------------------------------------------------------
+    // Utils classes
     
-    PhileasCursorData.prototype.constructor = PhileasCursorData;
-    
-    PhileasCursorData.prototype.setFromJson = function(params) {
-        if (params == undefined) {
-            return;
-        }
-        
-        this.CursorPicture = params["CursorPicture"] || "";
-        this.CursorPictureOnClick = params["CursorPictureOnClick"] || "";
-        this.CursorXOffset = Number(params["CursorXOffset"]);
-        this.CursorYOffset = Number(params["CursorYOffset"]);
-        this.CursorFramesNumber = Number(params["CursorFramesNumber"]);
-        this.CursorClickFramesNumber = Number(params["CursorClickFramesNumber"]);
-    }
-
-    PhileasCursorData.prototype.setFromParams = function(params) {
-        if (params == "") {
-            return;
-        }
-        
-        params = JSON.parse(params);
-        this.setFromJson(params);
-    }
-    
-    PhileasCursorData.prototype.equals = function(cursorData) {
-        if (cursorData instanceof PhileasEventCursorData) {
-            return false;
-        }
-        
-        return this.CursorPicture == cursorData.CursorPicture
-            && this.CursorPictureOnClick == cursorData.CursorPictureOnClick
-            && this.CursorXOffset == cursorData.CursorXOffset
-            && this.CursorYOffset == cursorData.CursorYOffset
-            && this.CursorFramesNumber == cursorData.CursorFramesNumber
-            && this.CursorClickFramesNumber == cursorData.CursorClickFramesNumber;
-    }
-
-    function PhileasEventCursorData() {
-        this.initialize(...arguments);
-    }
-    
-    PhileasEventCursorData.prototype.initialize = function() {
-        PhileasCursorData.prototype.initialize.call(this);
-        this.CursorStartOnClick = false;
-        this.CursorStartOnHover = false;
-    };
-
-    PhileasEventCursorData.prototype = Object.create(PhileasCursorData.prototype);
-    PhileasEventCursorData.prototype.constructor = PhileasEventCursorData;
-    
-    PhileasEventCursorData.prototype.setFromNote = function(note) {
-        const meta = getMeta(note);
-        if (meta == undefined) {
-            return;
-        }
-
-        for (let i in phileasCursorTags) {
-            let tag = phileasCursorTags[i];
-            if (meta[tag] != undefined) {
-                this[tag] = meta[tag];
-            }
-        }
-        
-        this.CursorXOffset = Number(this.CursorXOffset);
-        this.CursorYOffset = Number(this.CursorYOffset);
-        this.CursorFramesNumber = Number(this.CursorFramesNumber);
-        this.CursorClickFramesNumber = Number(this.CursorClickFramesNumber);
-        this.CursorStartOnClick = this.CursorStartOnClick != undefined;
-        this.CursorStartOnHover = this.CursorStartOnHover != undefined;
-    };
-    
-    PhileasEventCursorData.prototype.setFromJson = function(params) {
-        if (params == undefined) {
-            return;
-        }
-        
-        this.CursorPicture = params["CursorPicture"] || "";
-        this.CursorPictureOnClick = params["CursorPictureOnClick"] || "";
-        this.CursorXOffset = Number(params["CursorXOffset"]);
-        this.CursorYOffset = Number(params["CursorYOffset"]);
-        this.CursorFramesNumber = Number(params["CursorFramesNumber"]);
-        this.CursorClickFramesNumber = Number(params["CursorClickFramesNumber"]);
-        this.CursorStartOnClick = params["CursorStartOnClick"] == "true";
-        this.CursorStartOnHover = params["CursorStartOnHover"] == "true";
-    }
-
-    PhileasEventCursorData.prototype.setFromParams = function(params) {
-        if (params == "") {
-            return;
-        }
-        
-        params = JSON.parse(params);
-        this.setFromJson(params);
-    }
-    
-    PhileasEventCursorData.prototype.equals = function(cursorData) {
-        if (!(cursorData instanceof PhileasEventCursorData)) {
-            return false;
-        }
-        
-        return this.CursorPicture == cursorData.CursorPicture
-            && this.CursorPictureOnClick == cursorData.CursorPictureOnClick
-            && this.CursorXOffset == cursorData.CursorXOffset
-            && this.CursorYOffset == cursorData.CursorYOffset
-            && this.CursorFramesNumber == cursorData.CursorFramesNumber
-            && this.CursorClickFramesNumber == cursorData.CursorClickFramesNumber
-            && this.CursorStartOnClick == cursorData.CursorStartOnClick
-            && this.CursorStartOnHover == cursorData.CursorStartOnHover;
-    }
-
-    
-//-----------------------------------------------------------------------------
-// Data
-
-    const base_url = "./img/system/";
-    const fallbackStyle = "pointer";
-    const phileasMouseKeyMap = {
-        "left": 0,
-        "middle": 1,
-        "right": 2
-    }
-    const phileasCursorTags = ["CursorPicture", "CursorPictureOnClick", "CursorXOffset", "CursorYOffset", "CursorFramesNumber", "CursorClickFramesNumber", "CursorStartOnClick", "CursorStartOnHover"];
-    
-    var parameters = PluginManager.parameters("Phileas_Cursor");
-    var hideAtStartup = parameters["hideAtStartup"] == "true";
-    var keyboardHideKey = parameters["keyboardHideKey"] || "";
-    var keyboardHideKeyNumber = Number(parameters["keyboardHideKeyNumber"] || 0);
-    var mouseHideKey = parameters["mouseHideKey"] || "";
-    var mouseHideKeyNumber = Number(parameters["mouseHideKeyNumber"] || 0);
-    var gamepadHideKey = parameters["gamepadHideKey"] || "";
-    var gamepadHideKeyNumber = Number(parameters["gamepadHideKeyNumber"] || 0);
-    var animationPeriod = Number(parameters["animationPeriod"] || 100);
-    var mapsPreload = parameters["mapsPreload"] == "true";
-    var commonEventsPreload = parameters["commonEventsPreload"] == "true";
-    
-    var defaultCursor = new PhileasCursorData();
-    defaultCursor.setFromParams(parameters["defaultCursor"]);
-    var battleCursor = new PhileasCursorData();
-    battleCursor.setFromParams(parameters["battleCursor"]);
-    var menuCursor = new PhileasCursorData();
-    menuCursor.setFromParams(parameters["menuCursor"]);
-    var eventCursorsEnabled = true;
-    var currentHidden = false;
-    var currentClick = false;
-    var lastFrameIncrementTime = 0; // milliseconds
-    var currentFrame = 0;
-    var currentClickFrame = 0;
-    var currentCursor = new PhileasCursorData();
-    var currentCursorSet = {
-        "file": "",
-        "x": -1,
-        "y": -1
-    }
-    setCurrentCursor(defaultCursor);
-    
-    PluginManager.registerCommand("Phileas_Cursor", "setDefaultCursor", setDefaultCursor);
-    PluginManager.registerCommand("Phileas_Cursor", "setBattleCursor", setBattleCursor);
-    PluginManager.registerCommand("Phileas_Cursor", "setMenuCursor", setMenuCursor);
-    PluginManager.registerCommand("Phileas_Cursor", "hide", hide);
-    PluginManager.registerCommand("Phileas_Cursor", "show", show);
-    PluginManager.registerCommand("Phileas_Cursor", "setEventCursorData", setEventCursorData);
-    PluginManager.registerCommand("Phileas_Cursor", "setGlobalEventCursorData", setGlobalEventCursorData);
-    PluginManager.registerCommand("Phileas_Cursor", "disableEventCursors", disableEventCursors);
-    PluginManager.registerCommand("Phileas_Cursor", "enableEventCursors", enableEventCursors);
-    
-    // key - mapId, value = dictionary<eventId, PhileasEventCursorData>
-    var phileasGlobalEventCursorData = {};
-   
-//-----------------------------------------------------------------------------
-// Preloading
-
-    var phileasCursorsCash = new Set();
-
-    function preloadCursorImage(file) {
-        if (phileasCursorsCash.has(file)) {
-            return;
-        }
-        
-        //ImageManager.loadSystem(filename);
-        const img = new Image();
-        img.src = `${base_url}${file}.png`;
-        img.onload = () => phileasCursorsCash.add(file);
-        img.onerror = () => console.log(`Failed to load cursor image ${file}.png`);
-    }
-    
-    function preloadCursorData(cursorData) {
-        if (cursorData.CursorPicture != "") {
-            preloadCursorImage(cursorData.CursorPicture);
-            for (let i = 1; i < cursorData.CursorFramesNumber; ++i) {
-                preloadCursorImage(cursorData.CursorPicture + String(i));
-            }
-        }
-        
-        if (cursorData.CursorPictureOnClick != "") {
-            preloadCursorImage(cursorData.CursorPictureOnClick);
-            for (let i = 1; i < cursorData.CursorClickFramesNumber; ++i) {
-                preloadCursorImage(cursorData.CursorPicture + String(i));
-            }
-        }
-    }
-    
-    function preloadCursorDataFromCommandList(list) {
-        let cursorCommandData = new PhileasEventCursorData();
-        for (let i = 0; i < list.length; ++i) {
-            if (list[i].code != 357 || list[i].parameters[0] != "Phileas_Cursor") {
-                continue;
-            }
-            
-            switch (list[i].parameters[1]) {
-                case "setDefaultCursor":
-                case "setBattleCursor":
-                case "setMenuCursor":
-                    cursorCommandData.setFromParams(list[i].parameters[3].cursorData);
-                    break;
-                case "setEventCursorData":
-                case "setGlobalEventCursorData":
-                    cursorCommandData.setFromParams(list[i].parameters[3].cursorEventData);
-                    break;
-                default:
-                    continue;
-            }
-            
-            preloadCursorData(cursorCommandData);
-        }
-    }
-    
-    function preloadCursorDataFromPages(pages) {
-        for (let i = 0; i < pages.length; ++i) {
-            preloadCursorDataFromCommandList(pages[i].list);
-        }
-    }
-    
-    function preloadCursorDataFromEvent(eventData) {
-        let cursorNoteData = new PhileasEventCursorData();
-        cursorNoteData.setFromNote(eventData.note);
-        preloadCursorData(cursorNoteData);
-        preloadCursorDataFromPages(eventData.pages);
-    }
-    
-    function preloadCursorDataFromMaps() {
-        let preloadCounter = 1;
-        
-        const Origin_onDataLoad = DataManager.onLoad;
-        DataManager.onLoad = function(object) {
-            Origin_onDataLoad.call(this, object);
-            if (object.events) {
-                for (let i = 1; i < object.events.length; ++i) {
-                    if (object.events[i]) {
-                        preloadCursorDataFromEvent(object.events[i]);
+        function getMeta(data) {
+            const regExp = /<([^<>:]+)(:?)([^>]*)>/g;
+            let meta = {};
+            for (;;) {
+                const match = regExp.exec(data);
+                if (match) {
+                    if (match[2] === ":") {
+                        meta[match[1]] = match[3];
+                    } else {
+                        meta[match[1]] = true;
                     }
+                } else {
+                    break;
                 }
             }
             
-            ++preloadCounter;
-            if (preloadCounter == $dataMapInfos.length) {
-                DataManager.onLoad = Origin_onDataLoad;;
-            }
+            return meta;
+        };
+    
+        function PhileasCursorData() {
+            this.initialize(...arguments);
+        }
+        
+        PhileasCursorData.prototype.initialize = function() {
+            this.CursorPicture = "";
+            this.CursorPictureOnClick = "";
+            this.CursorFramesNumber = 1;
+            this.CursorClickFramesNumber = 1;
+            this.CursorXOffset = 1;
+            this.CursorYOffset = 1;
         };
         
-        for (let i = 1; i < $dataMapInfos.length; ++i) {
-            if ($dataMapInfos[i]) {
-                DataManager.loadMapData($dataMapInfos[i].id);
-            }
-        }
-    }
-    
-    function preloadCursorDataFromCommonEvents() {
-        for (let i = 1; i < $dataCommonEvents.length; ++i) {
-            preloadCursorDataFromCommandList($dataCommonEvents[i].list);
-        }
-    }
-    
-    function preloadCursorImages() {
-        preloadCursorData(defaultCursor);
-        preloadCursorData(battleCursor);
-        preloadCursorData(menuCursor);
+        PhileasCursorData.prototype.constructor = PhileasCursorData;
         
-        if (commonEventsPreload) {
-            preloadCursorDataFromCommonEvents();
-        }
-        
-        if (mapsPreload) {
-            preloadCursorDataFromMaps();
-        }
-    }
-    
-//-----------------------------------------------------------------------------
-// Main
- 
-    function setPhileasCursorConfiguration(data) {
-        let file = "";
-        
-        if (currentClick && data.CursorPictureOnClick != "") {
-            file = data.CursorPictureOnClick;
-            if (currentClickFrame > 0) {
-                file += String(currentClickFrame);
-            }
-        } else {
-            file = data.CursorPicture;
-            if (currentFrame > 0) {
-                file += String(currentFrame);
-            }
-        }
-        
-        if (currentCursorSet.file == file
-            && currentCursorSet.x == data.CursorXOffset
-            && currentCursorSet.y == data.CursorYOffset) {
-            return;
-        }
-        
-        currentCursorSet.file = file;
-        currentCursorSet.x = data.CursorXOffset;
-        currentCursorSet.y = data.CursorYOffset;
-        document.body.style.cursor = file == "" 
-            ? "default"
-            : `url("${base_url}${file}.png") ${data.CursorXOffset} ${data.CursorYOffset}, ${fallbackStyle}`;
-    }
-    
-    function updatePhileasCursor() {
-        const now = Date.now();
-        const passedTime = now - lastFrameIncrementTime;
-        if (currentClick) {
-            if (currentCursor.CursorClickFramesNumber > 1 && passedTime > animationPeriod) {
-                currentClickFrame = (currentClickFrame + 1) % currentCursor.CursorClickFramesNumber;
-                lastFrameIncrementTime = now;
-            }
-        } else if (currentCursor.CursorFramesNumber > 1 && passedTime > animationPeriod) {
-            currentFrame = (currentFrame + 1) % currentCursor.CursorFramesNumber;
-            lastFrameIncrementTime = now;
-        }
-        
-        setPhileasCursorConfiguration(currentCursor);
-        requestAnimationFrame(updatePhileasCursor);
-    }
-
-    requestAnimationFrame(updatePhileasCursor);
-    
-    function setCurrentCursor(cursorData) {
-        if (currentCursor.equals(cursorData)) {
-            return;
-        }
-        
-        currentCursor = cursorData;
-        currentFrame = currentClickFrame = 0;
-    }
-
-    function setDefaultCursor(params) {
-        defaultCursor.setFromParams(params["cursorData"]);
-    }
-    
-    function setBattleCursor(params) {
-        battleCursor.setFromParams(params["cursorData"]);
-    }
-    
-    function setMenuCursor(params) {
-        menuCursor.setFromParams(params["cursorData"]);
-    }
-    
-    function changeCursorToBasic() {
-        let scene = SceneManager._scene;
-        
-        if (battleCursor.CursorPicture != "" && scene instanceof Scene_Battle) {
-            setCurrentCursor(battleCursor);
-            return;
-        }
-        
-        if (menuCursor.CursorPicture != "" && scene instanceof Scene_MenuBase) {
-            setCurrentCursor(menuCursor);
-            return;
-        }
-        
-        setCurrentCursor(defaultCursor);
-    }
-    
-    function hide() {
-        currentHidden = true;
-        document.body.style.cursor = "none";
-    }
-    
-    function show() {
-        currentHidden = false;
-        changeCursorToBasic();
-    }
-    
-    function refreshEventCursor(eventId, cursorData) {
-        let scene = SceneManager._scene;
-          
-        if (!(scene instanceof Scene_Map) || eventId < 1 || eventId > $gameMap.events().length) {
-            return;
-        }
-        
-        const event = $gameMap.event(eventId);
-        event.phileasCursorData = cursorData;
-    }
-    
-    function updateEventCursorData(mapId, params) {
-        const eventId = Number(params["eventId"]);
-        
-        let cd = new PhileasEventCursorData();
-        cd.setFromParams(params["cursorEventData"]);
-        
-        if (phileasGlobalEventCursorData[mapId] == undefined) {
-            phileasGlobalEventCursorData[mapId] = {};
-        }
-        
-        phileasGlobalEventCursorData[mapId][eventId] = cd;
-        
-        if ($gameMap.mapId() == mapId) {
-            refreshEventCursor(eventId, cd);
-        }
-    }
-    
-    function setEventCursorData(params) {
-        updateEventCursorData($gameMap.mapId(), params);
-    }
-    
-    function setGlobalEventCursorData(params) {
-        const mapId = Number(params["mapId"]);
-        updateEventCursorData(mapId, params);
-    }
-
-    function disableEventCursors() {
-        eventCursorsEnabled = false;
-        changeCursorToBasic();
-    }
-
-    function enableEventCursors() {
-        eventCursorsEnabled = true;
-    }
-    
-    function switchHide() {
-        if (currentHidden) {
-            show();
-        }
-        else {
-            hide();
-        }
-    }
-    
-    function getKeyByValue(object, value) {
-        return Object.keys(object).find(key => object[key] === value);
-    }
-    
-    function phileasCursorDownHandler(event) {
-        if (event.keyCode == keyboardHideKeyNumber) {
-            switchHide();
-        }
-    }
-    
-    function phileasCursorMouseDownHandler(event) {
-        if (event.button == mouseHideKeyNumber) {
-            switchHide();
-        }
-    }
-    
-    if (hideAtStartup) {
-        hide();
-    }
-    if (keyboardHideKeyNumber == 0) {
-        keyboardHideKeyNumber = getKeyByValue(Input.keyMapper, keyboardHideKey);
-    }
-    if (mouseHideKeyNumber == 0) {
-        mouseHideKeyNumber = phileasMouseKeyMap[mouseHideKey];
-    }
-    if (gamepadHideKeyNumber == 0) {
-        gamepadHideKeyNumber = getKeyByValue(Input.gamepadMapper, gamepadHideKey);
-    }
-    if (keyboardHideKeyNumber != 0) {
-        document.addEventListener("keydown", phileasCursorDownHandler);
-    }
-    if (mouseHideKeyNumber != 0) {
-        document.addEventListener("mousedown", phileasCursorMouseDownHandler);
-    }
-    
-    function phileasCursorClickDownHandler(event) {
-        if (event.button == 0) {
-            currentClick = true;
-        }
-    }
-    
-    function phileasCursorClickUpHandler(event) {
-        if (event.button == 0) {
-            currentClick = false;
-        }
-    }
-    
-    document.addEventListener("mousedown", phileasCursorClickDownHandler);
-    document.addEventListener("mouseup", phileasCursorClickUpHandler);
-    
-    
-    Scene_Map.prototype.setupPhileasEventCursors = function() {
-        if (!(SceneManager._scene instanceof Scene_Map)) {
-            return;
-        }
-
-        let events = SceneManager._scene._spriteset._characterSprites;
-        SceneManager._scene.phileasLabelWindows = {};
-        for (var i = 0; i < events.length; ++i) {
-            if (!(events[i]._character instanceof Game_Event)) {
-                continue;
-            }
-
-            const ch = events[i]._character;
-
-            if (!mapsPreload) {
-                preloadCursorDataFromPages(ch.event().pages);
+        PhileasCursorData.prototype.setFromJson = function(params) {
+            if (params == undefined) {
+                return;
             }
             
-            if (phileasGlobalEventCursorData[$gameMap.mapId()] != undefined) {
-                const cursorData = phileasGlobalEventCursorData[$gameMap.mapId()][ch.eventId()];
-                if (cursorData != undefined) {
-                    ch.phileasCursorData = cursorData;
-                    continue;
-                }
-            }
-
-            events[i]._character.phileasCursorData = new PhileasEventCursorData();
-            events[i]._character.phileasCursorData.setFromNote(ch.event().note);
+            this.CursorPicture = params["CursorPicture"] || "";
+            this.CursorPictureOnClick = params["CursorPictureOnClick"] || "";
+            this.CursorXOffset = Number(params["CursorXOffset"]);
+            this.CursorYOffset = Number(params["CursorYOffset"]);
+            this.CursorFramesNumber = Number(params["CursorFramesNumber"]);
+            this.CursorClickFramesNumber = Number(params["CursorClickFramesNumber"]);
         }
-    };
     
-    Scene_Map.prototype.phileasCheckEventCursors = function(x, y) {
-        if (!eventCursorsEnabled) {
-            return;
-        }
-
-        const mapX = $gameMap.canvasToMapX(x);
-        const mapY = $gameMap.canvasToMapY(y);
-        const events = $gameMap.eventsXy(mapX, mapY);
-
-        if (events.length === 0) {
-            changeCursorToBasic();
-            return;
-        }
-        
-        for (let i = 0; i < events.length; ++i) {
-            const cursorData = events[i].phileasCursorData;
-            if (cursorData != undefined && cursorData.CursorStartOnHover) {
-                events[i].start();
+        PhileasCursorData.prototype.setFromParams = function(params) {
+            if (params == "") {
+                return;
             }
             
-            if (cursorData != undefined && cursorData.CursorPicture) {
-                setCurrentCursor(cursorData);
-            }
-        }
-    };
-    
-    TouchInput.phileasCheckClickEventCursors = function(x, y) {
-        if (!eventCursorsEnabled) {
-            return;
-        }
-
-        const scene = SceneManager._scene;
-
-        if (!(scene instanceof Scene_Map) || !scene.isActive() || $gameMessage.isBusy()) {
-            return false;
+            params = JSON.parse(params);
+            this.setFromJson(params);
         }
         
-        const mapX = $gameMap.canvasToMapX(x);
-        const mapY = $gameMap.canvasToMapY(y);
-        const events = $gameMap.eventsXy(mapX, mapY);
-        
-        for (let i = 0; i < events.length; ++i) {
-            if (events[i]._erased) {
+        PhileasCursorData.prototype.equals = function(cursorData) {
+            if (cursorData instanceof PhileasEventCursorData) {
                 return false;
             }
             
-            const cursorData = events[i].phileasCursorData;
-            if (cursorData != undefined && cursorData.CursorStartOnClick) {
-                events[i].start();
-                return true;
+            return this.CursorPicture == cursorData.CursorPicture
+                && this.CursorPictureOnClick == cursorData.CursorPictureOnClick
+                && this.CursorXOffset == cursorData.CursorXOffset
+                && this.CursorYOffset == cursorData.CursorYOffset
+                && this.CursorFramesNumber == cursorData.CursorFramesNumber
+                && this.CursorClickFramesNumber == cursorData.CursorClickFramesNumber;
+        }
+    
+        function PhileasEventCursorData() {
+            this.initialize(...arguments);
+        }
+        
+        PhileasEventCursorData.prototype.initialize = function() {
+            PhileasCursorData.prototype.initialize.call(this);
+            this.CursorStartOnClick = false;
+            this.CursorStartOnHover = false;
+        };
+    
+        PhileasEventCursorData.prototype = Object.create(PhileasCursorData.prototype);
+        PhileasEventCursorData.prototype.constructor = PhileasEventCursorData;
+        
+        PhileasEventCursorData.prototype.setFromNote = function(note) {
+            const meta = getMeta(note);
+            if (meta == undefined) {
+                return;
+            }
+    
+            for (let i in phileasCursorTags) {
+                let tag = phileasCursorTags[i];
+                if (meta[tag] != undefined) {
+                    this[tag] = meta[tag];
+                }
+            }
+            
+            this.CursorXOffset = Number(this.CursorXOffset);
+            this.CursorYOffset = Number(this.CursorYOffset);
+            this.CursorFramesNumber = Number(this.CursorFramesNumber);
+            this.CursorClickFramesNumber = Number(this.CursorClickFramesNumber);
+            this.CursorStartOnClick = this.CursorStartOnClick != undefined;
+            this.CursorStartOnHover = this.CursorStartOnHover != undefined;
+        };
+        
+        PhileasEventCursorData.prototype.setFromJson = function(params) {
+            if (params == undefined) {
+                return;
+            }
+            
+            this.CursorPicture = params["CursorPicture"] || "";
+            this.CursorPictureOnClick = params["CursorPictureOnClick"] || "";
+            this.CursorXOffset = Number(params["CursorXOffset"]);
+            this.CursorYOffset = Number(params["CursorYOffset"]);
+            this.CursorFramesNumber = Number(params["CursorFramesNumber"]);
+            this.CursorClickFramesNumber = Number(params["CursorClickFramesNumber"]);
+            this.CursorStartOnClick = params["CursorStartOnClick"] == "true";
+            this.CursorStartOnHover = params["CursorStartOnHover"] == "true";
+        }
+    
+        PhileasEventCursorData.prototype.setFromParams = function(params) {
+            if (params == "") {
+                return;
+            }
+            
+            params = JSON.parse(params);
+            this.setFromJson(params);
+        }
+        
+        PhileasEventCursorData.prototype.equals = function(cursorData) {
+            if (!(cursorData instanceof PhileasEventCursorData)) {
+                return false;
+            }
+            
+            return this.CursorPicture == cursorData.CursorPicture
+                && this.CursorPictureOnClick == cursorData.CursorPictureOnClick
+                && this.CursorXOffset == cursorData.CursorXOffset
+                && this.CursorYOffset == cursorData.CursorYOffset
+                && this.CursorFramesNumber == cursorData.CursorFramesNumber
+                && this.CursorClickFramesNumber == cursorData.CursorClickFramesNumber
+                && this.CursorStartOnClick == cursorData.CursorStartOnClick
+                && this.CursorStartOnHover == cursorData.CursorStartOnHover;
+        }
+    
+        
+    //-----------------------------------------------------------------------------
+    // Data
+    
+        const base_url = "./img/system/";
+        const fallbackStyle = "pointer";
+        const phileasMouseKeyMap = {
+            "left": 0,
+            "middle": 1,
+            "right": 2
+        }
+        const phileasCursorTags = ["CursorPicture", "CursorPictureOnClick", "CursorXOffset", "CursorYOffset", "CursorFramesNumber", "CursorClickFramesNumber", "CursorStartOnClick", "CursorStartOnHover"];
+        
+        var parameters = PluginManager.parameters("Phileas_Cursor");
+        var hideAtStartup = parameters["hideAtStartup"] == "true";
+        var keyboardHideKey = parameters["keyboardHideKey"] || "";
+        var keyboardHideKeyNumber = Number(parameters["keyboardHideKeyNumber"] || 0);
+        var mouseHideKey = parameters["mouseHideKey"] || "";
+        var mouseHideKeyNumber = Number(parameters["mouseHideKeyNumber"] || 0);
+        var gamepadHideKey = parameters["gamepadHideKey"] || "";
+        var gamepadHideKeyNumber = Number(parameters["gamepadHideKeyNumber"] || 0);
+        var animationPeriod = Number(parameters["animationPeriod"] || 100);
+        var mapsPreload = parameters["mapsPreload"] == "true";
+        var commonEventsPreload = parameters["commonEventsPreload"] == "true";
+        
+        var defaultCursor = new PhileasCursorData();
+        defaultCursor.setFromParams(parameters["defaultCursor"]);
+        var battleCursor = new PhileasCursorData();
+        battleCursor.setFromParams(parameters["battleCursor"]);
+        var menuCursor = new PhileasCursorData();
+        menuCursor.setFromParams(parameters["menuCursor"]);
+        var eventCursorsEnabled = true;
+        var currentHidden = false;
+        var currentClick = false;
+        var lastFrameIncrementTime = 0; // milliseconds
+        var currentFrame = 0;
+        var currentClickFrame = 0;
+        var currentCursor = new PhileasCursorData();
+        var currentCursorSet = {
+            "file": "",
+            "x": -1,
+            "y": -1
+        }
+        setCurrentCursor(defaultCursor);
+        
+        PluginManager.registerCommand("Phileas_Cursor", "setDefaultCursor", setDefaultCursor);
+        PluginManager.registerCommand("Phileas_Cursor", "setBattleCursor", setBattleCursor);
+        PluginManager.registerCommand("Phileas_Cursor", "setMenuCursor", setMenuCursor);
+        PluginManager.registerCommand("Phileas_Cursor", "hide", hide);
+        PluginManager.registerCommand("Phileas_Cursor", "show", show);
+        PluginManager.registerCommand("Phileas_Cursor", "setEventCursorData", setEventCursorData);
+        PluginManager.registerCommand("Phileas_Cursor", "setGlobalEventCursorData", setGlobalEventCursorData);
+        PluginManager.registerCommand("Phileas_Cursor", "disableEventCursors", disableEventCursors);
+        PluginManager.registerCommand("Phileas_Cursor", "enableEventCursors", enableEventCursors);
+        
+        // key - mapId, value = dictionary<eventId, PhileasEventCursorData>
+        var phileasGlobalEventCursorData = {};
+       
+    //-----------------------------------------------------------------------------
+    // Preloading
+    
+        var phileasCursorsCash = new Set();
+    
+        function preloadCursorImage(file) {
+            if (phileasCursorsCash.has(file)) {
+                return;
+            }
+            
+            //ImageManager.loadSystem(filename);
+            const img = new Image();
+            img.src = `${base_url}${file}.png`;
+            img.onload = () => phileasCursorsCash.add(file);
+            img.onerror = () => console.log(`Failed to load cursor image ${file}.png`);
+        }
+        
+        function preloadCursorData(cursorData) {
+            if (cursorData.CursorPicture != "") {
+                preloadCursorImage(cursorData.CursorPicture);
+                for (let i = 1; i < cursorData.CursorFramesNumber; ++i) {
+                    preloadCursorImage(cursorData.CursorPicture + String(i));
+                }
+            }
+            
+            if (cursorData.CursorPictureOnClick != "") {
+                preloadCursorImage(cursorData.CursorPictureOnClick);
+                for (let i = 1; i < cursorData.CursorClickFramesNumber; ++i) {
+                    preloadCursorImage(cursorData.CursorPicture + String(i));
+                }
             }
         }
         
-        return false;
-    };
-
-//--------CHANGED CORE:
-    
-    const Origin_loaded = Scene_Boot.prototype.onDatabaseLoaded;
-    Scene_Boot.prototype.onDatabaseLoaded = function() {
-        Origin_loaded.call(this);
-        preloadCursorImages();
-    };
-
-    const Origin_setupNewGame = DataManager.setupNewGame;
-    DataManager.setupNewGame = function() {
-        Origin_setupNewGame.call(this);
-        changeCursorToBasic();
-    };
-    
-    const Origin_makeSaveContents = DataManager.makeSaveContents;
-    DataManager.makeSaveContents = function() {
-        let contents = Origin_makeSaveContents.call(this);
-        contents.phileasDefaultCursor = defaultCursor;
-        contents.phileasBattleCursor = battleCursor;
-        contents.phileasMenuCursor = menuCursor;
-        contents.phileasCursorHidden = currentHidden;
-        contents.eventCursorsEnabled = eventCursorsEnabled;
-        contents.phileasGlobalEventCursorData = phileasGlobalEventCursorData;
-        return contents;
-    };
-    
-    const Origin_extractSaveContents = DataManager.extractSaveContents;
-    DataManager.extractSaveContents = function(contents) {
-        Origin_extractSaveContents.call(this, contents);
-        defaultCursor = new PhileasCursorData();
-        defaultCursor.setFromJson(contents.phileasDefaultCursor);
-        battleCursor = new PhileasCursorData();
-        battleCursor.setFromJson(contents.phileasBattleCursor);
-        menuCursor = new PhileasCursorData();
-        menuCursor.setFromJson(contents.phileasMenuCursor);
-        phileasGlobalEventCursorData = {};
-        const data = contents.phileasGlobalEventCursorData || {};
-        for (const mapId in data) {
-            const localData = data[mapId];
-            for (const eventId in localData) {
-                var ecd = new PhileasEventCursorData();
-                ecd.setFromJson(localData[eventId]);
-                if (phileasGlobalEventCursorData[mapId] == undefined) {
-                    phileasGlobalEventCursorData[mapId] = {};
+        function preloadCursorDataFromCommandList(list) {
+            let cursorCommandData = new PhileasEventCursorData();
+            for (let i = 0; i < list.length; ++i) {
+                if (list[i].code != 357 || list[i].parameters[0] != "Phileas_Cursor") {
+                    continue;
                 }
                 
-                phileasGlobalEventCursorData[mapId][eventId] = ecd;
+                switch (list[i].parameters[1]) {
+                    case "setDefaultCursor":
+                    case "setBattleCursor":
+                    case "setMenuCursor":
+                        cursorCommandData.setFromParams(list[i].parameters[3].cursorData);
+                        break;
+                    case "setEventCursorData":
+                    case "setGlobalEventCursorData":
+                        cursorCommandData.setFromParams(list[i].parameters[3].cursorEventData);
+                        break;
+                    default:
+                        continue;
+                }
+                
+                preloadCursorData(cursorCommandData);
             }
         }
-
-        eventCursorsEnabled = contents.eventCursorsEnabled;
-        changeCursorToBasic();
-        if (contents.phileasCursorHidden || false) {
+        
+        function preloadCursorDataFromPages(pages) {
+            for (let i = 0; i < pages.length; ++i) {
+                preloadCursorDataFromCommandList(pages[i].list);
+            }
+        }
+        
+        function preloadCursorDataFromEvent(eventData) {
+            let cursorNoteData = new PhileasEventCursorData();
+            cursorNoteData.setFromNote(eventData.note);
+            preloadCursorData(cursorNoteData);
+            preloadCursorDataFromPages(eventData.pages);
+        }
+        
+        function preloadCursorDataFromMaps() {
+            let preloadCounter = 1;
+            
+            const Origin_onDataLoad = DataManager.onLoad;
+            DataManager.onLoad = function(object) {
+                Origin_onDataLoad.call(this, object);
+                if (object.events) {
+                    for (let i = 1; i < object.events.length; ++i) {
+                        if (object.events[i]) {
+                            preloadCursorDataFromEvent(object.events[i]);
+                        }
+                    }
+                }
+                
+                ++preloadCounter;
+                if (preloadCounter == $dataMapInfos.length) {
+                    DataManager.onLoad = Origin_onDataLoad;;
+                }
+            };
+            
+            for (let i = 1; i < $dataMapInfos.length; ++i) {
+                if ($dataMapInfos[i]) {
+                    DataManager.loadMapData($dataMapInfos[i].id);
+                }
+            }
+        }
+        
+        function preloadCursorDataFromCommonEvents() {
+            for (let i = 1; i < $dataCommonEvents.length; ++i) {
+                preloadCursorDataFromCommandList($dataCommonEvents[i].list);
+            }
+        }
+        
+        function preloadCursorImages() {
+            preloadCursorData(defaultCursor);
+            preloadCursorData(battleCursor);
+            preloadCursorData(menuCursor);
+            
+            if (commonEventsPreload) {
+                preloadCursorDataFromCommonEvents();
+            }
+            
+            if (mapsPreload) {
+                preloadCursorDataFromMaps();
+            }
+        }
+        
+    //-----------------------------------------------------------------------------
+    // Main
+     
+        function setPhileasCursorConfiguration(data) {
+            let file = "";
+            
+            if (currentClick && data.CursorPictureOnClick != "") {
+                file = data.CursorPictureOnClick;
+                if (currentClickFrame > 0) {
+                    file += String(currentClickFrame);
+                }
+            } else {
+                file = data.CursorPicture;
+                if (currentFrame > 0) {
+                    file += String(currentFrame);
+                }
+            }
+            
+            if (currentCursorSet.file == file
+                && currentCursorSet.x == data.CursorXOffset
+                && currentCursorSet.y == data.CursorYOffset) {
+                return;
+            }
+            
+            currentCursorSet.file = file;
+            currentCursorSet.x = data.CursorXOffset;
+            currentCursorSet.y = data.CursorYOffset;
+            document.body.style.cursor = file == "" 
+                ? "default"
+                : `url("${base_url}${file}.png") ${data.CursorXOffset} ${data.CursorYOffset}, ${fallbackStyle}`;
+        }
+        
+        function updatePhileasCursor() {
+            const now = Date.now();
+            const passedTime = now - lastFrameIncrementTime;
+            if (currentClick) {
+                if (currentCursor.CursorClickFramesNumber > 1 && passedTime > animationPeriod) {
+                    currentClickFrame = (currentClickFrame + 1) % currentCursor.CursorClickFramesNumber;
+                    lastFrameIncrementTime = now;
+                }
+            } else if (currentCursor.CursorFramesNumber > 1 && passedTime > animationPeriod) {
+                currentFrame = (currentFrame + 1) % currentCursor.CursorFramesNumber;
+                lastFrameIncrementTime = now;
+            }
+            
+            setPhileasCursorConfiguration(currentCursor);
+            requestAnimationFrame(updatePhileasCursor);
+        }
+    
+        requestAnimationFrame(updatePhileasCursor);
+        
+        function setCurrentCursor(cursorData) {
+            if (currentCursor.equals(cursorData)) {
+                return;
+            }
+            
+            currentCursor = cursorData;
+            currentFrame = currentClickFrame = 0;
+        }
+    
+        function setDefaultCursor(params) {
+            defaultCursor.setFromParams(params["cursorData"]);
+        }
+        
+        function setBattleCursor(params) {
+            battleCursor.setFromParams(params["cursorData"]);
+        }
+        
+        function setMenuCursor(params) {
+            menuCursor.setFromParams(params["cursorData"]);
+        }
+        
+        function changeCursorToBasic() {
+            let scene = SceneManager._scene;
+            
+            if (battleCursor.CursorPicture != "" && scene instanceof Scene_Battle) {
+                setCurrentCursor(battleCursor);
+                return;
+            }
+            
+            if (menuCursor.CursorPicture != "" && scene instanceof Scene_MenuBase) {
+                setCurrentCursor(menuCursor);
+                return;
+            }
+            
+            setCurrentCursor(defaultCursor);
+        }
+        
+        function hide() {
+            currentHidden = true;
+            document.body.style.cursor = "none";
+        }
+        
+        function show() {
+            currentHidden = false;
+            changeCursorToBasic();
+        }
+        
+        function refreshEventCursor(eventId, cursorData) {
+            let scene = SceneManager._scene;
+              
+            if (!(scene instanceof Scene_Map) || eventId < 1 || eventId > $gameMap.events().length) {
+                return;
+            }
+            
+            const event = $gameMap.event(eventId);
+            event.phileasCursorData = cursorData;
+        }
+        
+        function updateEventCursorData(mapId, params) {
+            const eventId = Number(params["eventId"]);
+            
+            let cd = new PhileasEventCursorData();
+            cd.setFromParams(params["cursorEventData"]);
+            
+            if (phileasGlobalEventCursorData[mapId] == undefined) {
+                phileasGlobalEventCursorData[mapId] = {};
+            }
+            
+            phileasGlobalEventCursorData[mapId][eventId] = cd;
+            
+            if ($gameMap.mapId() == mapId) {
+                refreshEventCursor(eventId, cd);
+            }
+        }
+        
+        function setEventCursorData(params) {
+            updateEventCursorData($gameMap.mapId(), params);
+        }
+        
+        function setGlobalEventCursorData(params) {
+            const mapId = Number(params["mapId"]);
+            updateEventCursorData(mapId, params);
+        }
+    
+        function disableEventCursors() {
+            eventCursorsEnabled = false;
+            changeCursorToBasic();
+        }
+    
+        function enableEventCursors() {
+            eventCursorsEnabled = true;
+        }
+        
+        function switchHide() {
+            if (currentHidden) {
+                show();
+            }
+            else {
+                hide();
+            }
+        }
+        
+        function getKeyByValue(object, value) {
+            return Object.keys(object).find(key => object[key] === value);
+        }
+        
+        function phileasCursorDownHandler(event) {
+            if (event.keyCode == keyboardHideKeyNumber) {
+                switchHide();
+            }
+        }
+        
+        function phileasCursorMouseDownHandler(event) {
+            if (event.button == mouseHideKeyNumber) {
+                switchHide();
+            }
+        }
+        
+        if (hideAtStartup) {
             hide();
         }
-        else {
-            show();
+        if (keyboardHideKeyNumber == 0) {
+            keyboardHideKeyNumber = getKeyByValue(Input.keyMapper, keyboardHideKey);
         }
-    };
+        if (mouseHideKeyNumber == 0) {
+            mouseHideKeyNumber = phileasMouseKeyMap[mouseHideKey];
+        }
+        if (gamepadHideKeyNumber == 0) {
+            gamepadHideKeyNumber = getKeyByValue(Input.gamepadMapper, gamepadHideKey);
+        }
+        if (keyboardHideKeyNumber != 0) {
+            document.addEventListener("keydown", phileasCursorDownHandler);
+        }
+        if (mouseHideKeyNumber != 0) {
+            document.addEventListener("mousedown", phileasCursorMouseDownHandler);
+        }
+        
+        function phileasCursorClickDownHandler(event) {
+            if (event.button == 0) {
+                currentClick = true;
+            }
+        }
+        
+        function phileasCursorClickUpHandler(event) {
+            if (event.button == 0) {
+                currentClick = false;
+            }
+        }
+        
+        document.addEventListener("mousedown", phileasCursorClickDownHandler);
+        document.addEventListener("mouseup", phileasCursorClickUpHandler);
+        
+        
+        Scene_Map.prototype.setupPhileasEventCursors = function() {
+            if (!(SceneManager._scene instanceof Scene_Map)) {
+                return;
+            }
     
-    if (gamepadHideKeyNumber != 0) {
-        Origin_updateGamepadState = Input._updateGamepadState;
-        Input._updateGamepadState = function(gamepad) {
-            Origin_updateGamepadState.call(this, gamepad);
-            const lastState = this._gamepadStates[gamepad.index] || [];
-            let state = this._gamepadStates[gamepad.index];
-            for (let i = 0; i < state.length; ++i) {
-                if (state[i] == true && lastState[i] != true && i == gamepadHideKeyNumber) {
-                    switchHide();
+            let events = SceneManager._scene._spriteset._characterSprites;
+            SceneManager._scene.phileasLabelWindows = {};
+            for (var i = 0; i < events.length; ++i) {
+                if (!(events[i]._character instanceof Game_Event)) {
+                    continue;
+                }
+    
+                const ch = events[i]._character;
+    
+                if (!mapsPreload) {
+                    preloadCursorDataFromPages(ch.event().pages);
+                }
+                
+                if (phileasGlobalEventCursorData[$gameMap.mapId()] != undefined) {
+                    const cursorData = phileasGlobalEventCursorData[$gameMap.mapId()][ch.eventId()];
+                    if (cursorData != undefined) {
+                        ch.phileasCursorData = cursorData;
+                        continue;
+                    }
+                }
+    
+                events[i]._character.phileasCursorData = new PhileasEventCursorData();
+                events[i]._character.phileasCursorData.setFromNote(ch.event().note);
+            }
+        };
+        
+        Scene_Map.prototype.phileasCheckEventCursors = function(x, y) {
+            if (!eventCursorsEnabled) {
+                return;
+            }
+    
+            const mapX = $gameMap.canvasToMapX(x);
+            const mapY = $gameMap.canvasToMapY(y);
+            const events = $gameMap.eventsXy(mapX, mapY);
+    
+            if (events.length === 0) {
+                changeCursorToBasic();
+                return;
+            }
+            
+            for (let i = 0; i < events.length; ++i) {
+                let cursorData = events[i].phileasCursorData;
+    
+                if (cursorData == undefined) {
+                    events[i].phileasCursorData = new PhileasEventCursorData();
+                    events[i].phileasCursorData.setFromNote(events[i].event().note);
+                    cursorData = events[i].phileasCursorData;
+                }
+    
+                if (cursorData == undefined) {
+                    return;
+                }
+    
+                if (cursorData.CursorStartOnHover) {
+                    events[i].start();
+                }
+                
+                if (cursorData.CursorPicture) {
+                    setCurrentCursor(cursorData);
                 }
             }
         };
-    }
-
-    const Origin_onMapLoaded = Scene_Map.prototype.onMapLoaded;
-    Scene_Map.prototype.onMapLoaded = function() {
-        Origin_onMapLoaded.call(this);
-        this.setupPhileasEventCursors();
-    };
-    
-    const Origin_onMouseMove = TouchInput._onMouseMove;
-    TouchInput._onMouseMove = function(event) {
-        Origin_onMouseMove.call(this, event);
-
-        const x = Graphics.pageToCanvasX(event.pageX);
-        const y = Graphics.pageToCanvasY(event.pageY);
-        const scene = SceneManager._scene;
-
-        if (!currentHidden
-            && Graphics.isInsideCanvas(x, y) 
-            && scene instanceof Scene_Map 
-            && scene.isActive() 
-            && !$gameMessage.isBusy()) {
-
-            scene.phileasCheckEventCursors(this._x, this._y);
-        }
-    };
-    
-    const Origin_onTrigger = TouchInput._onTrigger;
-    TouchInput._onTrigger = function(x, y) {
-        if (this.phileasCheckClickEventCursors(x, y)) {
-            $gameTemp.clearDestination();
-            return;
-        }
         
-        Origin_onTrigger.call(this, x, y);
-    };
+        TouchInput.phileasCheckClickEventCursors = function(x, y) {
+            if (!eventCursorsEnabled) {
+                return;
+            }
     
-    if (!commonEventsPreload) {
-        const Origin_CommonEventInitialize = Game_CommonEvent.prototype.initialize;
-        Game_CommonEvent.prototype.initialize = function(commonEventId) {
-            preloadCursorDataFromCommandList($dataCommonEvents[commonEventId].list);
-            Origin_CommonEventInitialize.call(commonEventId);
+            const scene = SceneManager._scene;
+    
+            if (!(scene instanceof Scene_Map) || !scene.isActive() || $gameMessage.isBusy()) {
+                return false;
+            }
+            
+            const mapX = $gameMap.canvasToMapX(x);
+            const mapY = $gameMap.canvasToMapY(y);
+            const events = $gameMap.eventsXy(mapX, mapY);
+            
+            for (let i = 0; i < events.length; ++i) {
+                if (events[i]._erased) {
+                    return false;
+                }
+                
+                const cursorData = events[i].phileasCursorData;
+                if (cursorData.CursorStartOnClick) {
+                    events[i].start();
+                    return true;
+                }
+            }
+            
+            return false;
         };
-    }
-
-    const Origin_battleStart = Scene_Battle.prototype.start;
-    Scene_Battle.prototype.start = function() {
-        Origin_battleStart.call(this);
-        changeCursorToBasic();
-    };
-
-    const Origin_menuStart = Scene_MenuBase.prototype.start;
-    Scene_MenuBase.prototype.start = function() {
-        Origin_menuStart.call(this);
-        changeCursorToBasic();
-    };
-
-    const Origin_mapStart = Scene_Map.prototype.start;
-    Scene_Map.prototype.start = function() {
-        Origin_mapStart.call(this);
-        changeCursorToBasic();
-    };
-}());
+    
+    //--------CHANGED CORE:
+        
+        const Origin_loaded = Scene_Boot.prototype.onDatabaseLoaded;
+        Scene_Boot.prototype.onDatabaseLoaded = function() {
+            Origin_loaded.call(this);
+            preloadCursorImages();
+        };
+    
+        const Origin_setupNewGame = DataManager.setupNewGame;
+        DataManager.setupNewGame = function() {
+            Origin_setupNewGame.call(this);
+            changeCursorToBasic();
+        };
+        
+        const Origin_makeSaveContents = DataManager.makeSaveContents;
+        DataManager.makeSaveContents = function() {
+            let contents = Origin_makeSaveContents.call(this);
+            contents.phileasDefaultCursor = defaultCursor;
+            contents.phileasBattleCursor = battleCursor;
+            contents.phileasMenuCursor = menuCursor;
+            contents.phileasCursorHidden = currentHidden;
+            contents.eventCursorsEnabled = eventCursorsEnabled;
+            contents.phileasGlobalEventCursorData = phileasGlobalEventCursorData;
+            return contents;
+        };
+        
+        const Origin_extractSaveContents = DataManager.extractSaveContents;
+        DataManager.extractSaveContents = function(contents) {
+            Origin_extractSaveContents.call(this, contents);
+            defaultCursor = new PhileasCursorData();
+            defaultCursor.setFromJson(contents.phileasDefaultCursor);
+            battleCursor = new PhileasCursorData();
+            battleCursor.setFromJson(contents.phileasBattleCursor);
+            menuCursor = new PhileasCursorData();
+            menuCursor.setFromJson(contents.phileasMenuCursor);
+            phileasGlobalEventCursorData = {};
+            const data = contents.phileasGlobalEventCursorData || {};
+            for (const mapId in data) {
+                const localData = data[mapId];
+                for (const eventId in localData) {
+                    var ecd = new PhileasEventCursorData();
+                    ecd.setFromJson(localData[eventId]);
+                    if (phileasGlobalEventCursorData[mapId] == undefined) {
+                        phileasGlobalEventCursorData[mapId] = {};
+                    }
+                    
+                    phileasGlobalEventCursorData[mapId][eventId] = ecd;
+                }
+            }
+    
+            eventCursorsEnabled = contents.eventCursorsEnabled;
+            changeCursorToBasic();
+            if (contents.phileasCursorHidden || false) {
+                hide();
+            }
+            else {
+                show();
+            }
+        };
+        
+        if (gamepadHideKeyNumber != 0) {
+            Origin_updateGamepadState = Input._updateGamepadState;
+            Input._updateGamepadState = function(gamepad) {
+                Origin_updateGamepadState.call(this, gamepad);
+                const lastState = this._gamepadStates[gamepad.index] || [];
+                let state = this._gamepadStates[gamepad.index];
+                for (let i = 0; i < state.length; ++i) {
+                    if (state[i] == true && lastState[i] != true && i == gamepadHideKeyNumber) {
+                        switchHide();
+                    }
+                }
+            };
+        }
+    
+        const Origin_onMapLoaded = Scene_Map.prototype.onMapLoaded;
+        Scene_Map.prototype.onMapLoaded = function() {
+            Origin_onMapLoaded.call(this);
+            this.setupPhileasEventCursors();
+        };
+        
+        const Origin_onMouseMove = TouchInput._onMouseMove;
+        TouchInput._onMouseMove = function(event) {
+            Origin_onMouseMove.call(this, event);
+    
+            const x = Graphics.pageToCanvasX(event.pageX);
+            const y = Graphics.pageToCanvasY(event.pageY);
+            const scene = SceneManager._scene;
+    
+            if (!currentHidden
+                && Graphics.isInsideCanvas(x, y) 
+                && scene instanceof Scene_Map 
+                && scene.isActive() 
+                && !$gameMessage.isBusy()) {
+    
+                scene.phileasCheckEventCursors(this._x, this._y);
+            }
+        };
+        
+        const Origin_onTrigger = TouchInput._onTrigger;
+        TouchInput._onTrigger = function(x, y) {
+            if (this.phileasCheckClickEventCursors(x, y)) {
+                $gameTemp.clearDestination();
+                return;
+            }
+            
+            Origin_onTrigger.call(this, x, y);
+        };
+        
+        if (!commonEventsPreload) {
+            const Origin_CommonEventInitialize = Game_CommonEvent.prototype.initialize;
+            Game_CommonEvent.prototype.initialize = function(commonEventId) {
+                preloadCursorDataFromCommandList($dataCommonEvents[commonEventId].list);
+                Origin_CommonEventInitialize.call(commonEventId);
+            };
+        }
+    
+        const Origin_battleStart = Scene_Battle.prototype.start;
+        Scene_Battle.prototype.start = function() {
+            Origin_battleStart.call(this);
+            changeCursorToBasic();
+        };
+    
+        const Origin_menuStart = Scene_MenuBase.prototype.start;
+        Scene_MenuBase.prototype.start = function() {
+            Origin_menuStart.call(this);
+            changeCursorToBasic();
+        };
+    
+        const Origin_mapStart = Scene_Map.prototype.start;
+        Scene_Map.prototype.start = function() {
+            Origin_mapStart.call(this);
+            changeCursorToBasic();
+        };
+    }());
