@@ -52,12 +52,12 @@
 #### Модификации чужих плагинов
 | Название | Описание | Код | Форум | Оригинал |
 | --- | --- | --- | --- | --- |
+| **MOG Map Name Hud (Phileas mod)** | HUD с названием карты | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/MOG_MapNameHud.js) | [Тема](https://rpgmakerunion.ru/thread/mz-mog-map-name-hud-phileas-mod.1075) | [Сайт](https://plugin.fungamemake.com/archives/19219) |
 | **Ramza Plugins - Pre-Title Splash Events (Phileas mod)** | Дисклеймер, заставки (картинки, видео) перед титульным экраном | [MV](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Ramza_PreTitleSplash_MV.js)<br/> [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Ramza_PreTitleSplash_MZ.js) | [Тема](https://rpgmakerunion.ru/thread/mvmz-ramzapretitlesplash-phileas-mod.523) | [Itch.io](https://capnrammo.itch.io/mvmz-pre-title-splash-videos)
 
 #### Модификации чужих скриптов для VX Ace
 | Название | Описание | Код | Форум | Оригинал |
 | --- | --- | --- | --- | --- |
 | **CSCA Toast Manager (Phileas mod)** | Всплывающие уведомления | [Core](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/scripts/csca_core.rb)<br/> [VX Ace](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/scripts/csca_toast_manager.rb) | [Тема](https://rpgmakerunion.ru/thread/vx-ace-csca-toast-manager-remeyk.298) | [Тема](https://www.rpgmakercentral.com/topic/13960-csca-toast-manager/) |
-| **MOG Map Name Hud (Phileas mod)** | HUD с названием карты | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/MOG_MapNameHud.js) | [Тема](https://rpgmakerunion.ru/thread/mz-mog-map-name-hud-phileas-mod.1075) | [Сайт](https://plugin.fungamemake.com/archives/19219) |
 | **Shaz - SUPER SIMPLE MOUSE SCRIPT (Phileas and Dmy mod)** | Скрипт мыши | [VX Ace](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/scripts/shaz_mouse.rb) | [Тема](https://rpgmakerunion.ru/thread/vx-ace-fiks-skripta-myshi.297) | [Тема](https://forums.rpgmakerweb.com/index.php?threads/super-simple-mouse-script.16520/) |
 
