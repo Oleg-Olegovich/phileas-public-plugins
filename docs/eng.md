@@ -52,6 +52,7 @@ Some of the plugins for MZ can work on MV. But I haven't tested it. Write to [me
 #### Modifications of other author's plugins
 | Name | Description | Code | Forum | Original |
 | --- | --- | --- | --- | --- |
+| **MOG Map Name Hud (Phileas mod)** | Map name HUD | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/MOG_MapNameHud.js) | [Thread](https://rpgmakerunion.ru/thread/mz-mog-map-name-hud-phileas-mod.1075) | [Website](https://plugin.fungamemake.com/archives/19219) |
 | **Ramza Plugins - Pre-Title Splash Events (Phileas mod)** | Disclaimer, images, videos prior to the title | [MV](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Ramza_PreTitleSplash_MV.js)<br/> [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Ramza_PreTitleSplash_MZ.js) | [Thread](https://rpgmakerunion.ru/thread/mvmz-ramzapretitlesplash-phileas-mod.523) | [Itch.io](https://capnrammo.itch.io/mvmz-pre-title-splash-videos)
 
 #### Modifications of other author's scripts for VX Ace
