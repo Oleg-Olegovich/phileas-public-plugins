@@ -8,6 +8,7 @@
 // 2024.July.06 Ver1.0.3 Fixed russian keyboard
 // 2024.August.21 Ver1.1.0 Added message
 // 2024.September.23 Ver1.2.0 Improved Japanese display
+// 2024.October.3 Ver1.2.1 If keyboard input is disabled, you can input the letter with the Z key and delete it with the X key
 
 /*:
  * @target MZ
@@ -64,7 +65,7 @@
  * @text Keyboard input
  * @type boolean
  * @default true
- * @desc Allows to enter all characters from the keyboard
+ * @desc Allows to enter all characters from the keyboard. If keyboard input is disabled, you can input the letter with the Z key and delete it with the X key
  *
  * @arg firstIsUpper
  * @text The first letter is uppercase
@@ -144,7 +145,7 @@
  * @text Keyboard input
  * @type boolean
  * @default true
- * @desc Allows to enter all characters from the keyboard
+ * @desc Allows to enter all characters from the keyboard. If keyboard input is disabled, you can input the letter with the Z key and delete it with the X key
  *
  * @arg firstIsUpper
  * @text The first letter is uppercase
@@ -189,6 +190,8 @@
  * The plugin provides 2 commands:
  * - Name inputing
  * - Variable inputing
+ * 
+ * If keyboard input is disabled, you can input the letter with the Z key and delete it with the X key.
  *
  * You can always write to the author if you need other features or even plugins.
  * Patreon: https://www.patreon.com/treeverse_games
@@ -260,7 +263,7 @@
  * @text Ввод с клавиатуры
  * @type boolean
  * @default true
- * @desc Позволяет вводить все символы с клавиатуры
+ * @desc Позволяет вводить все символы с клавиатуры. Если выключен ввод клавиатурой, можно выбирать буквы клавишей Z и удалять клавишей X
  *
  * @arg firstIsUpper
  * @text Первая заглавная
@@ -340,7 +343,7 @@
  * @text Ввод с клавиатуры
  * @type boolean
  * @default true
- * @desc Позволяет вводить все символы с клавиатуры
+ * @desc Позволяет вводить все символы с клавиатуры. Если выключен ввод клавиатурой, можно выбирать буквы клавишей Z и удалять клавишей X
  *
  * @arg firstIsUpper
  * @text Первая заглавная
@@ -384,6 +387,8 @@
  * Плагин предоставляет 2 команды:
  * - Ввод имени
  * - Ввод в переменную
+ * 
+ * Если выключен ввод клавиатурой, можно выбирать буквы клавишей Z и удалять клавишей X.
  *
  * Вы всегда можете написать автору, если вам нужны другие функции или даже плагины.
  * Boosty: https://boosty.to/phileas
@@ -838,12 +843,28 @@ Window_PhileasInput.prototype.processCursorMove = function() {
     this.updateCursor();
 };
 
+Window_PhileasInput.prototype.isOkPressed = function(event) {
+    if (this._keyboardInput) {
+        return event.key == "Enter";
+    }
+
+    return Input.isPressed("ok");
+}
+
+Window_PhileasInput.prototype.isDeletePressed = function(event) {
+    if (this._keyboardInput) {
+        return event.key == "Backspace";
+    }
+
+    return Input.isPressed("cancel");
+}
+
 Window_PhileasInput.prototype.keyDownHandler = function(event) {
     if (!this.isOpen() || !this.active) {
         return;
     }
 
-    if (event.key == "Enter") {
+    if (this.isOkPressed(event)) {
         this.processOk();
         return;
     }
@@ -853,12 +874,12 @@ Window_PhileasInput.prototype.keyDownHandler = function(event) {
         return;
     }
 
-    if (!this._keyboardInput) {
+    if (this.isDeletePressed(event)) {
+        this.processBack();
         return;
     }
 
-    if (event.key == "Backspace") {
-        this.processBack();
+    if (!this._keyboardInput) {
         return;
     }
 
