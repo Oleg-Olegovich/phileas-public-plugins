@@ -13,6 +13,7 @@
 // 2024.September.19 Ver1.4.4 Blocked player movement when the trigger is triggered
 // 2024.September.23 Ver1.5.0 Commands to enable and disable the plugin
 // 2024.September.25 Ver1.5.1 Fixed exit trigger
+// 2024.October.3 Ver1.5.2 Fixed alpha pixel check
 
 /*:
  * @target MZ
@@ -664,7 +665,16 @@
             const touchPos = new Point(TouchInput.x, TouchInput.y);
             const localPos = sprite.worldTransform.applyInverse(touchPos);
             const bitmap = sprite._bitmap;
-            const alpha = bitmap.getAlphaPixel(localPos.x, localPos.y);
+
+            let x = localPos.x;
+            let y = localPos.y;
+
+            if (sprite._anchor.x == 0.5) {
+                x += sprite._frame.width / 2;
+                y += sprite._frame.height / 2;
+            }
+
+            const alpha = bitmap.getAlphaPixel(x, y);
 
             if (alpha === 0) {
                 return false;
