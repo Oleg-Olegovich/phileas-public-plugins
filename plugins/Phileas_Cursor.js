@@ -197,7 +197,11 @@
  * - "Show cursor"
  * - "Configure an event" - configures the cursor for a single event
  * - "Configure an event (global)" - configures the cursor for a single event on any map
- *
+ * - "Freeze the cursor" and "Unfreeze the cursor" - control the freezing of the cursor.
+ * 
+ * If cursor freeze is enabled, the cursor image will not be updated.
+ * Optimization is useful if you don't use animations, click images, and event cursors.
+ * 
  * You can set the cursor configuration for an event using the plugin command and using tags in the event notes:
  * <CursorPicture:picture> - this picture (picture.png) will be used when the cursor is hovered over the event
  * <CursorPictureOnClick:pictureClick> - the picture displayed when clicked (if not specified, the cursor will not change when clicked)
@@ -524,6 +528,10 @@
  * - "Показать курсор"
  * - "Настроить событие" - конфигурирует курсор для отдельного события
  * - "Настроить событие (глобально)" - конфигурирует курсор для события на любой карте
+ * - "Заморозить курсор" и "Разморозить курсор" - контролируют заморозку курсора.
+ * 
+ * Если включена заморозка курсора, то картинка курсора не будет обновляться.
+ * Оптимизация полезна, если вы не используете анимации, отдельные картинки для клика и курсоры событий.
  *
  * Задать конфигурацию курсора для события можно с помощью команды плагина и с помощью тегов в заметках события:
  * <CursorPicture:picture> - эта картинка (picture.png) будет использоваться, когда курсор наведён на событие
@@ -1090,6 +1098,10 @@
         }
 
         setCurrentCursor(defaultCursor);
+
+        if (isFrozen) {
+            requestAnimationFrame(updatePhileasCursor);
+        }
     }
 
     function hide() {
@@ -1154,6 +1166,7 @@
 
     function unfreezeCursor() {
         isFrozen = false;
+        requestAnimationFrame(updatePhileasCursor);
     }
 
     function switchHide() {
@@ -1248,7 +1261,7 @@
     };
 
     Scene_Map.prototype.phileasCheckEventCursors = function (x, y) {
-        if (!eventCursorsEnabled) {
+        if (!eventCursorsEnabled || isFrozen) {
             return;
         }
 
