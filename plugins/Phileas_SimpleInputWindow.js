@@ -9,6 +9,7 @@
 // 2024.August.21 Ver1.1.0 Added message
 // 2024.September.23 Ver1.2.0 Improved Japanese display
 // 2024.October.3 Ver1.2.1 If keyboard input is disabled, you can input the letter with the Z key and delete it with the X key
+// 2024.October.13 Ver1.2.2 Fixed the type of the "message" argument
 
 /*:
  * @target MZ
@@ -92,6 +93,7 @@
  * 
  * @arg message
  * @text Message
+ * @type note
  * @desc If the message is empty, the message box will not be displayed
  * 
  * @arg widthPadding
@@ -290,6 +292,7 @@
  * 
  * @arg message
  * @text Сообщение
+ * @type note
  * @desc Если сообщение пустое, то окно сообщения не будет отображаться
  * 
  * @arg widthPadding
@@ -370,6 +373,7 @@
  * 
  * @arg message
  * @text Сообщение
+ * @type note
  * @desc Если сообщение пустое, то окно сообщения не будет отображаться
  * 
  * @arg widthPadding
