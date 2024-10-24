@@ -14,11 +14,12 @@
 // 2024.September.23 Ver1.5.0 Commands to enable and disable the plugin
 // 2024.September.25 Ver1.5.1 Fixed exit trigger
 // 2024.October.3 Ver1.5.2 Fixed alpha pixel check
+// 2024.October.24 Ver1.6.0 Added running the JS script
 
 /*:
  * @target MZ
  * @plugindesc Triggering of the switch/variable/common event when the pointer acts with the picture
- * @author Phileas
+ * @author Phileas, ZX_Lost_Soul
  *
  * @command assign
  * @text Assign
@@ -51,6 +52,11 @@
  * @text Common event ID
  * @type common_event
  * @default 0
+ * 
+ * @arg runScript
+ * @text Script
+ * @type text
+ * @desc An arbitrary JS script that will be executed at the trigger.
  * 
  * @arg ignoreTransparentPixels
  * @text Ignore transparent pixels
@@ -116,6 +122,11 @@
  * @text Common event ID
  * @type common_event
  * @default 0
+ * 
+ * @arg runScript
+ * @text Script
+ * @type text
+ * @desc An arbitrary JS script that will be executed at the trigger.
  * 
  * @arg ignoreTransparentPixels
  * @text Ignore transparent pixels
@@ -249,7 +260,7 @@
 /*:ru
  * @target MZ
  * @plugindesc Срабатывание переключателя/переменной/общего события при действии указателя с картинкой
- * @author Phileas
+ * @author Phileas, ZX_Lost_Soul
  *
  * @command assign
  * @text Назначить
@@ -282,6 +293,11 @@
  * @text ID общего события
  * @type common_event
  * @default 0
+ * 
+ * @arg runScript
+ * @text Скрипт
+ * @type text
+ * @desc Произвольный JS-скрипт, который будет исполнен при срабатывании триггера.
  * 
  * @arg ignoreTransparentPixels
  * @text Игнорировать прозрачные пиксели
@@ -347,6 +363,11 @@
  * @text ID общего события
  * @type common_event
  * @default 0
+ * 
+ * @arg runScript
+ * @text Скрипт
+ * @type text
+ * @desc Произвольный JS-скрипт, который будет исполнен при срабатывании триггера.
  * 
  * @arg ignoreTransparentPixels
  * @text Игнорировать прозрачные пиксели
@@ -533,6 +554,7 @@
         
         const pictureVariableId = Number(params["pictureVariableId"]);
         const commonEventId = Number(params["commonEventId"]);
+        const runScript = params["runScript"];
         const ignoreTransparentPixels = params["ignoreTransparentPixels"] == "true";
 
         let act = {};
@@ -541,6 +563,7 @@
         act.variableData = variableData;
         act.pictureVariableId = pictureVariableId;
         act.commonEventId = commonEventId;
+        act.runScript = runScript;
         act.ignoreTransparentPixels = ignoreTransparentPixels;
 
         return act;
@@ -606,7 +629,7 @@
         if (act == undefined) {
             return;
         }
-        
+
         if (act.switchData.id != undefined && act.switchData.id > 0 && act.switchData.state != undefined) {
             $gameSwitches.setValue(
                 act.switchData.id,
@@ -639,6 +662,10 @@
         
         if (act.commonEventId != undefined) {
             $gameTemp.reserveCommonEvent(act.commonEventId);
+        }
+
+        if (act.runScript != undefined) {
+            eval(act.runScript);
         }
     }
     
