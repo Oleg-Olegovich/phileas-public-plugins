@@ -13,26 +13,6 @@
 // 2024.May.8 Ver1.3.3 Switch labels
 // 2024.November.10 Ver1.3.4 Added window width parameter
 
-/*
-Title: Phileas_OptionsManager
-Author: Phileas
-Site: https://boosty.to/phileas
-E-mail: olek.olegovich@gmail.com
-Version: 1.3.1
-First release: 07.23.2023
-Last release: 29.01.2024
-*/
-
-/*ru
-Название: Phileas_OptionsManager
-Автор: Phileas
-Сайт: https://boosty.to/phileas
-E-mail: olek.olegovich@gmail.com
-Версия: 1.3.1
-Первый релиз: 23.07.2023
-Последний релиз: 29.01.2024
-*/
-
 /*:
  * @target MZ
  * @plugindesc Configures the options menu, adds an unlimited number of custom options
