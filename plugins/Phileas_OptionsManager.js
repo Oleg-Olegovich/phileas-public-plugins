@@ -11,6 +11,7 @@
 // 2023.November.22 Ver1.3.0 Fixed arrow keys
 // 2024.January.29 Ver1.3.2 Fixed compatibility with PKD_ExtendedLoot
 // 2024.May.8 Ver1.3.3 Switch labels
+// 2024.November.10 Ver1.3.4 Added window width parameter
 
 /*
 Title: Phileas_OptionsManager
@@ -87,6 +88,13 @@ E-mail: olek.olegovich@gmail.com
  * @type number
  * @default 20
  * @desc The value by which the volume changes in one click.
+ *
+ * @param optionsWindowWidth
+ * @text Options window`s width
+ * @type number
+ * @default 0
+ * @min 0
+ * @desc Input 0 to use the default value.
  * 
  * @help
  * The plugin does not provide commands.
@@ -186,6 +194,13 @@ E-mail: olek.olegovich@gmail.com
  * @type number
  * @default 20
  * @desc Значение, на которое изменяется громкость за один клик.
+ *
+ * @param optionsWindowWidth
+ * @text Ширина окна настроек
+ * @type number
+ * @default 0
+ * @min 0
+ * @desc Введите 0, чтобы использовать значение по умолчанию.
  * 
  * @help
  * Плагин не предоставляет команд.
@@ -532,6 +547,7 @@ E-mail: olek.olegovich@gmail.com
     var showMEVolume = parameters["Show 'ME Volume' option?"] == "true";
     var showSEVolume = parameters["Show 'SE Volume' option?"] == "true";
     var volumeOffset = Number(parameters["Volume offset"]) || 20;
+    var optionsWindowWidth = Number(parameters["optionsWindowWidth"]) || 0;
     
     var messageSpeedValue = messageSpeedOption[5];
     
@@ -726,6 +742,20 @@ E-mail: olek.olegovich@gmail.com
     }
 
 //--------CHANGED CORE:
+
+    const Origin_Scene_Option_optionsWindowRect = Scene_Options.prototype.optionsWindowRect;
+    Scene_Options.prototype.optionsWindowRect = function() {
+        if (optionsWindowWidth == 0) {
+            return Origin_Scene_Option_optionsWindowRect.call(this);
+        }
+
+        const n = Math.min(this.maxCommands(), this.maxVisibleCommands());
+        const ww = optionsWindowWidth;
+        const wh = this.calcWindowHeight(n, true);
+        const wx = (Graphics.boxWidth - ww) / 2;
+        const wy = (Graphics.boxHeight - wh) / 2;
+        return new Rectangle(wx, wy, ww, wh);
+    };
 
     Window_Options.prototype.makeCommandList = function() {
         this.addFullscreenOption(0);
