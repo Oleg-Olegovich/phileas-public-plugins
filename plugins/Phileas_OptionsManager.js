@@ -11,7 +11,7 @@
 // 2023.November.22 Ver1.3.0 Fixed arrow keys
 // 2024.January.29 Ver1.3.2 Fixed compatibility with PKD_ExtendedLoot
 // 2024.May.8 Ver1.3.3 Switch labels
-// 2024.November.10 Ver1.3.4 Added window width parameter
+// 2024.November.10 Ver1.3.4 Added window width and status width parameters
 
 /*:
  * @target MZ
@@ -71,6 +71,13 @@
  *
  * @param optionsWindowWidth
  * @text Options window`s width
+ * @type number
+ * @default 0
+ * @min 0
+ * @desc Input 0 to use the default value.
+ *
+ * @param statusTextWidth
+ * @text Option value width (status)
  * @type number
  * @default 0
  * @min 0
@@ -177,6 +184,13 @@
  *
  * @param optionsWindowWidth
  * @text Ширина окна настроек
+ * @type number
+ * @default 0
+ * @min 0
+ * @desc Введите 0, чтобы использовать значение по умолчанию.
+ *
+ * @param statusTextWidth
+ * @text Ширина значения опции
  * @type number
  * @default 0
  * @min 0
@@ -528,6 +542,7 @@
     var showSEVolume = parameters["Show 'SE Volume' option?"] == "true";
     var volumeOffset = Number(parameters["Volume offset"]) || 20;
     var optionsWindowWidth = Number(parameters["optionsWindowWidth"]) || 0;
+    var statusTextWidth = Number(parameters["statusTextWidth"]) || 0;
     
     var messageSpeedValue = messageSpeedOption[5];
     
@@ -859,6 +874,15 @@
         }
 
         return this.booleanStatusText(value);
+    };
+
+    const Origin_Window_Options_statusWidth = Window_Options.prototype.statusWidth;
+    Window_Options.prototype.statusWidth = function() {
+        if (statusTextWidth == 0) {
+            return Origin_Window_Options_statusWidth.call(this);
+        }
+
+        return statusTextWidth;
     };
     
     const Origin_switchFullscreen = Graphics._switchFullScreen;
