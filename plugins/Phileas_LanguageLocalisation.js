@@ -482,9 +482,9 @@
     var languages = loadLanguages();
     var files = loadFiles();
     
-    var languageData = {};
-
     ConfigManager.phileasLanguageIndex = 0;
+
+    var languageData = {};
 
 //-----------------------------------------------------------------------------
 // Main
@@ -763,9 +763,9 @@
         Origin_Game_Message_setChoices.call(this, choices, defaultType, cancelType);
     };
 
-    const Origin_Scene_Boot_start = Scene_Boot.prototype.start;
-    Scene_Boot.prototype.start = function() {
-        Origin_Scene_Boot_start.call(this);
+    const Origin_Scene_Boot_onDatabaseLoaded = Scene_Boot.prototype.onDatabaseLoaded;
+    Scene_Boot.prototype.onDatabaseLoaded = function() {
+        Origin_Scene_Boot_onDatabaseLoaded.call(this);
         loadLanguageData();
         setTimeout(function(){
             updateGameTitle();
