@@ -31,6 +31,7 @@ Some of the plugins for MZ can work on MV. But I haven't tested it. Write to [me
 #### Messages
 | Name | Description | Code | Forum |
 | --- | --- | --- | --- |
+| **Phileas's Language Localisation** | Языковые локализации текста в игре | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_LanguageLocalisation.js) | [Thread](https://forums.rpgmakerweb.com/index.php?threads/phileass-language-localisation.173148/) |
 | **Phileas's Message Window Rect Settings** | Customizing the Message Window | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_MessageWindowRectSettings.js) | [Thread](https://forums.rpgmakerweb.com/index.php?threads/mz-phileass-message-window-rect-settings-mz-message-window-customizer.158531/) |
 | **Phileas's Skipping Messages** | Fast-forward messages | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_SkippingMessages.js) | [Thread](https://forums.rpgmakerweb.com/index.php?threads/mz-phileass-skipping-messages-mz-skip-message-fast-forward-message.158530/) |
 | **Phileas's Text Wrap** | Automatic word wrap | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_TextWrap.js) | [Thread](https://forums.rpgmakerweb.com/index.php?threads/phileass-text-wrap-automatic-text-break-word-wrap-in-the-message.158894/) |
