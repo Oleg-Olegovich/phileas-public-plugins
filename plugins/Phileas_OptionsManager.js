@@ -11,7 +11,7 @@
 // 2023.November.22 Ver1.3.0 Fixed arrow keys
 // 2024.January.29 Ver1.3.2 Fixed compatibility with PKD_ExtendedLoot
 // 2024.May.8 Ver1.3.3 Switch labels
-// 2024.November.10 Ver1.3.4 Added window width and status width parameters
+// 2024.November.10 Ver1.3.4 Added window width, status width and visible options max number parameters
 
 /*:
  * @target MZ
@@ -78,6 +78,13 @@
  *
  * @param statusTextWidth
  * @text Option value width (status)
+ * @type number
+ * @default 0
+ * @min 0
+ * @desc Input 0 to use the default value.
+ * 
+ * @param optionsWindowMaxVisibleCommands
+ * @text Max number of visible options
  * @type number
  * @default 0
  * @min 0
@@ -191,6 +198,13 @@
  *
  * @param statusTextWidth
  * @text Ширина значения опции
+ * @type number
+ * @default 0
+ * @min 0
+ * @desc Введите 0, чтобы использовать значение по умолчанию.
+ * 
+ * @param optionsWindowMaxVisibleCommands
+ * @text Макс. кол-во видимых опций
  * @type number
  * @default 0
  * @min 0
@@ -543,6 +557,7 @@
     var volumeOffset = Number(parameters["Volume offset"]) || 20;
     var optionsWindowWidth = Number(parameters["optionsWindowWidth"]) || 0;
     var statusTextWidth = Number(parameters["statusTextWidth"]) || 0;
+    var optionsWindowMaxVisibleCommands = Number(parameters["optionsWindowMaxVisibleCommands"]) || 0;
     
     var messageSpeedValue = messageSpeedOption[5];
     
@@ -750,6 +765,18 @@
         const wx = (Graphics.boxWidth - ww) / 2;
         const wy = (Graphics.boxHeight - wh) / 2;
         return new Rectangle(wx, wy, ww, wh);
+    };
+
+    const Origin_Scene_Options_maxVisibleCommands = Scene_Options.prototype.maxVisibleCommands;
+    Scene_Options.prototype.maxVisibleCommands = function() {
+        return optionsWindowMaxVisibleCommands == 0
+            ? Origin_Scene_Options_maxVisibleCommands.call(this)
+            : optionsWindowMaxVisibleCommands;
+    };
+
+    const Origin_Scene_Options_maxCommands = Scene_Options.prototype.maxCommands;
+    Scene_Options.prototype.maxCommands = function() {
+        return this.maxVisibleCommands();
     };
 
     Window_Options.prototype.makeCommandList = function() {
