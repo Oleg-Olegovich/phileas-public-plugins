@@ -3,6 +3,7 @@
 //=============================================================================
 // [Update History]
 // 2024.November.09 Ver1.0.0 First Release
+// 2024.November.16 Ver1.1.0 Added media localization
 
 /*:
  * @target MZ
@@ -25,7 +26,7 @@
  * @text Language files
  * @desc The list of the JSON files (without extension) Separate the path with the symbol '/'
  * @type string[]
- * @default ["main"]
+ * @default []
  *
  * 
  * @command setLanguage
@@ -46,6 +47,8 @@
  *
  * To support custom fonts, install the Phileas_CustomFonts plugin.
  * 
+ * Use the Phileas_TextWrap plugin to automatically move words to a new line.
+ * 
  * If you are using the Phileas_OptionsManager plugin, place it above
  * the real plugin in the Plugin Manager menu.
  * 
@@ -64,23 +67,23 @@
  *    It will store the root properties of the language dictionary.
  *    There must be an object (curly brackets) at the root of this file.
  * 
- * 5. Configure the "Language files" parameter.
+ * 4. Configure the "Language files" parameter.
  *    A set of files the same for all languages.
  *    Do not use the name "main.json", it is used
  *    for root properties.
  *    You can use unlimited level directories nesting.
  *    In the list, separate the file path with the '/' character.
  * 
- * 6. In each language folder, create files with names that
+ * 5. In each language folder, create files with names that
  *    you have specified in the parameter "Language files".
  *    At the root of the file should be either an object
  *    (curly brackets) or an array (square brackets).
  * 
- * 7. Fill in the localization files with text.
+ * 6. Fill in the localization files with text.
  *    The structures of all objects must match,
  *    only the final string values can differ.
  * 
- * 8. To use localized text in the game, type a line
+ * 7. To use localized text in the game, type a line
  *    like this in the right place:
  * 
  *    ${<text code>}
@@ -88,7 +91,7 @@
  *    <text code>
  *    The text code should lead to the value in the localization files.
  * 
- * 9. The properties specified in "languages/<text code>/main.json",
+ * 8. The properties specified in "languages/<text code>/main.json",
  *    will be at the root of the localization dictionary.
  *    For example, if main is set like this:
  * 
@@ -99,7 +102,7 @@
  *    To use this value, type this:
  *    ${yes}
  * 
- * 10. If the property is specified in another file,
+ * 9. If the property is specified in another file,
  *    then you need to specify the path to the file before its name.
  *    For example, if you have a file with the path
  *    "../languages/<text code>/chapter_1/dialogues.json"
@@ -112,7 +115,7 @@
  *    To use this value, type this:
  *    ${chapter_1.dialogues.point_0}
  * 
- * 11. In addition to objects, you can use arrays.
+ * 10. In addition to objects, you can use arrays.
  *     Let's change the example from point 9:
  *     
  *     {
@@ -127,7 +130,7 @@
  *     ${chapter_1.dialogues.point_0[0]}
  *     ${chapter_1.dialogues.point_0[1]}
  * 
- * 12. The array can be located right at the root of the localization file
+ * 11. The array can be located right at the root of the localization file
  *     (except for the "main.json").
  *     Let's change the example from paragraph 10:
  * 
@@ -142,21 +145,62 @@
  *     ${chapter_1.dialogues[0][0]}
  *     ${chapter_1.dialogues[0][1]}
  * 
- * 13. You can optionally nest objects and arrays into each other.
+ * 12. You can optionally nest objects and arrays into each other.
  *     The nesting level is unlimited!
  * 
- * 14. You can also use the translated text inside the translated text:
+ * 13. You can also use the translated text inside the translated text:
  *     
  *     "first_text": "Simple example",
  *     "second_text": "The first text is ${first_text}."
  * 
- * 15. To use control symbols to set text, use a variable,
+ * 14. To use control symbols to set text, use a variable,
  *     icon, and more, add a second slash:
  *     
  *     \C[0] -> \\C[0] OR \V[1] -> \\V[1] OR \. -> \\.
  * 
- * 16. The plugin provides the following commands:
+ * 15. The plugin provides the following commands:
  *     - "Set the language" - changes the current language localization.
+ * 
+ *-----------------------------------------------------------------------------
+ * LOCALIZED RESOURCES (MEDIA)
+ * 
+ * You can use different files (audio, images, video) for each language.
+ * 
+ * The function works for all types of images (animations, pictures,
+ * tilesets and others), all types of audio (BGM, BGS, ME, SE)
+ * and video (movies).
+ * 
+ * Manual:
+ * 1. The language specified first in the "Languages" parameter
+ *    is considered the default language.
+ *    For example, the default language may be with the code "en".
+ * 2. Place the media file to the directory you need.
+ *    This should be a file for the default language.
+ *    For example, you can execute an image in the "img/pictures" directory.
+ *    Let it be "a.png":
+ *    "img/pictures/a.png"
+ * 3. If you want another image for a different language to appear
+ *    instead of this image, create a folder in the same directory.
+ *    Its name must match the code of the desired language. Example:
+ *    "img/pictures/ru".
+ * 4. In this new directory, create a media file with the same name
+ *    and relative path:
+ *    "img/pictures/ru/a.png".
+ * 5. In the "Show Picture" command, select the file for the default language.
+ *    If a second language is enabled in the game settings,
+ *    a picture for this language will appear.
+ * 6. You don't have to create a separate file for each language.
+ *    If a file for any language is not found,
+ *    the file for the default language will be used. 
+ * 7. You can use subfolders. Then the relative paths must match. Example:
+ *    "img/pictures/sub_folder/b.png"
+ *    "img/pictures/ru/sub_folder/b.png"
+ * 
+ *-----------------------------------------------------------------------------
+ * DEMO PROJECT
+ * The plugin has a demo project.
+ * Please review it if you still have questions about using the plugin:
+ * https://rpgmakerunion.ru/game/phileass-language-localisation-demo.33521384
  * 
  *-----------------------------------------------------------------------------
  * NOTE
@@ -240,7 +284,7 @@
  * @author Phileas
  * 
  * @param option
- * @text Option label
+ * @text Надпись опции
  * @desc Надпись опции выбора языка. Может быть переводимым текстом ${<текстовый код>}
  * @type string
  * @default Languages
@@ -255,7 +299,7 @@
  * @text Файлы языка
  * @desc Список JSON файлов (без расширения). Путь разделяйте символом '/'
  * @type string[]
- * @default ["main"]
+ * @default []
  *
  * 
  * @command setLanguage
@@ -276,6 +320,9 @@
  * 
  * Для поддержки кастомных шрифтов установите плагин Phileas_CustomFonts.
  * 
+ * Используйте плагин Phileas_TextWrap для автоматического переноса
+ * слов на новую строку.
+ * 
  * Если вы используете плагин Phileas_OptionsManager, расположите его выше
  * настоящего плагина в меню менеджера плагинов.
  * 
@@ -294,21 +341,21 @@
  *    В нём будут хранится корневые свойства словаря языка.
  *    В корне этого файла должен быть объект (фигурные скобки).
  * 
- * 5. Настройте параметр "Файлы языка". Набор файлов
+ * 4. Настройте параметр "Файлы языка". Набор файлов
  *    одинаковый для всех языков.
  *    Не используйте название "main.json", оно используется
  *    для корневых свойств.
  *    Вы можете использовать директории неограниченного уровня
  *    вложенности. В списке путь к файлу разделяйте символом '/'.
  * 
- * 6. В каждой папке языка создайте файлы с названиями, которые
+ * 5. В каждой папке языка создайте файлы с названиями, которые
  *    вы указали в параметре "Файлы языка". В корне файла должен
  *    быть либо объект (фигурные скобки), либо массив (квадратные скобки).
  * 
- * 7. Заполните файлы локализаций текстом. Структуры всех объектов должны
+ * 6. Заполните файлы локализаций текстом. Структуры всех объектов должны
  *    совпадать, отличаться могут только конечные строковые значения.
  * 
- * 8. Чтобы использовать локализованный текст в игре, введите в нужном
+ * 7. Чтобы использовать локализованный текст в игре, введите в нужном
  *    месте строку такого вида:
  * 
  *    ${<текстовый код>}
@@ -316,7 +363,7 @@
  *    <текстовый код>
  *    Текстовый код должен вести к значению в файлах локализации.
  * 
- * 9. Свойства, указанные в "languages/<код языка>/main.json",
+ * 8. Свойства, указанные в "languages/<код языка>/main.json",
  *    будут лежать в корне словаря локализации.
  *    К примеру, если main задан вот так:
  * 
@@ -327,7 +374,7 @@
  *    Чтобы использовать это значение, введите это:
  *    ${yes}
  * 
- * 10. Если свойство указано в другом файле, то перед его названием нужно
+ * 9. Если свойство указано в другом файле, то перед его названием нужно
  *    прописать путь к файлу. К примеру, если у вас есть файл с
  *    путём "../languages/<код языка>/chapter_1/dialogues.json"
  *    и такой структурой:
@@ -339,7 +386,7 @@
  *    Чтобы использовать это значение, введите это:
  *    ${chapter_1.dialogues.point_0}
  * 
- * 11. Помимо объектов, вы можете использовать массивы. Изменим
+ * 10. Помимо объектов, вы можете использовать массивы. Изменим
  *     пример из пункта 9:
  *     
  *     {
@@ -354,7 +401,7 @@
  *     ${chapter_1.dialogues.point_0[0]}
  *     ${chapter_1.dialogues.point_0[1]}
  * 
- * 12. Массив может лежать прямо в корне файла локализации
+ * 11. Массив может лежать прямо в корне файла локализации
  *     (кроме файла "main.json"). Изменим пример из пункта 10:
  * 
  *     [
@@ -368,29 +415,67 @@
  *     ${chapter_1.dialogues[0][0]}
  *     ${chapter_1.dialogues[0][1]}
  * 
- * 13. Вы можете произвольно вкладывать объекты и массивы
+ * 12. Вы можете произвольно вкладывать объекты и массивы
  *     друг в друга. Уровень вложенности не ограничен!
  * 
- * 14. Вы также можете использовать переводимый текст внутри
+ * 13. Вы также можете использовать переводимый текст внутри
  *     переводимого текста:
  *     
  *     "first_text": "Простой пример",
  *     "second_text": "Первый текст - ${first_text}."
  * 
- * 15. Чтобы использовать символы управления для установки
+ * 14. Чтобы использовать символы управления для установки
  *     текста, использования переменной, иконки и прочего,
  *     добавляйте второй слэш:
  *     
  *     \C[0] -> \\C[0] ИЛИ \V[1] -> \\V[1] ИЛИ \. -> \\.
  * 
- * 16. Плагин предоставляет следующие команды:
+ * 15. Плагин предоставляет следующие команды:
  *     - "Установить язык" - изменяет текущую языковую локализацию.
  * 
  *-----------------------------------------------------------------------------
- * ПРИМЕЧАНИЕ
+ * ЛОКАЛИЗОВАННЫЕ РЕСУРСЫ (МЕДИА)
  * 
- * Этот плагин представляет собой полностью переписанную и расширенную версию плагина
- * "Open Digital World - Multi-Language System Plugin".
+ * Вы можете использовать разные файлы (аудио, изображения, видео)
+ * для каждого языка.
+ * 
+ * Функция работает для всех типов изображений (animations, pictures,
+ * tilesets и остальных), всех типов аудио (BGM, BGS, ME, SE) и
+ * видео (movies).
+ * 
+ * Инструкция:
+ * 1. Язык, указанный первым в параметре "Языки", считается
+ *    языком по умолчанию.
+ *    К примеру, язык по умолчанию может быть с кодом "en".
+ * 2. Расположите медиа-файл в нужной вам директории. Это должен
+ *    быть файл для языка по умолчанию.
+ *    К примеру, вы можете положить изображение в директорию
+ *    "img/pictures". Пусть это будет "a.png":
+ *    "img/pictures/a.png"
+ * 3. Если вы хотите, чтобы для другого языка вместо этого
+ *    изображения отображалось другое, в этой же директории
+ *    создайте папку. Её название должно совпадать с
+ *    кодом нужного языка. Пример: "img/pictures/ru".
+ * 4. В этой новой директории создайте медиа-файл с таким же
+ *    именем и относительным путём:
+ *    "img/pictures/ru/a.png".
+ * 5. В команде "Показать картинку" выберете файл для языка
+ *    по умолчанию. Если в настройках игры будет включён
+ *    второй язык, отобразится картинка для него.
+ * 6. Вам необязательно создавать отдельный файл для каждого
+ *    языка. Если файл для какого-то языка не будет найден,
+ *    будет использоваться файл для языка по умолчанию.
+ * 7. Вы можете использовать подпапки. Тогда относительные
+ *    пути должны совпадать. Пример:
+ *    "img/pictures/sub_folder/b.png"
+ *    "img/pictures/ru/sub_folder/b.png"
+ * 
+ *-----------------------------------------------------------------------------
+ * ДЕМО ПРОЕКТ
+ * У плагина есть демонстрационный проект. Пожалуйста, ознакомьтесь с ним,
+ * если у вас остались вопросы по использованию плагина:
+ * https://rpgmakerunion.ru/game/phileass-language-localisation-demo.33521384
+ * 
  * 
  * Вы всегда можете написать автору, если вам нужны другие функции или даже плагины.
  * Boosty: https://boosty.to/phileas
@@ -630,6 +715,54 @@
         document.title = getText($dataSystem.gameTitle);
     }
 
+    function getLocalizationImageFolder(folder, filename) {
+        const languageId = getCurrentIndex();
+
+        if (languageId == 0) {
+            return folder;
+        }
+
+        const newFolder = folder + getCurrentLanguage().code + "/";
+
+        const fs = require("fs");
+        return fs.existsSync(newFolder + filename)
+            ? newFolder
+            : folder;
+    }
+
+    function getLocalizationAudioFolder(folder, filename) {
+        const languageId = getCurrentIndex();
+
+        if (languageId == 0) {
+            return folder;
+        }
+
+        const newFolder = folder + getCurrentLanguage().code + "/";
+
+        const fs = require("fs");
+        return fs.existsSync("audio/" + newFolder + filename)
+            ? newFolder
+            : folder;
+    }
+
+    function getLocalizationMovieSrc(src) {
+        const languageId = getCurrentIndex();
+
+        if (languageId == 0) {
+            return src;
+        }
+
+        const id = src.indexOf("/");
+        const dir = src.substring(0, id + 1);
+        const file = src.substring(id);
+        const newSrc = dir + getCurrentLanguage().code + file;
+
+        const fs = require("fs");
+        return fs.existsSync(newSrc)
+            ? newSrc
+            : src;
+    }
+ 
     DataManager.phileasLoadLanguageFile = function(id, url, file) {
         const xhr = new XMLHttpRequest();
         xhr.open("GET", url);
@@ -687,50 +820,33 @@
 
 //--------CHANGED CORE:
 
+//-----------------------------------------------------------------------------
+// Core
+
     const Origin_Bitmap_drawText = Bitmap.prototype.drawText;
     Bitmap.prototype.drawText = function(text, x, y, maxWidth, lineHeight, align) {
         Origin_Bitmap_drawText.call(this, getText(text), x, y, maxWidth, lineHeight, align);
     };
 
-    const Origin_ConfigManager_makeData = ConfigManager.makeData;
-    ConfigManager.makeData = function() {
-        const config = Origin_ConfigManager_makeData.call(this);
-        config.phileasLanguageIndex = this.phileasLanguageIndex;
-        return config;
+    const Video_play = Video.play;
+    Video.play = function(src) {
+        src = getLocalizationMovieSrc(src);
+        Video_play.call(this, src);
     };
 
-    const Origin_ConfigManager_applyData = ConfigManager.applyData;
-    ConfigManager.applyData = function(config) {
-        Origin_ConfigManager_applyData.call(this, config);
-        this.phileasLanguageIndex = config["phileasLanguageIndex"] || 0;
-    };
+//-----------------------------------------------------------------------------
+// Sprites
 
-    const Origin_TextManager_basic = TextManager.basic;
-    TextManager.basic = function(basicId) {
-        return getText(Origin_TextManager_basic.call(this, basicId));
-    };
+Sprite_Damage.prototype.createMiss = function() {
+    const h = this.fontSize();
+    const w = Math.floor(h * 3.0);
+    const sprite = this.createChildSprite(w, h);
+    sprite.bitmap.drawText(getCurrentMissText(), 0, 0, w, h, "center");
+    sprite.dy = 0;
+};
 
-    const Origin_TextManager_param = TextManager.param;
-    TextManager.param = function(paramId) {
-        return getText(Origin_TextManager_param.call(this, paramId));
-    };
-
-    const Origin_TextManager_command = TextManager.command;
-    TextManager.command = function(commandId) {
-        return getText(Origin_TextManager_command.call(this, commandId));
-    };
-
-    const Origin_TextManager_message = TextManager.message;
-    TextManager.message = function(messageId) {
-        return getText(Origin_TextManager_message.call(this, messageId));
-    };
-
-    Object.defineProperty( TextManager, "currencyUnit", {
-        get: function() {
-            return getText($dataSystem.currencyUnit);
-        },
-        configurable: true
-    });
+//-----------------------------------------------------------------------------
+// Objects
 
     const Origin_Game_System_mainFontFace = Game_System.prototype.mainFontFace;;
     Game_System.prototype.mainFontFace = function() {
@@ -762,6 +878,9 @@
         choices = choices.map(choice => getText(choice));
         Origin_Game_Message_setChoices.call(this, choices, defaultType, cancelType);
     };
+    
+//-----------------------------------------------------------------------------
+// Scenes
 
     const Origin_Scene_Boot_onDatabaseLoaded = Scene_Boot.prototype.onDatabaseLoaded;
     Scene_Boot.prototype.onDatabaseLoaded = function() {
@@ -776,13 +895,8 @@
         updateGameTitle();
     };
 
-    Sprite_Damage.prototype.createMiss = function() {
-        const h = this.fontSize();
-        const w = Math.floor(h * 3.0);
-        const sprite = this.createChildSprite(w, h);
-        sprite.bitmap.drawText(getCurrentMissText(), 0, 0, w, h, "center");
-        sprite.dy = 0;
-    };
+//-----------------------------------------------------------------------------
+// Windows
 
     const Origin_Window_Base_textWidth = Window_Base.prototype.textWidth;
     Window_Base.prototype.textWidth = function(text) {
@@ -883,6 +997,61 @@
         Origin_Window_NameEdit_setup.call(this, actor, maxLength);
         this._name = getText(this._name).slice(0, this._maxLength);
         this._index = this._name.length;
+    };
+
+//-----------------------------------------------------------------------------
+// Managers
+
+    const Origin_ConfigManager_makeData = ConfigManager.makeData;
+    ConfigManager.makeData = function() {
+        const config = Origin_ConfigManager_makeData.call(this);
+        config.phileasLanguageIndex = this.phileasLanguageIndex;
+        return config;
+    };
+
+    const Origin_ConfigManager_applyData = ConfigManager.applyData;
+    ConfigManager.applyData = function(config) {
+        Origin_ConfigManager_applyData.call(this, config);
+        this.phileasLanguageIndex = config["phileasLanguageIndex"] || 0;
+    };
+
+    const Origin_TextManager_basic = TextManager.basic;
+    TextManager.basic = function(basicId) {
+        return getText(Origin_TextManager_basic.call(this, basicId));
+    };
+
+    const Origin_TextManager_param = TextManager.param;
+    TextManager.param = function(paramId) {
+        return getText(Origin_TextManager_param.call(this, paramId));
+    };
+
+    const Origin_TextManager_command = TextManager.command;
+    TextManager.command = function(commandId) {
+        return getText(Origin_TextManager_command.call(this, commandId));
+    };
+
+    const Origin_TextManager_message = TextManager.message;
+    TextManager.message = function(messageId) {
+        return getText(Origin_TextManager_message.call(this, messageId));
+    };
+
+    Object.defineProperty(TextManager, "currencyUnit", {
+        get: function() {
+            return getText($dataSystem.currencyUnit);
+        },
+        configurable: true
+    });
+
+    const Origin_ImageManager_loadBitmap = ImageManager.loadBitmap;
+    ImageManager.loadBitmap = function(folder, filename) {
+        folder = getLocalizationImageFolder(folder, filename + ".png");
+        return Origin_ImageManager_loadBitmap.call(this, folder, filename);
+    };
+
+    const Origin_AudioManager_createBuffer = AudioManager.createBuffer;
+    AudioManager.createBuffer = function(folder, name) {
+        folder = getLocalizationAudioFolder(folder, name + AudioManager.audioFileExt());
+        return Origin_AudioManager_createBuffer.call(this, folder, name);
     };
 
 }());
