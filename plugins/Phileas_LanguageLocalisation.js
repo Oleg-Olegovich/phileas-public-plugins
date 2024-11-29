@@ -86,23 +86,23 @@
  *    It will store the root properties of the language dictionary.
  *    There must be an object (curly brackets) at the root of this file.
  * 
- * 4. Configure the "Language files" parameter.
+ * 5. Configure the "Language files" parameter.
  *    A set of files the same for all languages.
  *    Do not use the name "main.json", it is used
  *    for root properties.
  *    You can use unlimited level directories nesting.
  *    In the list, separate the file path with the '/' character.
  * 
- * 5. In each language folder, create files with names that
+ * 6. In each language folder, create files with names that
  *    you have specified in the parameter "Language files".
  *    At the root of the file should be either an object
  *    (curly brackets) or an array (square brackets).
  * 
- * 6. Fill in the localization files with text.
+ * 7. Fill in the localization files with text.
  *    The structures of all objects must match,
  *    only the final string values can differ.
  * 
- * 7. To use localized text in the game, type a line
+ * 8. To use localized text in the game, type a line
  *    like this in the right place:
  * 
  *    ${<text code>}
@@ -110,7 +110,7 @@
  *    <text code>
  *    The text code should lead to the value in the localization files.
  * 
- * 8. The properties specified in "languages/<text code>/main.json",
+ * 9. The properties specified in "languages/<text code>/main.json",
  *    will be at the root of the localization dictionary.
  *    For example, if main is set like this:
  * 
@@ -121,7 +121,7 @@
  *    To use this value, type this:
  *    ${yes}
  * 
- * 9. If the property is specified in another file,
+ * 10. If the property is specified in another file,
  *    then you need to specify the path to the file before its name.
  *    For example, if you have a file with the path
  *    "../languages/<text code>/chapter_1/dialogues.json"
@@ -134,7 +134,7 @@
  *    To use this value, type this:
  *    ${chapter_1.dialogues.point_0}
  * 
- * 10. In addition to objects, you can use arrays.
+ * 11. In addition to objects, you can use arrays.
  *     Let's change the example from point 9:
  *     
  *     {
@@ -149,7 +149,7 @@
  *     ${chapter_1.dialogues.point_0[0]}
  *     ${chapter_1.dialogues.point_0[1]}
  * 
- * 11. The array can be located right at the root of the localization file
+ * 12. The array can be located right at the root of the localization file
  *     (except for the "main.json").
  *     Let's change the example from paragraph 10:
  * 
@@ -164,20 +164,20 @@
  *     ${chapter_1.dialogues[0][0]}
  *     ${chapter_1.dialogues[0][1]}
  * 
- * 12. You can optionally nest objects and arrays into each other.
+ * 13. You can optionally nest objects and arrays into each other.
  *     The nesting level is unlimited!
  * 
- * 13. You can also use the translated text inside the translated text:
+ * 14. You can also use the translated text inside the translated text:
  *     
  *     "first_text": "Simple example",
  *     "second_text": "The first text is ${first_text}."
  * 
- * 14. To use control symbols to set text, use a variable,
+ * 15. To use control symbols to set text, use a variable,
  *     icon, and more, add a second slash:
  *     
  *     \C[0] -> \\C[0] OR \V[1] -> \\V[1] OR \. -> \\.
  * 
- * 15. The plugin provides the following commands:
+ * 16. The plugin provides the following commands:
  *     - "Set the language" - changes the current language localization.
  *     - "Export to XLSX" - exports language data from JSON to
  *       a file "language_data.xlsx", which will be created
@@ -380,21 +380,21 @@
  *    В нём будут хранится корневые свойства словаря языка.
  *    В корне этого файла должен быть объект (фигурные скобки).
  * 
- * 4. Настройте параметр "Файлы языка". Набор файлов
+ * 5. Настройте параметр "Файлы языка". Набор файлов
  *    одинаковый для всех языков.
  *    Не используйте название "main.json", оно используется
  *    для корневых свойств.
  *    Вы можете использовать директории неограниченного уровня
  *    вложенности. В списке путь к файлу разделяйте символом '/'.
  * 
- * 5. В каждой папке языка создайте файлы с названиями, которые
+ * 6. В каждой папке языка создайте файлы с названиями, которые
  *    вы указали в параметре "Файлы языка". В корне файла должен
  *    быть либо объект (фигурные скобки), либо массив (квадратные скобки).
  * 
- * 6. Заполните файлы локализаций текстом. Структуры всех объектов должны
+ * 7. Заполните файлы локализаций текстом. Структуры всех объектов должны
  *    совпадать, отличаться могут только конечные строковые значения.
  * 
- * 7. Чтобы использовать локализованный текст в игре, введите в нужном
+ * 8. Чтобы использовать локализованный текст в игре, введите в нужном
  *    месте строку такого вида:
  * 
  *    ${<текстовый код>}
@@ -402,7 +402,7 @@
  *    <текстовый код>
  *    Текстовый код должен вести к значению в файлах локализации.
  * 
- * 8. Свойства, указанные в "languages/<код языка>/main.json",
+ * 9. Свойства, указанные в "languages/<код языка>/main.json",
  *    будут лежать в корне словаря локализации.
  *    К примеру, если main задан вот так:
  * 
@@ -413,7 +413,7 @@
  *    Чтобы использовать это значение, введите это:
  *    ${yes}
  * 
- * 9. Если свойство указано в другом файле, то перед его названием нужно
+ * 10. Если свойство указано в другом файле, то перед его названием нужно
  *    прописать путь к файлу. К примеру, если у вас есть файл с
  *    путём "../languages/<код языка>/chapter_1/dialogues.json"
  *    и такой структурой:
@@ -425,7 +425,7 @@
  *    Чтобы использовать это значение, введите это:
  *    ${chapter_1.dialogues.point_0}
  * 
- * 10. Помимо объектов, вы можете использовать массивы. Изменим
+ * 11. Помимо объектов, вы можете использовать массивы. Изменим
  *     пример из пункта 9:
  *     
  *     {
@@ -440,7 +440,7 @@
  *     ${chapter_1.dialogues.point_0[0]}
  *     ${chapter_1.dialogues.point_0[1]}
  * 
- * 11. Массив может лежать прямо в корне файла локализации
+ * 12. Массив может лежать прямо в корне файла локализации
  *     (кроме файла "main.json"). Изменим пример из пункта 10:
  * 
  *     [
@@ -454,22 +454,22 @@
  *     ${chapter_1.dialogues[0][0]}
  *     ${chapter_1.dialogues[0][1]}
  * 
- * 12. Вы можете произвольно вкладывать объекты и массивы
+ * 13. Вы можете произвольно вкладывать объекты и массивы
  *     друг в друга. Уровень вложенности не ограничен!
  * 
- * 13. Вы также можете использовать переводимый текст внутри
+ * 14. Вы также можете использовать переводимый текст внутри
  *     переводимого текста:
  *     
  *     "first_text": "Простой пример",
  *     "second_text": "Первый текст - ${first_text}."
  * 
- * 14. Чтобы использовать символы управления для установки
+ * 15. Чтобы использовать символы управления для установки
  *     текста, использования переменной, иконки и прочего,
  *     добавляйте второй слэш:
  *     
  *     \C[0] -> \\C[0] ИЛИ \V[1] -> \\V[1] ИЛИ \. -> \\.
  * 
- * 15. Плагин предоставляет следующие команды:
+ * 16. Плагин предоставляет следующие команды:
  *     - "Установить язык" - изменяет текущую языковую локализацию.
  *     - "Экспортировать в XLSX" - экспортирует языковые данные из
  *       JSON в файл "language_data.xlsx", который будет создан в корне проекта.
