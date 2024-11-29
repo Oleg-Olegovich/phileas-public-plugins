@@ -1169,9 +1169,8 @@ var DO_NOT_EXPORT_CODEPAGE=true;var DO_NOT_EXPORT_JSZIP=true;(function(e){if("ob
         Scene_Base.prototype.initialize.call(this);
     };
 
-    Scene_LanguageSelection.prototype.prepare = function(nextScene, options = {}) {
+    Scene_LanguageSelection.prototype.prepare = function(nextScene) {
         this._nextScene = nextScene;
-        this._options = options;
     };
 
     Scene_LanguageSelection.prototype.create = function() {
@@ -1357,7 +1356,7 @@ var DO_NOT_EXPORT_CODEPAGE=true;var DO_NOT_EXPORT_JSZIP=true;(function(e){if("ob
             if (ConfigManager.phileasLanguageIndex == undefined) {
                 const nextScene = SceneManager._nextScene.constructor;
                 SceneManager.goto(Scene_LanguageSelection);
-                SceneManager.prepareNextScene(nextScene, { firstLaunch: true });
+                SceneManager.prepareNextScene(nextScene);
             } else {
                 loadLanguageData(() => {
                     updateGameTitle();
