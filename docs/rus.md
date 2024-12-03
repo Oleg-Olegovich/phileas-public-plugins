@@ -33,7 +33,7 @@
 | --- | --- | --- | --- |
 | **Phileas's Language Localisation** | Языковые локализации текста в игре | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_LanguageLocalisation.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-language-localisation.1150) |
 | **Phileas's Message Window Rect Settings** | Настройка окна сообщения | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_MessageWindowRectSettings.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-message-window-rect-settings.295) |
-| **Phileas's Skipping Messages** | Быстрая промотка сообщений | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_SkippingMessages.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-skipping-messages.294) |
+| **Phileas's Skipping Messages** | Быстрая промотка (пропуск) сообщений | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_SkippingMessages.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-skipping-messages.294) |
 | **Phileas's Text Wrap** | Автоматический перенос слов | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_TextWrap.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-text-wrap.311) |
 
 #### Остальное
