@@ -6,6 +6,7 @@
 // 2024.May.05 Ver1.0.1 Fixed pixi compatibility
 // 2024.May.05 Ver1.1.0 Faces and saves
 // 2024.May.05 Ver1.1.1 Prettier faces
+// 2024.May.05 Ver1.1.2 Different HEX formats support
 
 /*:
  * @target MZ
@@ -112,6 +113,11 @@
  * - "Erase all outlines"
  * - "Set faces outline"
  * - "Erase faces outline"
+ * 
+ * Input the color in one of the following formats:
+ * - 0xffffff
+ * - #ffffff
+ * - ffffff
  * 
  * You can always write to the author if you need other features or even plugins.
  * Boosty: https://boosty.to/phileas
@@ -233,6 +239,11 @@
  * - "Удалить все обводки"
  * - "Установить обводку лиц"
  * - "Удалить обводку лиц"
+ * 
+ * Вводите цвет в одном из следующих форматов:
+ * - 0xffffff
+ * - #ffffff
+ * - ffffff
  *
  * Вы всегда можете написать автору, если вам нужны другие функции или даже плагины.
  * Boosty: https://boosty.to/phileas
@@ -311,9 +322,21 @@
         }
     }
 
+    function readColor(param) {
+        if (param.startsWith("0x")) {
+            return Number(param);
+        }
+
+        if (param.startsWith("#")) {
+            return Number("0x" + param.slice(1));
+        }
+
+        return Number("0x" + param);
+    }
+
     function createFilter(params) {
         const thickness = Number(params["thickness"]);
-        const color = Number(params["color"]);
+        const color = readColor(params["color"]);
         return new PIXI.filters.OutlineFilter(thickness, color);
     }
 
