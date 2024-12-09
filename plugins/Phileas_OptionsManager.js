@@ -8,7 +8,7 @@
 //                       Now you can specify the status text of the variable
 // 2023.Oct.01 Ver1.2.0 Added message speed option
 // 2023.Oct.06 Ver1.3.0 Added window state option
-// 2023.November.22 Ver1.3.0 Fixed arrow keys
+// 2023.November.22 Ver1.3.1 Fixed arrow keys
 // 2024.January.29 Ver1.3.2 Fixed compatibility with PKD_ExtendedLoot
 // 2024.May.8 Ver1.3.3 Switch labels
 // 2024.November.10 Ver1.3.4 Added window width, status width and visible options max number parameters
