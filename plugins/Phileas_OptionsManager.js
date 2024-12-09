@@ -12,6 +12,7 @@
 // 2024.January.29 Ver1.3.2 Fixed compatibility with PKD_ExtendedLoot
 // 2024.May.8 Ver1.3.3 Switch labels
 // 2024.November.10 Ver1.3.4 Added window width, status width and visible options max number parameters
+// 2024.December.09 Ver1.3.5 Fixed switch option arrow keys
 
 /*:
  * @target MZ
@@ -751,6 +752,22 @@
         }
     }
 
+    Window_Options.prototype.phileasProcessOk = function(method) {
+        const index = this.index();
+        const symbol = this.commandSymbol(index);
+        if (symbol == "fullscreen") {
+            Graphics._switchFullScreen();
+        }
+        else {
+            let opt = customOptions[symbol];
+            if (opt != undefined && opt[0] == true) {
+                $gameSwitches.setValue(opt[1], !$gameSwitches.value(opt[1]));
+            }
+            
+            method.call(this);
+        }
+    }
+
 //--------CHANGED CORE:
 
     const Origin_Scene_Option_optionsWindowRect = Scene_Options.prototype.optionsWindowRect;
@@ -858,21 +875,19 @@
         return volumeOffset;
     };
     
-    const Origin_processOk = Window_Options.prototype.processOk;
+    const Origin_Window_Options_processOk = Window_Options.prototype.processOk;
     Window_Options.prototype.processOk = function() {
-        const index = this.index();
-        const symbol = this.commandSymbol(index);
-        if (symbol == "fullscreen") {
-            Graphics._switchFullScreen();
-        }
-        else {
-            let opt = customOptions[symbol];
-            if (opt != undefined && opt[0] == true) {
-                $gameSwitches.setValue(opt[1], !$gameSwitches.value(opt[1]));
-            }
-            
-            Origin_processOk.call(this);
-        }
+        this.phileasProcessOk(Origin_Window_Options_processOk);
+    };
+
+    const Origin_Window_Options_cursorRight = Window_Options.prototype.cursorRight;
+    Window_Options.prototype.cursorRight = function() {
+        this.phileasProcessOk(Origin_Window_Options_cursorRight);
+    };
+    
+    const Origin_Window_Options_cursorLeft = Window_Options.prototype.cursorLeft;
+    Window_Options.prototype.cursorLeft = function() {
+        this.phileasProcessOk(Origin_Window_Options_cursorLeft);
     };
     
     Window_Options.prototype.statusText = function(index) {
