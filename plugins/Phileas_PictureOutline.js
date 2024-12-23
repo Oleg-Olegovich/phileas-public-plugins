@@ -1,3697 +1,640 @@
 //=============================================================================
-// rmmz_sprites.js v1.8.1
+// Phileas_PictureOutline.js
 //=============================================================================
+// [Update History]
+// 2024.May.04 Ver1.0.0 First Release
+// 2024.May.05 Ver1.0.1 Fixed pixi compatibility
+// 2024.May.05 Ver1.1.0 Faces and saves
+// 2024.May.05 Ver1.1.1 Prettier faces
+// 2024.May.05 Ver1.1.2 Different HEX formats support
+// 2024.December.23 Ver1.2.0 Added picture sprite backing
+
+/*:
+ * @target MZ
+ * @plugindesc Clear picture outlines
+ * @author Phileas
+ *
+ * @command set
+ * @text Set picture outline
+ * @desc 
+ * 
+ * @arg pictureNumber
+ * @text Picture number
+ * @type number
+ * @min 1
+ * @default 1 
+ * 
+ * @arg thickness
+ * @text Thickness
+ * @type number
+ * @min 1
+ * @default 4
+ * 
+ * @arg color
+ * @text Color
+ * @default 0xffffff
+ * 
+ * @arg backing
+ * @text Sprite backing
+ * @type boolean
+ * @default false
+ * 
+ *
+ * @command erase
+ * @text Erase picture outline
+ * @desc 
+ * @arg pictureNumber
+ * @text Picture number
+ * @type number
+ * @min 1
+ * @default 1 
+ * 
+ *
+ * @command setSeveral
+ * @text Set several outlines
+ * @desc 
+ * 
+ * @arg pictureNumbers
+ * @text Picture numbers
+ * @type number[]
+ * @min 1
+ * @default 1 
+ * 
+ * @arg thickness
+ * @text Thickness
+ * @type number
+ * @min 1
+ * @default 4
+ * 
+ * @arg color
+ * @text Color
+ * @default 0xffffff
+ * 
+ * @arg backing
+ * @text Sprite backing
+ * @type boolean
+ * @default false
+ * 
+ * 
+ * @command eraseSeveral
+ * @text Erase several outlines
+ * @desc 
+ * 
+ * @arg pictureNumbers
+ * @text Picture numbers
+ * @type number[]
+ * @min 1
+ * @default 1 
+ * 
+ * 
+ * @command eraseAll
+ * @text Erase all outlines
+ * @desc 
+ * 
+ * 
+ * @command setFace
+ * @text Set faces outline
+ * @desc 
+ * 
+ * @arg thickness
+ * @text Thickness
+ * @type number
+ * @min 1
+ * @default 4
+ * 
+ * @arg color
+ * @text Color
+ * @default 0xffffff
+ * 
+ * 
+ * @command eraseFace
+ * @text Erase faces outline
+ * @desc 
+ *
+ * 
+ * @help
+ * Displays a smooth outline around the pictures.
+ * You can adjust the thickness and color of the outline.
+ * See the plugin commands.
+ * 
+ * Plugin commands: 
+ * - "Set picture outline"
+ * - "Erase picture outline"
+ * - "Set several outlines"
+ * - "Erase several outlines"
+ * - "Erase all outlines"
+ * - "Set faces outline"
+ * - "Erase faces outline"
+ * 
+ * Input the color in one of the following formats:
+ * - 0xffffff
+ * - #ffffff
+ * - ffffff
+ * 
+ * When installing a filter on an picture, you can choose whether to bake its sprite or not.
+ * This feature is disabled by default.
+ * When baking, the picture together in the outline is rendered into a single bitmap, which
+ * replaces the original one.
+ * The difference can be noticed when changing the opacity of the image.
+ * 
+ * You can always write to the author if you need other features or even plugins.
+ * Boosty: https://boosty.to/phileas
+ * RPG Maker Web: https://forums.rpgmakerweb.com/index.php?members/phileas.176075/
+ * RPG Maker Union: https://rpgmakerunion.ru/id/phileas
+ * Email: olek.olegovich gmail.com
+ * Telegram: olekolegovich
+ *
+ * [License]
+ * This plugin is released under MIT license.
+ * http://opensource.org/licenses/mit-license.php
+ *
+ * This means that you can freely use the plugin in non-commercial and commercial games and even edit it.
+ * But be sure to include me in the credits!
+ */
+ 
+/*:ru
+ * @target MZ
+ * @plugindesc Чёткие обводки картинок
+ * @author Phileas
+ *
+ * @command set
+ * @text Установить обводку картинки
+ * @desc 
+ * 
+ * @arg pictureNumber
+ * @text Номер картинки
+ * @type number
+ * @min 1
+ * @default 1 
+ *
+ * @arg thickness
+ * @text Толщина
+ * @type number
+ * @min 1
+ * @default 4
+ * 
+ * @arg color
+ * @text Цвет
+ * @default 0xffffff
+ * 
+ * @arg backing
+ * @text Запекание спрайта
+ * @type boolean
+ * @default false
+ * 
+ *
+ * @command erase
+ * @text Удалить обводку картинки
+ * @desc 
+ * @arg pictureNumber
+ * @text Номер картинки
+ * @type number
+ * @min 1
+ * @default 1 
+ * 
+ *
+ * @command setSeveral
+ * @text Установить несколько обводок
+ * @desc 
+ * 
+ * @arg pictureNumbers
+ * @text Номера картинок
+ * @type number[]
+ * @min 1
+ * @default 1 
+ *
+ * @arg thickness
+ * @text Толщина
+ * @type number
+ * @min 1
+ * @default 4
+ * 
+ * @arg color
+ * @text Цвет
+ * @default 0xffffff
+ * 
+ * @arg backing
+ * @text Запекание спрайта
+ * @type boolean
+ * @default false
+ * 
+ * 
+ * @command eraseSeveral
+ * @text Удалить несколько обводок
+ * @desc 
+ * 
+ * @arg pictureNumbers
+ * @text Номера картинок
+ * @type number[]
+ * @min 1
+ * @default 1 
+ *
+ * 
+ * @command eraseAll
+ * @text Удалить все обводки
+ * @desc 
+ * 
+ * 
+ * @command setFace
+ * @text Установить обводку лиц
+ * @desc 
+ * 
+ * @arg thickness
+ * @text Толщина
+ * @type number
+ * @min 1
+ * @default 4
+ * 
+ * @arg color
+ * @text Цвет
+ * @default 0xffffff
+ * 
+ * 
+ * @command eraseFace
+ * @text Удалить обводку лиц
+ * @desc 
+ *
+ * 
+ * @help
+ * Отображает ровную обводку вокруг изображений.
+ * Вы можете настроить толщину и цвет обводки.
+ * Смотрите команды плагина.
+ * 
+ * Команды плагина: 
+ * - "Установить обводку картинки"
+ * - "Удалить обводку картинки"
+ * - "Установить несколько обводок"
+ * - "Удалить несколько обводок"
+ * - "Удалить все обводки"
+ * - "Установить обводку лиц"
+ * - "Удалить обводку лиц"
+ * 
+ * Вводите цвет в одном из следующих форматов:
+ * - 0xffffff
+ * -rgb(255, 255, 255)
+ * - ffffff
+ * 
+ * При установке фильтра картинке вы можете выбрать, запекать её спрайт или нет.
+ * Эта функция по умолчанию выключена.
+ * При запекании картина вместе в обводкой рендерится в один битмап, который
+ * заменяет изначальный.
+ * Разницу можно заметить при изменении непрозрачности картинки.
+ *
+ * Вы всегда можете написать автору, если вам нужны другие функции или даже плагины.
+ * Boosty: https://boosty.to/phileas
+ * RPG Maker Web: https://forums.rpgmakerweb.com/index.php?members/phileas.176075/
+ * RPG Maker Union: https://rpgmakerunion.ru/id/phileas
+ * Email: olek.olegovich gmail.com
+ * Telegram: olekolegovich
+ *
+ * [License]
+ * Этот плагин распространяется по лицензии MIT.
+ * http://opensource.org/licenses/mit-license.php
+ *
+ * Это означает, что вы можете свободно использовать плагин в некоммерческих и коммерческих играх и даже редактировать его.
+ * Но обязательно укажите меня в титрах!
+ */
+ 
+(function() {
+
+//--------MY CODE:
 
 //-----------------------------------------------------------------------------
-// Sprite_Clickable
-//
-// The sprite class with click handling functions.
-
-function Sprite_Clickable() {
-    this.initialize(...arguments);
-}
-
-Sprite_Clickable.prototype = Object.create(Sprite.prototype);
-Sprite_Clickable.prototype.constructor = Sprite_Clickable;
-
-Sprite_Clickable.prototype.initialize = function() {
-    Sprite.prototype.initialize.call(this);
-    this._pressed = false;
-    this._hovered = false;
-};
-
-Sprite_Clickable.prototype.update = function() {
-    Sprite.prototype.update.call(this);
-    this.processTouch();
-};
-
-Sprite_Clickable.prototype.processTouch = function() {
-    if (this.isClickEnabled()) {
-        if (this.isBeingTouched()) {
-            if (!this._hovered && TouchInput.isHovered()) {
-                this._hovered = true;
-                this.onMouseEnter();
+// Data
+    PluginManager.registerCommand("Phileas_PictureOutline", "set", set);
+    PluginManager.registerCommand("Phileas_PictureOutline", "erase", erase);
+    PluginManager.registerCommand("Phileas_PictureOutline", "setSeveral", setSeveral);
+    PluginManager.registerCommand("Phileas_PictureOutline", "eraseSeveral", eraseSeveral);
+    PluginManager.registerCommand("Phileas_PictureOutline", "eraseAll", eraseAll);
+    PluginManager.registerCommand("Phileas_PictureOutline", "setFace", setFace);
+    PluginManager.registerCommand("Phileas_PictureOutline", "eraseFace", eraseFace);
+    
+    var phileasOutlineFilters = [];
+    var phileasFaceFilter = null;
+    
+//-----------------------------------------------------------------------------
+// My code
+    
+    function saveFilterData(filter) {
+        let data = {};
+        data.thickness = filter.thickness;
+        data.color = filter.color;
+        return data;
+    }
+    
+    function savePhileasFilterData(filter) {
+        let data = saveFilterData(filter);
+        data.phileasPictureNumbers = filter.phileasPictureNumbers;
+        data.needBacking = filter.needBacking;
+        return data;
+    }
+    
+    function savePictureFiltersData() {
+        let data = [];
+        for (let i = 0; i < phileasOutlineFilters.length; ++i) {
+            data.push(savePhileasFilterData(phileasOutlineFilters[i]));
+        }
+        
+        return data;
+    }
+    
+    function loadFilterData(data) {
+        const thickness = data.thickness;
+        const color = data.color;
+        return new PIXI.filters.OutlineFilter(thickness, color);
+    }
+    
+    function loadPhileasFilterData(data) {
+        let filter = loadFilterData(data);
+        filter.phileasPictureOutline = true;
+        filter.phileasPictureNumbers = data.phileasPictureNumbers;
+        filter.needBacking = data.needBacking;
+        phileasOutlineFilters.push(filter);
+        return filter;
+    }
+    
+    function loadPictureFiltersData(data) {
+        phileasOutlineFilters = [];
+    
+        for (let i = 0; i < data.length; ++i) {
+            loadPhileasFilterData(data[i]);
+        }
+    }
+    
+    function readColor(param) {
+        if (param.startsWith("0x")) {
+            return Number(param);
+        }
+        
+        if (param.startsWith("#")) {
+            return Number("0x" + param.slice(1));
+        }
+        
+        return Number("0x" + param);
+    }
+    
+    function createFilter(params) {
+        const thickness = Number(params["thickness"]);
+        const color = readColor(params["color"]);
+        const outlineFilter = new PIXI.filters.OutlineFilter(thickness, color);
+        return outlineFilter;
+    }
+    
+    function createPhileasFilter(params, pictureNumbers) {
+        const filter = createFilter(params);
+        filter.phileasPictureOutline = true;
+        filter.phileasPictureNumbers = pictureNumbers;
+        filter.needBacking = params["backing"] == "true";
+    
+        phileasOutlineFilters.push(filter);
+    }
+    
+    function erasePicturesFromFilters(pictureNumbers) {
+        for (let i = phileasOutlineFilters.length - 1; i > -1; --i) {
+            phileasOutlineFilters[i].phileasPictureNumbers
+                = phileasOutlineFilters[i].phileasPictureNumbers.filter(number => !pictureNumbers.includes(number));
+            if (phileasOutlineFilters[i].phileasPictureNumbers.length == 0) {
+                phileasOutlineFilters.splice(i, 1);
             }
-            if (TouchInput.isTriggered()) {
-                this._pressed = true;
-                this.onPress();
+        }
+    
+        SceneManager._scene.updateOutlines();
+        const targets = SceneManager._scene.getTargets(pictureNumbers);
+            for (let j = 0; j < targets.length; ++j) {
+            if (!targets[j]) {
+                continue;
             }
-        } else {
-            if (this._hovered) {
-                this.onMouseExit();
+        
+            let arr = targets[j].filters || [];
+            arr = arr.filter(item => item.phileasPictureOutline !== true);
+            targets[j].filters = arr;
+        }
+    }
+    
+    function set(params) {
+        const pictureNumbers = [Number(params["pictureNumber"])];
+        createPhileasFilter(params, pictureNumbers);
+    }
+    
+    function erase(params) {
+        const pictureNumbers = [Number(params["pictureNumber"])];
+        erasePicturesFromFilters(pictureNumbers);
+    }
+    
+    function setSeveral(params) {
+        const pictureNumbers = JSON.parse(params["pictureNumbers"]);
+        for (let i = 0; i < pictureNumbers.length; ++i) {
+            pictureNumbers[i] = Number(pictureNumbers[i]);
+        }
+    
+        createPhileasFilter(params, pictureNumbers);
+    }
+    
+    function eraseSeveral(params) {
+        const pictureNumbers = JSON.parse(params["pictureNumbers"]);
+        for (let i = 0; i < pictureNumbers.length; ++i) {
+            pictureNumbers[i] = Number(pictureNumbers[i]);
+        }
+    
+        erasePicturesFromFilters(pictureNumbers);
+    }
+    
+    function eraseAll() {
+        phileasOutlineFilters = [];
+    
+        SceneManager._scene.updateOutlines();
+        const targets = SceneManager._scene._spriteset._pictureContainer.children;
+        for (let j = 0; j < targets.length; ++j) {
+            if (!targets[j]) {
+                continue;
             }
-            this._pressed = false;
-            this._hovered = false;
-        }
-        if (this._pressed && TouchInput.isReleased()) {
-            this._pressed = false;
-            this.onClick();
-        }
-    } else {
-        this._pressed = false;
-        this._hovered = false;
-    }
-};
-
-Sprite_Clickable.prototype.isPressed = function() {
-    return this._pressed;
-};
-
-Sprite_Clickable.prototype.isClickEnabled = function() {
-    return this.worldVisible;
-};
-
-Sprite_Clickable.prototype.isBeingTouched = function() {
-    const touchPos = new Point(TouchInput.x, TouchInput.y);
-    const localPos = this.worldTransform.applyInverse(touchPos);
-    return this.hitTest(localPos.x, localPos.y);
-};
-
-Sprite_Clickable.prototype.hitTest = function(x, y) {
-    const rect = new Rectangle(
-        -this.anchor.x * this.width,
-        -this.anchor.y * this.height,
-        this.width,
-        this.height
-    );
-    return rect.contains(x, y);
-};
-
-Sprite_Clickable.prototype.onMouseEnter = function() {
-    //
-};
-
-Sprite_Clickable.prototype.onMouseExit = function() {
-    //
-};
-
-Sprite_Clickable.prototype.onPress = function() {
-    //
-};
-
-Sprite_Clickable.prototype.onClick = function() {
-    //
-};
-
-//-----------------------------------------------------------------------------
-// Sprite_Button
-//
-// The sprite for displaying a button.
-
-function Sprite_Button() {
-    this.initialize(...arguments);
-}
-
-Sprite_Button.prototype = Object.create(Sprite_Clickable.prototype);
-Sprite_Button.prototype.constructor = Sprite_Button;
-
-Sprite_Button.prototype.initialize = function(buttonType) {
-    Sprite_Clickable.prototype.initialize.call(this);
-    this._buttonType = buttonType;
-    this._clickHandler = null;
-    this._coldFrame = null;
-    this._hotFrame = null;
-    this.setupFrames();
-};
-
-Sprite_Button.prototype.setupFrames = function() {
-    const data = this.buttonData();
-    const x = data.x * this.blockWidth();
-    const width = data.w * this.blockWidth();
-    const height = this.blockHeight();
-    this.loadButtonImage();
-    this.setColdFrame(x, 0, width, height);
-    this.setHotFrame(x, height, width, height);
-    this.updateFrame();
-    this.updateOpacity();
-};
-
-Sprite_Button.prototype.blockWidth = function() {
-    return 48;
-};
-
-Sprite_Button.prototype.blockHeight = function() {
-    return 48;
-};
-
-Sprite_Button.prototype.loadButtonImage = function() {
-    this.bitmap = ImageManager.loadSystem("ButtonSet");
-};
-
-Sprite_Button.prototype.buttonData = function() {
-    const buttonTable = {
-        cancel: { x: 0, w: 2 },
-        pageup: { x: 2, w: 1 },
-        pagedown: { x: 3, w: 1 },
-        down: { x: 4, w: 1 },
-        up: { x: 5, w: 1 },
-        down2: { x: 6, w: 1 },
-        up2: { x: 7, w: 1 },
-        ok: { x: 8, w: 2 },
-        menu: { x: 10, w: 1 }
-    };
-    return buttonTable[this._buttonType];
-};
-
-Sprite_Button.prototype.update = function() {
-    Sprite_Clickable.prototype.update.call(this);
-    this.checkBitmap();
-    this.updateFrame();
-    this.updateOpacity();
-    this.processTouch();
-};
-
-Sprite_Button.prototype.checkBitmap = function() {
-    if (this.bitmap.isReady() && this.bitmap.width < this.blockWidth() * 11) {
-        // Probably MV image is used
-        throw new Error("ButtonSet image is too small");
-    }
-};
-
-Sprite_Button.prototype.updateFrame = function() {
-    const frame = this.isPressed() ? this._hotFrame : this._coldFrame;
-    if (frame) {
-        this.setFrame(frame.x, frame.y, frame.width, frame.height);
-    }
-};
-
-Sprite_Button.prototype.updateOpacity = function() {
-    this.opacity = this._pressed ? 255 : 192;
-};
-
-Sprite_Button.prototype.setColdFrame = function(x, y, width, height) {
-    this._coldFrame = new Rectangle(x, y, width, height);
-};
-
-Sprite_Button.prototype.setHotFrame = function(x, y, width, height) {
-    this._hotFrame = new Rectangle(x, y, width, height);
-};
-
-Sprite_Button.prototype.setClickHandler = function(method) {
-    this._clickHandler = method;
-};
-
-Sprite_Button.prototype.onClick = function() {
-    if (this._clickHandler) {
-        this._clickHandler();
-    } else {
-        Input.virtualClick(this._buttonType);
-    }
-};
-
-//-----------------------------------------------------------------------------
-// Sprite_Character
-//
-// The sprite for displaying a character.
-
-function Sprite_Character() {
-    this.initialize(...arguments);
-}
-
-Sprite_Character.prototype = Object.create(Sprite.prototype);
-Sprite_Character.prototype.constructor = Sprite_Character;
-
-Sprite_Character.prototype.initialize = function(character) {
-    Sprite.prototype.initialize.call(this);
-    this.initMembers();
-    this.setCharacter(character);
-};
-
-Sprite_Character.prototype.initMembers = function() {
-    this.anchor.x = 0.5;
-    this.anchor.y = 1;
-    this._character = null;
-    this._balloonDuration = 0;
-    this._tilesetId = 0;
-    this._upperBody = null;
-    this._lowerBody = null;
-};
-
-Sprite_Character.prototype.setCharacter = function(character) {
-    this._character = character;
-};
-
-Sprite_Character.prototype.checkCharacter = function(character) {
-    return this._character === character;
-};
-
-Sprite_Character.prototype.update = function() {
-    Sprite.prototype.update.call(this);
-    this.updateBitmap();
-    this.updateFrame();
-    this.updatePosition();
-    this.updateOther();
-    this.updateVisibility();
-};
-
-Sprite_Character.prototype.updateVisibility = function() {
-    Sprite.prototype.updateVisibility.call(this);
-    if (this.isEmptyCharacter() || this._character.isTransparent()) {
-        this.visible = false;
-    }
-};
-
-Sprite_Character.prototype.isTile = function() {
-    return this._character.isTile();
-};
-
-Sprite_Character.prototype.isObjectCharacter = function() {
-    return this._character.isObjectCharacter();
-};
-
-Sprite_Character.prototype.isEmptyCharacter = function() {
-    return this._tileId === 0 && !this._characterName;
-};
-
-Sprite_Character.prototype.tilesetBitmap = function(tileId) {
-    const tileset = $gameMap.tileset();
-    const setNumber = 5 + Math.floor(tileId / 256);
-    return ImageManager.loadTileset(tileset.tilesetNames[setNumber]);
-};
-
-Sprite_Character.prototype.updateBitmap = function() {
-    if (this.isImageChanged()) {
-        this._tilesetId = $gameMap.tilesetId();
-        this._tileId = this._character.tileId();
-        this._characterName = this._character.characterName();
-        this._characterIndex = this._character.characterIndex();
-        if (this._tileId > 0) {
-            this.setTileBitmap();
-        } else {
-            this.setCharacterBitmap();
+        
+            let arr = targets[j].filters || [];
+            arr = arr.filter(item => item.phileasPictureOutline !== true);
+            targets[j].filters = arr;
         }
     }
-};
-
-Sprite_Character.prototype.isImageChanged = function() {
-    return (
-        this._tilesetId !== $gameMap.tilesetId() ||
-        this._tileId !== this._character.tileId() ||
-        this._characterName !== this._character.characterName() ||
-        this._characterIndex !== this._character.characterIndex()
-    );
-};
-
-Sprite_Character.prototype.setTileBitmap = function() {
-    this.bitmap = this.tilesetBitmap(this._tileId);
-};
-
-Sprite_Character.prototype.setCharacterBitmap = function() {
-    this.bitmap = ImageManager.loadCharacter(this._characterName);
-    this._isBigCharacter = ImageManager.isBigCharacter(this._characterName);
-};
-
-Sprite_Character.prototype.updateFrame = function() {
-    if (this._tileId > 0) {
-        this.updateTileFrame();
-    } else {
-        this.updateCharacterFrame();
+    
+    function setFace(params) {
+        phileasFaceFilter = createFilter(params);
     }
-};
-
-Sprite_Character.prototype.updateTileFrame = function() {
-    const tileId = this._tileId;
-    const pw = this.patternWidth();
-    const ph = this.patternHeight();
-    const sx = ((Math.floor(tileId / 128) % 2) * 8 + (tileId % 8)) * pw;
-    const sy = (Math.floor((tileId % 256) / 8) % 16) * ph;
-    this.setFrame(sx, sy, pw, ph);
-};
-
-Sprite_Character.prototype.updateCharacterFrame = function() {
-    const pw = this.patternWidth();
-    const ph = this.patternHeight();
-    const sx = (this.characterBlockX() + this.characterPatternX()) * pw;
-    const sy = (this.characterBlockY() + this.characterPatternY()) * ph;
-    this.updateHalfBodySprites();
-    if (this._bushDepth > 0) {
-        const d = this._bushDepth;
-        this._upperBody.setFrame(sx, sy, pw, ph - d);
-        this._lowerBody.setFrame(sx, sy + ph - d, pw, d);
-        this.setFrame(sx, sy, 0, ph);
-    } else {
-        this.setFrame(sx, sy, pw, ph);
+    
+    function eraseFace() {
+        phileasFaceFilter = null;
     }
-};
-
-Sprite_Character.prototype.characterBlockX = function() {
-    if (this._isBigCharacter) {
-        return 0;
-    } else {
-        const index = this._character.characterIndex();
-        return (index % 4) * 3;
+    
+    function addBitmapOutline(faceBitmap) {
+        const sprite = new Sprite(faceBitmap);
+        sprite.filters = [phileasFaceFilter];
+    
+        const renderTexture = PIXI.RenderTexture.create({ width: sprite.width, height: sprite.height });
+        Graphics.app.renderer.render(sprite, renderTexture);
+    
+        const newBitmap = new Bitmap(sprite.width, sprite.height);
+        const canvas = Graphics.app.renderer.extract.canvas(renderTexture);
+        newBitmap.context.drawImage(canvas, 0, 0);
+        newBitmap.baseTexture.update();
+    
+        return newBitmap;
     }
-};
-
-Sprite_Character.prototype.characterBlockY = function() {
-    if (this._isBigCharacter) {
-        return 0;
-    } else {
-        const index = this._character.characterIndex();
-        return Math.floor(index / 4) * 4;
+    
+    function processFaceBitmap(bitmap, sx, sy, sw, sh) {
+        let newBitmap = new Bitmap(sw, sh);
+        newBitmap.blt(bitmap, sx, sy, sw, sh, 0, 0);
+        return addBitmapOutline(newBitmap);
     }
-};
-
-Sprite_Character.prototype.characterPatternX = function() {
-    return this._character.pattern();
-};
-
-Sprite_Character.prototype.characterPatternY = function() {
-    return (this._character.direction() - 2) / 2;
-};
-
-Sprite_Character.prototype.patternWidth = function() {
-    if (this._tileId > 0) {
-        return $gameMap.tileWidth();
-    } else if (this._isBigCharacter) {
-        return this.bitmap.width / 3;
-    } else {
-        return this.bitmap.width / 12;
+    
+    function applyFilter(sprite, filter) {
+        let arr = sprite.filters || [];
+        arr = arr.filter(item => item.phileasPictureOutline !== true);
+        arr.push(filter);
+        sprite.filters = arr;
     }
-};
-
-Sprite_Character.prototype.patternHeight = function() {
-    if (this._tileId > 0) {
-        return $gameMap.tileHeight();
-    } else if (this._isBigCharacter) {
-        return this.bitmap.height / 4;
-    } else {
-        return this.bitmap.height / 8;
-    }
-};
-
-Sprite_Character.prototype.updateHalfBodySprites = function() {
-    if (this._bushDepth > 0) {
-        this.createHalfBodySprites();
-        this._upperBody.bitmap = this.bitmap;
-        this._upperBody.visible = true;
-        this._upperBody.y = -this._bushDepth;
-        this._lowerBody.bitmap = this.bitmap;
-        this._lowerBody.visible = true;
-        this._upperBody.setBlendColor(this.getBlendColor());
-        this._lowerBody.setBlendColor(this.getBlendColor());
-        this._upperBody.setColorTone(this.getColorTone());
-        this._lowerBody.setColorTone(this.getColorTone());
-        this._upperBody.blendMode = this.blendMode;
-        this._lowerBody.blendMode = this.blendMode;
-    } else if (this._upperBody) {
-        this._upperBody.visible = false;
-        this._lowerBody.visible = false;
-    }
-};
-
-Sprite_Character.prototype.createHalfBodySprites = function() {
-    if (!this._upperBody) {
-        this._upperBody = new Sprite();
-        this._upperBody.anchor.x = 0.5;
-        this._upperBody.anchor.y = 1;
-        this.addChild(this._upperBody);
-    }
-    if (!this._lowerBody) {
-        this._lowerBody = new Sprite();
-        this._lowerBody.anchor.x = 0.5;
-        this._lowerBody.anchor.y = 1;
-        this._lowerBody.opacity = 128;
-        this.addChild(this._lowerBody);
-    }
-};
-
-Sprite_Character.prototype.updatePosition = function() {
-    this.x = this._character.screenX();
-    this.y = this._character.screenY();
-    this.z = this._character.screenZ();
-};
-
-Sprite_Character.prototype.updateOther = function() {
-    this.opacity = this._character.opacity();
-    this.blendMode = this._character.blendMode();
-    this._bushDepth = this._character.bushDepth();
-};
-
-//-----------------------------------------------------------------------------
-// Sprite_Battler
-//
-// The superclass of Sprite_Actor and Sprite_Enemy.
-
-function Sprite_Battler() {
-    this.initialize(...arguments);
-}
-
-Sprite_Battler.prototype = Object.create(Sprite_Clickable.prototype);
-Sprite_Battler.prototype.constructor = Sprite_Battler;
-
-Sprite_Battler.prototype.initialize = function(battler) {
-    Sprite_Clickable.prototype.initialize.call(this);
-    this.initMembers();
-    this.setBattler(battler);
-};
-
-Sprite_Battler.prototype.initMembers = function() {
-    this.anchor.x = 0.5;
-    this.anchor.y = 1;
-    this._battler = null;
-    this._damages = [];
-    this._homeX = 0;
-    this._homeY = 0;
-    this._offsetX = 0;
-    this._offsetY = 0;
-    this._targetOffsetX = NaN;
-    this._targetOffsetY = NaN;
-    this._movementDuration = 0;
-    this._selectionEffectCount = 0;
-};
-
-Sprite_Battler.prototype.setBattler = function(battler) {
-    this._battler = battler;
-};
-
-Sprite_Battler.prototype.checkBattler = function(battler) {
-    return this._battler === battler;
-};
-
-Sprite_Battler.prototype.mainSprite = function() {
-    return this;
-};
-
-Sprite_Battler.prototype.setHome = function(x, y) {
-    this._homeX = x;
-    this._homeY = y;
-    this.updatePosition();
-};
-
-Sprite_Battler.prototype.update = function() {
-    Sprite_Clickable.prototype.update.call(this);
-    if (this._battler) {
-        this.updateMain();
-        this.updateDamagePopup();
-        this.updateSelectionEffect();
-        this.updateVisibility();
-    } else {
-        this.bitmap = null;
-    }
-};
-
-Sprite_Battler.prototype.updateVisibility = function() {
-    Sprite_Clickable.prototype.updateVisibility.call(this);
-    if (!this._battler || !this._battler.isSpriteVisible()) {
-        this.visible = false;
-    }
-};
-
-Sprite_Battler.prototype.updateMain = function() {
-    if (this._battler.isSpriteVisible()) {
-        this.updateBitmap();
-        this.updateFrame();
-    }
-    this.updateMove();
-    this.updatePosition();
-};
-
-Sprite_Battler.prototype.updateBitmap = function() {
-    //
-};
-
-Sprite_Battler.prototype.updateFrame = function() {
-    //
-};
-
-Sprite_Battler.prototype.updateMove = function() {
-    if (this._movementDuration > 0) {
-        const d = this._movementDuration;
-        this._offsetX = (this._offsetX * (d - 1) + this._targetOffsetX) / d;
-        this._offsetY = (this._offsetY * (d - 1) + this._targetOffsetY) / d;
-        this._movementDuration--;
-        if (this._movementDuration === 0) {
-            this.onMoveEnd();
+    
+    function bakeSprite(sprite, filter) {
+        if (sprite.isBaked) {
+            return;
         }
-    }
-};
-
-Sprite_Battler.prototype.updatePosition = function() {
-    this.x = this._homeX + this._offsetX;
-    this.y = this._homeY + this._offsetY;
-};
-
-Sprite_Battler.prototype.updateDamagePopup = function() {
-    this.setupDamagePopup();
-    if (this._damages.length > 0) {
-        for (const damage of this._damages) {
-            damage.update();
+    
+        const w = sprite.width;
+        const h = sprite.height;
+        if (w == 0 || h == 0) {
+            return;
         }
-        if (!this._damages[0].isPlaying()) {
-            this.destroyDamageSprite(this._damages[0]);
-        }
+    
+        const tempContainer = new PIXI.Container();
+        tempContainer.filters = [filter];
+        tempContainer.filterArea = new PIXI.Rectangle(0, 0, w, h);
+        const tempSprite = new PIXI.Sprite(sprite.texture);
+        tempSprite.anchor.set(sprite.anchor.x, sprite.anchor.y);
+        tempSprite.x = w * sprite.anchor.x;
+        tempSprite.y = h * sprite.anchor.y;
+        tempContainer.addChild(tempSprite);
+    
+        const rt = PIXI.RenderTexture.create(w, h);
+        Graphics._app.renderer.render(tempContainer, rt);
+        const canvas = Graphics._app.renderer.extract.canvas(rt);
+        tempContainer.destroy({ children: true });
+    
+        const newBitmap = new Bitmap(w, h);
+        newBitmap._context.drawImage(canvas, 0, 0);
+        newBitmap.baseTexture.update();
+    
+        sprite.bitmap = newBitmap;
+        sprite.isBaked = true;
     }
-};
-
-Sprite_Battler.prototype.updateSelectionEffect = function() {
-    const target = this.mainSprite();
-    if (this._battler.isSelected()) {
-        this._selectionEffectCount++;
-        if (this._selectionEffectCount % 30 < 15) {
-            target.setBlendColor([255, 255, 255, 64]);
-        } else {
-            target.setBlendColor([0, 0, 0, 0]);
-        }
-    } else if (this._selectionEffectCount > 0) {
-        this._selectionEffectCount = 0;
-        target.setBlendColor([0, 0, 0, 0]);
+    
+    Scene_Base.prototype.getTargets = function(targetIds) {
+        const targets = [];
+        const picturesContainer = this._spriteset._pictureContainer.children;
+    
+        targetIds.forEach(targetId => {
+            const pictureId = $gameScreen.realPictureId(targetId) - 1;
+            if (picturesContainer[pictureId]) { 
+                targets.push(picturesContainer[pictureId]);
+            }
+        });
+    
+        return targets;
     }
-};
-
-Sprite_Battler.prototype.setupDamagePopup = function() {
-    if (this._battler.isDamagePopupRequested()) {
-        if (this._battler.isSpriteVisible()) {
-            this.createDamageSprite();
-        }
-        this._battler.clearDamagePopup();
-        this._battler.clearResult();
-    }
-};
-
-Sprite_Battler.prototype.createDamageSprite = function() {
-    const last = this._damages[this._damages.length - 1];
-    const sprite = new Sprite_Damage();
-    if (last) {
-        sprite.x = last.x + 8;
-        sprite.y = last.y - 16;
-    } else {
-        sprite.x = this.x + this.damageOffsetX();
-        sprite.y = this.y + this.damageOffsetY();
-    }
-    sprite.setup(this._battler);
-    this._damages.push(sprite);
-    this.parent.addChild(sprite);
-};
-
-Sprite_Battler.prototype.destroyDamageSprite = function(sprite) {
-    this.parent.removeChild(sprite);
-    this._damages.remove(sprite);
-    sprite.destroy();
-};
-
-Sprite_Battler.prototype.damageOffsetX = function() {
-    return 0;
-};
-
-Sprite_Battler.prototype.damageOffsetY = function() {
-    return 0;
-};
-
-Sprite_Battler.prototype.startMove = function(x, y, duration) {
-    if (this._targetOffsetX !== x || this._targetOffsetY !== y) {
-        this._targetOffsetX = x;
-        this._targetOffsetY = y;
-        this._movementDuration = duration;
-        if (duration === 0) {
-            this._offsetX = x;
-            this._offsetY = y;
-        }
-    }
-};
-
-Sprite_Battler.prototype.onMoveEnd = function() {
-    //
-};
-
-Sprite_Battler.prototype.isEffecting = function() {
-    return false;
-};
-
-Sprite_Battler.prototype.isMoving = function() {
-    return this._movementDuration > 0;
-};
-
-Sprite_Battler.prototype.inHomePosition = function() {
-    return this._offsetX === 0 && this._offsetY === 0;
-};
-
-Sprite_Battler.prototype.onMouseEnter = function() {
-    $gameTemp.setTouchState(this._battler, "select");
-};
-
-Sprite_Battler.prototype.onPress = function() {
-    $gameTemp.setTouchState(this._battler, "select");
-};
-
-Sprite_Battler.prototype.onClick = function() {
-    $gameTemp.setTouchState(this._battler, "click");
-};
-
-//-----------------------------------------------------------------------------
-// Sprite_Actor
-//
-// The sprite for displaying an actor.
-
-function Sprite_Actor() {
-    this.initialize(...arguments);
-}
-
-Sprite_Actor.prototype = Object.create(Sprite_Battler.prototype);
-Sprite_Actor.prototype.constructor = Sprite_Actor;
-
-Sprite_Actor.MOTIONS = {
-    walk: { index: 0, loop: true },
-    wait: { index: 1, loop: true },
-    chant: { index: 2, loop: true },
-    guard: { index: 3, loop: true },
-    damage: { index: 4, loop: false },
-    evade: { index: 5, loop: false },
-    thrust: { index: 6, loop: false },
-    swing: { index: 7, loop: false },
-    missile: { index: 8, loop: false },
-    skill: { index: 9, loop: false },
-    spell: { index: 10, loop: false },
-    item: { index: 11, loop: false },
-    escape: { index: 12, loop: true },
-    victory: { index: 13, loop: true },
-    dying: { index: 14, loop: true },
-    abnormal: { index: 15, loop: true },
-    sleep: { index: 16, loop: true },
-    dead: { index: 17, loop: true }
-};
-
-Sprite_Actor.prototype.initialize = function(battler) {
-    Sprite_Battler.prototype.initialize.call(this, battler);
-    this.moveToStartPosition();
-};
-
-Sprite_Actor.prototype.initMembers = function() {
-    Sprite_Battler.prototype.initMembers.call(this);
-    this._battlerName = "";
-    this._motion = null;
-    this._motionCount = 0;
-    this._pattern = 0;
-    this.createShadowSprite();
-    this.createWeaponSprite();
-    this.createMainSprite();
-    this.createStateSprite();
-};
-
-Sprite_Actor.prototype.mainSprite = function() {
-    return this._mainSprite;
-};
-
-Sprite_Actor.prototype.createMainSprite = function() {
-    this._mainSprite = new Sprite();
-    this._mainSprite.anchor.x = 0.5;
-    this._mainSprite.anchor.y = 1;
-    this.addChild(this._mainSprite);
-};
-
-Sprite_Actor.prototype.createShadowSprite = function() {
-    this._shadowSprite = new Sprite();
-    this._shadowSprite.bitmap = ImageManager.loadSystem("Shadow2");
-    this._shadowSprite.anchor.x = 0.5;
-    this._shadowSprite.anchor.y = 0.5;
-    this._shadowSprite.y = -2;
-    this.addChild(this._shadowSprite);
-};
-
-Sprite_Actor.prototype.createWeaponSprite = function() {
-    this._weaponSprite = new Sprite_Weapon();
-    this.addChild(this._weaponSprite);
-};
-
-Sprite_Actor.prototype.createStateSprite = function() {
-    this._stateSprite = new Sprite_StateOverlay();
-    this.addChild(this._stateSprite);
-};
-
-Sprite_Actor.prototype.setBattler = function(battler) {
-    Sprite_Battler.prototype.setBattler.call(this, battler);
-    if (battler !== this._actor) {
-        this._actor = battler;
-        if (battler) {
-            this.setActorHome(battler.index());
-        } else {
-            this._mainSprite.bitmap = null;
-            this._battlerName = "";
-        }
-        this.startEntryMotion();
-        this._stateSprite.setup(battler);
-    }
-};
-
-Sprite_Actor.prototype.moveToStartPosition = function() {
-    this.startMove(300, 0, 0);
-};
-
-Sprite_Actor.prototype.setActorHome = function(index) {
-    this.setHome(600 + index * 32, 280 + index * 48);
-};
-
-Sprite_Actor.prototype.update = function() {
-    Sprite_Battler.prototype.update.call(this);
-    this.updateShadow();
-    if (this._actor) {
-        this.updateMotion();
-    }
-};
-
-Sprite_Actor.prototype.updateShadow = function() {
-    this._shadowSprite.visible = !!this._actor;
-};
-
-Sprite_Actor.prototype.updateMain = function() {
-    Sprite_Battler.prototype.updateMain.call(this);
-    if (this._actor.isSpriteVisible() && !this.isMoving()) {
-        this.updateTargetPosition();
-    }
-};
-
-Sprite_Actor.prototype.setupMotion = function() {
-    if (this._actor.isMotionRequested()) {
-        this.startMotion(this._actor.motionType());
-        this._actor.clearMotion();
-    }
-};
-
-Sprite_Actor.prototype.setupWeaponAnimation = function() {
-    if (this._actor.isWeaponAnimationRequested()) {
-        this._weaponSprite.setup(this._actor.weaponImageId());
-        this._actor.clearWeaponAnimation();
-    }
-};
-
-Sprite_Actor.prototype.startMotion = function(motionType) {
-    const newMotion = Sprite_Actor.MOTIONS[motionType];
-    if (this._motion !== newMotion) {
-        this._motion = newMotion;
-        this._motionCount = 0;
-        this._pattern = 0;
-    }
-};
-
-Sprite_Actor.prototype.updateTargetPosition = function() {
-    if (this._actor.canMove() && BattleManager.isEscaped()) {
-        this.retreat();
-    } else if (this.shouldStepForward()) {
-        this.stepForward();
-    } else if (!this.inHomePosition()) {
-        this.stepBack();
-    }
-};
-
-Sprite_Actor.prototype.shouldStepForward = function() {
-    return this._actor.isInputting() || this._actor.isActing();
-};
-
-Sprite_Actor.prototype.updateBitmap = function() {
-    Sprite_Battler.prototype.updateBitmap.call(this);
-    const name = this._actor.battlerName();
-    if (this._battlerName !== name) {
-        this._battlerName = name;
-        this._mainSprite.bitmap = ImageManager.loadSvActor(name);
-    }
-};
-
-Sprite_Actor.prototype.updateFrame = function() {
-    Sprite_Battler.prototype.updateFrame.call(this);
-    const bitmap = this._mainSprite.bitmap;
-    if (bitmap) {
-        const motionIndex = this._motion ? this._motion.index : 0;
-        const pattern = this._pattern < 3 ? this._pattern : 1;
-        const cw = bitmap.width / 9;
-        const ch = bitmap.height / 6;
-        const cx = Math.floor(motionIndex / 6) * 3 + pattern;
-        const cy = motionIndex % 6;
-        this._mainSprite.setFrame(cx * cw, cy * ch, cw, ch);
-        this.setFrame(0, 0, cw, ch);
-    }
-};
-
-Sprite_Actor.prototype.updateMove = function() {
-    const bitmap = this._mainSprite.bitmap;
-    if (!bitmap || bitmap.isReady()) {
-        Sprite_Battler.prototype.updateMove.call(this);
-    }
-};
-
-Sprite_Actor.prototype.updateMotion = function() {
-    this.setupMotion();
-    this.setupWeaponAnimation();
-    if (this._actor.isMotionRefreshRequested()) {
-        this.refreshMotion();
-        this._actor.clearMotion();
-    }
-    this.updateMotionCount();
-};
-
-Sprite_Actor.prototype.updateMotionCount = function() {
-    if (this._motion && ++this._motionCount >= this.motionSpeed()) {
-        if (this._motion.loop) {
-            this._pattern = (this._pattern + 1) % 4;
-        } else if (this._pattern < 2) {
-            this._pattern++;
-        } else {
-            this.refreshMotion();
-        }
-        this._motionCount = 0;
-    }
-};
-
-Sprite_Actor.prototype.motionSpeed = function() {
-    return 12;
-};
-
-Sprite_Actor.prototype.refreshMotion = function() {
-    const actor = this._actor;
-    if (actor) {
-        const stateMotion = actor.stateMotionIndex();
-        if (actor.isInputting() || actor.isActing()) {
-            this.startMotion("walk");
-        } else if (stateMotion === 3) {
-            this.startMotion("dead");
-        } else if (stateMotion === 2) {
-            this.startMotion("sleep");
-        } else if (actor.isChanting()) {
-            this.startMotion("chant");
-        } else if (actor.isGuard() || actor.isGuardWaiting()) {
-            this.startMotion("guard");
-        } else if (stateMotion === 1) {
-            this.startMotion("abnormal");
-        } else if (actor.isDying()) {
-            this.startMotion("dying");
-        } else if (actor.isUndecided()) {
-            this.startMotion("walk");
-        } else {
-            this.startMotion("wait");
-        }
-    }
-};
-
-Sprite_Actor.prototype.startEntryMotion = function() {
-    if (this._actor && this._actor.canMove()) {
-        this.startMotion("walk");
-        this.startMove(0, 0, 30);
-    } else if (!this.isMoving()) {
-        this.refreshMotion();
-        this.startMove(0, 0, 0);
-    }
-};
-
-Sprite_Actor.prototype.stepForward = function() {
-    this.startMove(-48, 0, 12);
-};
-
-Sprite_Actor.prototype.stepBack = function() {
-    this.startMove(0, 0, 12);
-};
-
-Sprite_Actor.prototype.retreat = function() {
-    this.startMove(300, 0, 30);
-};
-
-Sprite_Actor.prototype.onMoveEnd = function() {
-    Sprite_Battler.prototype.onMoveEnd.call(this);
-    if (!BattleManager.isBattleEnd()) {
-        this.refreshMotion();
-    }
-};
-
-Sprite_Actor.prototype.damageOffsetX = function() {
-    return Sprite_Battler.prototype.damageOffsetX.call(this) - 32;
-};
-
-Sprite_Actor.prototype.damageOffsetY = function() {
-    return Sprite_Battler.prototype.damageOffsetY.call(this);
-};
-
-//-----------------------------------------------------------------------------
-// Sprite_Enemy
-//
-// The sprite for displaying an enemy.
-
-function Sprite_Enemy() {
-    this.initialize(...arguments);
-}
-
-Sprite_Enemy.prototype = Object.create(Sprite_Battler.prototype);
-Sprite_Enemy.prototype.constructor = Sprite_Enemy;
-
-Sprite_Enemy.prototype.initialize = function(battler) {
-    Sprite_Battler.prototype.initialize.call(this, battler);
-};
-
-Sprite_Enemy.prototype.initMembers = function() {
-    Sprite_Battler.prototype.initMembers.call(this);
-    this._enemy = null;
-    this._appeared = false;
-    this._battlerName = null;
-    this._battlerHue = 0;
-    this._effectType = null;
-    this._effectDuration = 0;
-    this._shake = 0;
-    this.createStateIconSprite();
-};
-
-Sprite_Enemy.prototype.createStateIconSprite = function() {
-    this._stateIconSprite = new Sprite_StateIcon();
-    this.addChild(this._stateIconSprite);
-};
-
-Sprite_Enemy.prototype.setBattler = function(battler) {
-    Sprite_Battler.prototype.setBattler.call(this, battler);
-    this._enemy = battler;
-    this.setHome(battler.screenX(), battler.screenY());
-    this._stateIconSprite.setup(battler);
-};
-
-Sprite_Enemy.prototype.update = function() {
-    Sprite_Battler.prototype.update.call(this);
-    if (this._enemy) {
-        this.updateEffect();
-        this.updateStateSprite();
-    }
-};
-
-Sprite_Enemy.prototype.updateBitmap = function() {
-    Sprite_Battler.prototype.updateBitmap.call(this);
-    const name = this._enemy.battlerName();
-    const hue = this._enemy.battlerHue();
-    if (this._battlerName !== name || this._battlerHue !== hue) {
-        this._battlerName = name;
-        this._battlerHue = hue;
-        this.loadBitmap(name);
-        this.setHue(hue);
-        this.initVisibility();
-    }
-};
-
-Sprite_Enemy.prototype.loadBitmap = function(name) {
-    if ($gameSystem.isSideView()) {
-        this.bitmap = ImageManager.loadSvEnemy(name);
-    } else {
-        this.bitmap = ImageManager.loadEnemy(name);
-    }
-};
-
-Sprite_Enemy.prototype.setHue = function(hue) {
-    Sprite_Battler.prototype.setHue.call(this, hue);
-    for (const child of this.children) {
-        if (child.setHue) {
-            child.setHue(-hue);
-        }
-    }
-};
-
-Sprite_Enemy.prototype.updateFrame = function() {
-    Sprite_Battler.prototype.updateFrame.call(this);
-    if (this._effectType === "bossCollapse") {
-        this.setFrame(0, 0, this.bitmap.width, this._effectDuration);
-    } else {
-        this.setFrame(0, 0, this.bitmap.width, this.bitmap.height);
-    }
-};
-
-Sprite_Enemy.prototype.updatePosition = function() {
-    Sprite_Battler.prototype.updatePosition.call(this);
-    this.x += this._shake;
-};
-
-Sprite_Enemy.prototype.updateStateSprite = function() {
-    this._stateIconSprite.y = -Math.round((this.bitmap.height + 40) * 0.9);
-    if (this._stateIconSprite.y < 20 - this.y) {
-        this._stateIconSprite.y = 20 - this.y;
-    }
-};
-
-Sprite_Enemy.prototype.initVisibility = function() {
-    this._appeared = this._enemy.isAlive();
-    if (!this._appeared) {
-        this.opacity = 0;
-    }
-};
-
-Sprite_Enemy.prototype.setupEffect = function() {
-    if (this._appeared && this._enemy.isEffectRequested()) {
-        this.startEffect(this._enemy.effectType());
-        this._enemy.clearEffect();
-    }
-    if (!this._appeared && this._enemy.isAlive()) {
-        this.startEffect("appear");
-    } else if (this._appeared && this._enemy.isHidden()) {
-        this.startEffect("disappear");
-    }
-};
-
-Sprite_Enemy.prototype.startEffect = function(effectType) {
-    this._effectType = effectType;
-    switch (this._effectType) {
-        case "appear":
-            this.startAppear();
-            break;
-        case "disappear":
-            this.startDisappear();
-            break;
-        case "whiten":
-            this.startWhiten();
-            break;
-        case "blink":
-            this.startBlink();
-            break;
-        case "collapse":
-            this.startCollapse();
-            break;
-        case "bossCollapse":
-            this.startBossCollapse();
-            break;
-        case "instantCollapse":
-            this.startInstantCollapse();
-            break;
-    }
-    this.revertToNormal();
-};
-
-Sprite_Enemy.prototype.startAppear = function() {
-    this._effectDuration = 16;
-    this._appeared = true;
-};
-
-Sprite_Enemy.prototype.startDisappear = function() {
-    this._effectDuration = 32;
-    this._appeared = false;
-};
-
-Sprite_Enemy.prototype.startWhiten = function() {
-    this._effectDuration = 16;
-};
-
-Sprite_Enemy.prototype.startBlink = function() {
-    this._effectDuration = 20;
-};
-
-Sprite_Enemy.prototype.startCollapse = function() {
-    this._effectDuration = 32;
-    this._appeared = false;
-};
-
-Sprite_Enemy.prototype.startBossCollapse = function() {
-    this._effectDuration = this.bitmap.height;
-    this._appeared = false;
-};
-
-Sprite_Enemy.prototype.startInstantCollapse = function() {
-    this._effectDuration = 16;
-    this._appeared = false;
-};
-
-Sprite_Enemy.prototype.updateEffect = function() {
-    this.setupEffect();
-    if (this._effectDuration > 0) {
-        this._effectDuration--;
-        switch (this._effectType) {
-            case "whiten":
-                this.updateWhiten();
-                break;
-            case "blink":
-                this.updateBlink();
-                break;
-            case "appear":
-                this.updateAppear();
-                break;
-            case "disappear":
-                this.updateDisappear();
-                break;
-            case "collapse":
-                this.updateCollapse();
-                break;
-            case "bossCollapse":
-                this.updateBossCollapse();
-                break;
-            case "instantCollapse":
-                this.updateInstantCollapse();
-                break;
-        }
-        if (this._effectDuration === 0) {
-            this._effectType = null;
-        }
-    }
-};
-
-Sprite_Enemy.prototype.isEffecting = function() {
-    return this._effectType !== null;
-};
-
-Sprite_Enemy.prototype.revertToNormal = function() {
-    this._shake = 0;
-    this.blendMode = 0;
-    this.opacity = 255;
-    this.setBlendColor([0, 0, 0, 0]);
-};
-
-Sprite_Enemy.prototype.updateWhiten = function() {
-    const alpha = 128 - (16 - this._effectDuration) * 8;
-    this.setBlendColor([255, 255, 255, alpha]);
-};
-
-Sprite_Enemy.prototype.updateBlink = function() {
-    this.opacity = this._effectDuration % 10 < 5 ? 255 : 0;
-};
-
-Sprite_Enemy.prototype.updateAppear = function() {
-    this.opacity = (16 - this._effectDuration) * 16;
-};
-
-Sprite_Enemy.prototype.updateDisappear = function() {
-    this.opacity = 256 - (32 - this._effectDuration) * 10;
-};
-
-Sprite_Enemy.prototype.updateCollapse = function() {
-    this.blendMode = 1;
-    this.setBlendColor([255, 128, 128, 128]);
-    this.opacity *= this._effectDuration / (this._effectDuration + 1);
-};
-
-Sprite_Enemy.prototype.updateBossCollapse = function() {
-    this._shake = (this._effectDuration % 2) * 4 - 2;
-    this.blendMode = 1;
-    this.opacity *= this._effectDuration / (this._effectDuration + 1);
-    this.setBlendColor([255, 255, 255, 255 - this.opacity]);
-    if (this._effectDuration % 20 === 19) {
-        SoundManager.playBossCollapse2();
-    }
-};
-
-Sprite_Enemy.prototype.updateInstantCollapse = function() {
-    this.opacity = 0;
-};
-
-Sprite_Enemy.prototype.damageOffsetX = function() {
-    return Sprite_Battler.prototype.damageOffsetX.call(this);
-};
-
-Sprite_Enemy.prototype.damageOffsetY = function() {
-    return Sprite_Battler.prototype.damageOffsetY.call(this) - 8;
-};
-
-//-----------------------------------------------------------------------------
-// Sprite_Animation
-//
-// The sprite for displaying an animation.
-
-function Sprite_Animation() {
-    this.initialize(...arguments);
-}
-
-Sprite_Animation.prototype = Object.create(Sprite.prototype);
-Sprite_Animation.prototype.constructor = Sprite_Animation;
-
-Sprite_Animation.prototype.initialize = function() {
-    Sprite.prototype.initialize.call(this);
-    this.initMembers();
-};
-
-Sprite_Animation.prototype.initMembers = function() {
-    this._targets = [];
-    this._animation = null;
-    this._mirror = false;
-    this._delay = 0;
-    this._previous = null;
-    this._effect = null;
-    this._handle = null;
-    this._playing = false;
-    this._started = false;
-    this._frameIndex = 0;
-    this._maxTimingFrames = 0;
-    this._flashColor = [0, 0, 0, 0];
-    this._flashDuration = 0;
-    this._viewportSize = 4096;
-    this.z = 8;
-};
-
-Sprite_Animation.prototype.destroy = function(options) {
-    Sprite.prototype.destroy.call(this, options);
-    if (this._handle) {
-        this._handle.stop();
-    }
-    this._effect = null;
-    this._handle = null;
-    this._playing = false;
-    this._started = false;
-};
-
-// prettier-ignore
-Sprite_Animation.prototype.setup = function(
-    targets, animation, mirror, delay, previous
-) {
-    this._targets = targets;
-    this._animation = animation;
-    this._mirror = mirror;
-    this._delay = delay;
-    this._previous = previous;
-    this._effect = EffectManager.load(animation.effectName);
-    this._playing = true;
-    const timings = animation.soundTimings.concat(animation.flashTimings);
-    for (const timing of timings) {
-        if (timing.frame > this._maxTimingFrames) {
-            this._maxTimingFrames = timing.frame;
-        }
-    }
-};
-
-Sprite_Animation.prototype.update = function() {
-    Sprite.prototype.update.call(this);
-    if (this._delay > 0) {
-        this._delay--;
-    } else if (this._playing) {
-        if (!this._started && this.canStart()) {
-            if (this._effect) {
-                if (this._effect.isLoaded) {
-                    this._handle = Graphics.effekseer.play(this._effect);
-                    this._started = true;
-                } else {
-                    EffectManager.checkErrors();
+    
+    Scene_Base.prototype.updateOutlines = function() {
+        for (let i = 0; i < phileasOutlineFilters.length; ++i) {
+            const targets = this.getTargets(phileasOutlineFilters[i].phileasPictureNumbers);
+        
+            for (let j = 0; j < targets.length; ++j) {
+                if (!targets[j]) {
+                    continue;
                 }
-            } else {
-                this._started = true;
+            
+                if (phileasOutlineFilters[i].needBacking) {
+                    bakeSprite(targets[j], phileasOutlineFilters[i]);
+                } else {
+                    applyFilter(targets[j], phileasOutlineFilters[i]);
+                }
             }
         }
-        if (this._started) {
-            this.updateEffectGeometry();
-            this.updateMain();
-            this.updateFlash();
-        }
-    }
-};
-
-Sprite_Animation.prototype.canStart = function() {
-    if (this._previous && this.shouldWaitForPrevious()) {
-        return !this._previous.isPlaying();
-    } else {
-        return true;
-    }
-};
-
-Sprite_Animation.prototype.shouldWaitForPrevious = function() {
-    // [Note] Older versions of Effekseer were very heavy on some mobile
-    //   devices. We don't need this anymore.
-    return false;
-};
-
-Sprite_Animation.prototype.updateEffectGeometry = function() {
-    const scale = this._animation.scale / 100;
-    const r = Math.PI / 180;
-    const rx = this._animation.rotation.x * r;
-    const ry = this._animation.rotation.y * r;
-    const rz = this._animation.rotation.z * r;
-    if (this._handle) {
-        this._handle.setLocation(0, 0, 0);
-        this._handle.setRotation(rx, ry, rz);
-        this._handle.setScale(scale, scale, scale);
-        this._handle.setSpeed(this._animation.speed / 100);
-    }
-};
-
-Sprite_Animation.prototype.updateMain = function() {
-    this.processSoundTimings();
-    this.processFlashTimings();
-    this._frameIndex++;
-    this.checkEnd();
-};
-
-Sprite_Animation.prototype.processSoundTimings = function() {
-    for (const timing of this._animation.soundTimings) {
-        if (timing.frame === this._frameIndex) {
-            AudioManager.playSe(timing.se);
-        }
-    }
-};
-
-Sprite_Animation.prototype.processFlashTimings = function() {
-    for (const timing of this._animation.flashTimings) {
-        if (timing.frame === this._frameIndex) {
-            this._flashColor = timing.color.clone();
-            this._flashDuration = timing.duration;
-        }
-    }
-};
-
-Sprite_Animation.prototype.checkEnd = function() {
-    if (
-        this._frameIndex > this._maxTimingFrames &&
-        this._flashDuration === 0 &&
-        !(this._handle && this._handle.exists)
-    ) {
-        this._playing = false;
-    }
-};
-
-Sprite_Animation.prototype.updateFlash = function() {
-    if (this._flashDuration > 0) {
-        const d = this._flashDuration--;
-        this._flashColor[3] *= (d - 1) / d;
-        for (const target of this._targets) {
-            target.setBlendColor(this._flashColor);
-        }
-    }
-};
-
-Sprite_Animation.prototype.isPlaying = function() {
-    return this._playing;
-};
-
-Sprite_Animation.prototype.setRotation = function(x, y, z) {
-    if (this._handle) {
-        this._handle.setRotation(x, y, z);
-    }
-};
-
-Sprite_Animation.prototype._render = function(renderer) {
-    if (this._targets.length > 0 && this._handle && this._handle.exists) {
-        this.onBeforeRender(renderer);
-        this.setProjectionMatrix(renderer);
-        this.setCameraMatrix(renderer);
-        this.setViewport(renderer);
-        Graphics.effekseer.beginDraw();
-        Graphics.effekseer.drawHandle(this._handle);
-        Graphics.effekseer.endDraw();
-        this.resetViewport(renderer);
-        this.onAfterRender(renderer);
-    }
-};
-
-Sprite_Animation.prototype.setProjectionMatrix = function(renderer) {
-    const x = this._mirror ? -1 : 1;
-    const y = -1;
-    const p = -(this._viewportSize / renderer.view.height);
-    // prettier-ignore
-    Graphics.effekseer.setProjectionMatrix([
-        x, 0, 0, 0,
-        0, y, 0, 0,
-        0, 0, 1, p,
-        0, 0, 0, 1,
-    ]);
-};
-
-Sprite_Animation.prototype.setCameraMatrix = function(/*renderer*/) {
-    // prettier-ignore
-    Graphics.effekseer.setCameraMatrix([
-        1, 0, 0, 0,
-        0, 1, 0, 0,
-        0, 0, 1, 0,
-        0, 0, -10, 1
-    ]);
-};
-
-Sprite_Animation.prototype.setViewport = function(renderer) {
-    const vw = this._viewportSize;
-    const vh = this._viewportSize;
-    const vx = this._animation.offsetX - vw / 2;
-    const vy = this._animation.offsetY - vh / 2;
-    const pos = this.targetPosition(renderer);
-    renderer.gl.viewport(vx + pos.x, vy + pos.y, vw, vh);
-};
-
-Sprite_Animation.prototype.targetPosition = function(renderer) {
-    const pos = new Point();
-    if (this._animation.displayType === 2) {
-        pos.x = renderer.view.width / 2;
-        pos.y = renderer.view.height / 2;
-    } else {
-        for (const target of this._targets) {
-            const tpos = this.targetSpritePosition(target);
-            pos.x += tpos.x;
-            pos.y += tpos.y;
-        }
-        pos.x /= this._targets.length;
-        pos.y /= this._targets.length;
-    }
-    return pos;
-};
-
-Sprite_Animation.prototype.targetSpritePosition = function(sprite) {
-    const point = new Point(0, -sprite.height / 2);
-    if (this._animation.alignBottom) {
-        point.y = 0;
-    }
-    sprite.updateTransform();
-    return sprite.worldTransform.apply(point);
-};
-
-Sprite_Animation.prototype.resetViewport = function(renderer) {
-    renderer.gl.viewport(0, 0, renderer.view.width, renderer.view.height);
-};
-
-Sprite_Animation.prototype.onBeforeRender = function(renderer) {
-    renderer.batch.flush();
-    renderer.geometry.reset();
-};
-
-Sprite_Animation.prototype.onAfterRender = function(renderer) {
-    renderer.texture.reset();
-    renderer.geometry.reset();
-    renderer.state.reset();
-    renderer.shader.reset();
-    renderer.framebuffer.reset();
-};
-
+    };
+        
 //-----------------------------------------------------------------------------
-// Sprite_AnimationMV
-//
-// The sprite for displaying an old format animation.
-
-function Sprite_AnimationMV() {
-    this.initialize(...arguments);
-}
-
-Sprite_AnimationMV.prototype = Object.create(Sprite.prototype);
-Sprite_AnimationMV.prototype.constructor = Sprite_AnimationMV;
-
-Sprite_AnimationMV.prototype.initialize = function() {
-    Sprite.prototype.initialize.call(this);
-    this.initMembers();
-};
-
-Sprite_AnimationMV.prototype.initMembers = function() {
-    this._targets = [];
-    this._animation = null;
-    this._mirror = false;
-    this._delay = 0;
-    this._rate = 4;
-    this._duration = 0;
-    this._flashColor = [0, 0, 0, 0];
-    this._flashDuration = 0;
-    this._screenFlashDuration = 0;
-    this._hidingDuration = 0;
-    this._hue1 = 0;
-    this._hue2 = 0;
-    this._bitmap1 = null;
-    this._bitmap2 = null;
-    this._cellSprites = [];
-    this._screenFlashSprite = null;
-    this.z = 8;
-};
-
-// prettier-ignore
-Sprite_AnimationMV.prototype.setup = function(
-    targets, animation, mirror, delay
-) {
-    this._targets = targets;
-    this._animation = animation;
-    this._mirror = mirror;
-    this._delay = delay;
-    if (this._animation) {
-        this.setupRate();
-        this.setupDuration();
-        this.loadBitmaps();
-        this.createCellSprites();
-        this.createScreenFlashSprite();
-    }
-};
-
-Sprite_AnimationMV.prototype.setupRate = function() {
-    this._rate = 4;
-};
-
-Sprite_AnimationMV.prototype.setupDuration = function() {
-    this._duration = this._animation.frames.length * this._rate + 1;
-};
-
-Sprite_AnimationMV.prototype.update = function() {
-    Sprite.prototype.update.call(this);
-    this.updateMain();
-    this.updateFlash();
-    this.updateScreenFlash();
-    this.updateHiding();
-};
-
-Sprite_AnimationMV.prototype.updateFlash = function() {
-    if (this._flashDuration > 0) {
-        const d = this._flashDuration--;
-        this._flashColor[3] *= (d - 1) / d;
-        for (const target of this._targets) {
-            target.setBlendColor(this._flashColor);
+// Changed code
+    
+    const Origin_Sprite_Picture_loadBitmap = Sprite_Picture.prototype.loadBitmap;
+    Sprite_Picture.prototype.loadBitmap = function() {
+        Origin_Sprite_Picture_loadBitmap.call(this);
+        this.isBaked = false;
+    };
+    
+    const Origin_updateMain = Scene_Map.prototype.updateMain;
+    Scene_Map.prototype.updateMain = function() {
+        Origin_updateMain.call(this);
+        this.updateOutlines();
+    };
+    
+    const Origin_update = Scene_Battle.prototype.update;
+    Scene_Battle.prototype.update = function() {
+        Origin_update.call(this);
+        this.updateOutlines();
+    };
+    
+    Window_Base.prototype.drawFace = function(faceName, faceIndex, x, y, width, height) {
+        width = width || ImageManager.faceWidth;
+        height = height || ImageManager.faceHeight;
+        let bitmap = ImageManager.loadFace(faceName);
+        const pw = ImageManager.faceWidth;
+        const ph = ImageManager.faceHeight;
+        const sw = Math.min(width, pw);
+        const sh = Math.min(height, ph);
+        const dx = Math.floor(x + Math.max(width - pw, 0) / 2);
+        const dy = Math.floor(y + Math.max(height - ph, 0) / 2);
+        let sx = Math.floor((faceIndex % 4) * pw + (pw - sw) / 2);
+        let sy = Math.floor(Math.floor(faceIndex / 4) * ph + (ph - sh) / 2);
+    
+        if (phileasFaceFilter != null) {
+            bitmap = processFaceBitmap(bitmap, sx, sy, sw, sh);
+            sx = sy = 0;
         }
-    }
-};
-
-Sprite_AnimationMV.prototype.updateScreenFlash = function() {
-    if (this._screenFlashDuration > 0) {
-        const d = this._screenFlashDuration--;
-        if (this._screenFlashSprite) {
-            this._screenFlashSprite.x = -this.absoluteX();
-            this._screenFlashSprite.y = -this.absoluteY();
-            this._screenFlashSprite.opacity *= (d - 1) / d;
-            this._screenFlashSprite.visible = this._screenFlashDuration > 0;
+    
+        this.contents.blt(bitmap, sx, sy, sw, sh, dx, dy);
+    };
+    
+    const Origin_makeSaveContents = DataManager.makeSaveContents;
+    DataManager.makeSaveContents = function() {
+        let contents = Origin_makeSaveContents.call(this);
+        contents.phileasOutlinePictureFilters = savePictureFiltersData();
+        if (phileasFaceFilter != null) {
+            contents.phileasOutlineFacePicture = saveFilterData(phileasFaceFilter);
         }
-    }
-};
-
-Sprite_AnimationMV.prototype.absoluteX = function() {
-    let x = 0;
-    let object = this;
-    while (object) {
-        x += object.x;
-        object = object.parent;
-    }
-    return x;
-};
-
-Sprite_AnimationMV.prototype.absoluteY = function() {
-    let y = 0;
-    let object = this;
-    while (object) {
-        y += object.y;
-        object = object.parent;
-    }
-    return y;
-};
-
-Sprite_AnimationMV.prototype.updateHiding = function() {
-    if (this._hidingDuration > 0) {
-        this._hidingDuration--;
-        if (this._hidingDuration === 0) {
-            for (const target of this._targets) {
-                target.show();
-            }
+    
+        return contents;
+    };
+    
+    const Origin_extractSaveContents = DataManager.extractSaveContents;
+    DataManager.extractSaveContents = function(contents) {
+        Origin_extractSaveContents.call(this, contents);
+        if (contents.phileasOutlinePictureFilters != undefined) {
+            loadPictureFiltersData(contents.phileasOutlinePictureFilters);
         }
-    }
-};
-
-Sprite_AnimationMV.prototype.isPlaying = function() {
-    return this._duration > 0;
-};
-
-Sprite_AnimationMV.prototype.loadBitmaps = function() {
-    const name1 = this._animation.animation1Name;
-    const name2 = this._animation.animation2Name;
-    this._hue1 = this._animation.animation1Hue;
-    this._hue2 = this._animation.animation2Hue;
-    this._bitmap1 = ImageManager.loadAnimation(name1);
-    this._bitmap2 = ImageManager.loadAnimation(name2);
-};
-
-Sprite_AnimationMV.prototype.isReady = function() {
-    return (
-        this._bitmap1 &&
-        this._bitmap1.isReady() &&
-        this._bitmap2 &&
-        this._bitmap2.isReady()
-    );
-};
-
-Sprite_AnimationMV.prototype.createCellSprites = function() {
-    this._cellSprites = [];
-    for (let i = 0; i < 16; i++) {
-        const sprite = new Sprite();
-        sprite.anchor.x = 0.5;
-        sprite.anchor.y = 0.5;
-        this._cellSprites.push(sprite);
-        this.addChild(sprite);
-    }
-};
-
-Sprite_AnimationMV.prototype.createScreenFlashSprite = function() {
-    this._screenFlashSprite = new ScreenSprite();
-    this.addChild(this._screenFlashSprite);
-};
-
-Sprite_AnimationMV.prototype.updateMain = function() {
-    if (this.isPlaying() && this.isReady()) {
-        if (this._delay > 0) {
-            this._delay--;
-        } else {
-            this._duration--;
-            this.updatePosition();
-            if (this._duration % this._rate === 0) {
-                this.updateFrame();
-            }
-            if (this._duration <= 0) {
-                this.onEnd();
-            }
+    
+        if (contents.phileasOutlineFacePicture != undefined) {
+            phileasFaceFilter = loadFilterData(contents.phileasOutlineFacePicture);
         }
-    }
-};
-
-Sprite_AnimationMV.prototype.updatePosition = function() {
-    if (this._animation.position === 3) {
-        this.x = this.parent.width / 2;
-        this.y = this.parent.height / 2;
-    } else if (this._targets.length > 0) {
-        const target = this._targets[0];
-        const parent = target.parent;
-        const grandparent = parent ? parent.parent : null;
-        this.x = target.x;
-        this.y = target.y;
-        if (this.parent === grandparent) {
-            this.x += parent.x;
-            this.y += parent.y;
-        }
-        if (this._animation.position === 0) {
-            this.y -= target.height;
-        } else if (this._animation.position === 1) {
-            this.y -= target.height / 2;
-        }
-    }
-};
-
-Sprite_AnimationMV.prototype.updateFrame = function() {
-    if (this._duration > 0) {
-        const frameIndex = this.currentFrameIndex();
-        this.updateAllCellSprites(this._animation.frames[frameIndex]);
-        for (const timing of this._animation.timings) {
-            if (timing.frame === frameIndex) {
-                this.processTimingData(timing);
-            }
-        }
-    }
-};
-
-Sprite_AnimationMV.prototype.currentFrameIndex = function() {
-    return (
-        this._animation.frames.length -
-        Math.floor((this._duration + this._rate - 1) / this._rate)
-    );
-};
-
-Sprite_AnimationMV.prototype.updateAllCellSprites = function(frame) {
-    if (this._targets.length > 0) {
-        for (let i = 0; i < this._cellSprites.length; i++) {
-            const sprite = this._cellSprites[i];
-            if (i < frame.length) {
-                this.updateCellSprite(sprite, frame[i]);
-            } else {
-                sprite.visible = false;
-            }
-        }
-    }
-};
-
-Sprite_AnimationMV.prototype.updateCellSprite = function(sprite, cell) {
-    const pattern = cell[0];
-    if (pattern >= 0) {
-        const sx = (pattern % 5) * 192;
-        const sy = Math.floor((pattern % 100) / 5) * 192;
-        const mirror = this._mirror;
-        sprite.bitmap = pattern < 100 ? this._bitmap1 : this._bitmap2;
-        sprite.setHue(pattern < 100 ? this._hue1 : this._hue2);
-        sprite.setFrame(sx, sy, 192, 192);
-        sprite.x = cell[1];
-        sprite.y = cell[2];
-        sprite.rotation = (cell[4] * Math.PI) / 180;
-        sprite.scale.x = cell[3] / 100;
-
-        if (cell[5]) {
-            sprite.scale.x *= -1;
-        }
-        if (mirror) {
-            sprite.x *= -1;
-            sprite.rotation *= -1;
-            sprite.scale.x *= -1;
-        }
-
-        sprite.scale.y = cell[3] / 100;
-        sprite.opacity = cell[6];
-        sprite.blendMode = cell[7];
-        sprite.visible = true;
-    } else {
-        sprite.visible = false;
-    }
-};
-
-Sprite_AnimationMV.prototype.processTimingData = function(timing) {
-    const duration = timing.flashDuration * this._rate;
-    switch (timing.flashScope) {
-        case 1:
-            this.startFlash(timing.flashColor, duration);
-            break;
-        case 2:
-            this.startScreenFlash(timing.flashColor, duration);
-            break;
-        case 3:
-            this.startHiding(duration);
-            break;
-    }
-    if (timing.se) {
-        AudioManager.playSe(timing.se);
-    }
-};
-
-Sprite_AnimationMV.prototype.startFlash = function(color, duration) {
-    this._flashColor = color.clone();
-    this._flashDuration = duration;
-};
-
-Sprite_AnimationMV.prototype.startScreenFlash = function(color, duration) {
-    this._screenFlashDuration = duration;
-    if (this._screenFlashSprite) {
-        this._screenFlashSprite.setColor(color[0], color[1], color[2]);
-        this._screenFlashSprite.opacity = color[3];
-    }
-};
-
-Sprite_AnimationMV.prototype.startHiding = function(duration) {
-    this._hidingDuration = duration;
-    for (const target of this._targets) {
-        target.hide();
-    }
-};
-
-Sprite_AnimationMV.prototype.onEnd = function() {
-    this._flashDuration = 0;
-    this._screenFlashDuration = 0;
-    this._hidingDuration = 0;
-    for (const target of this._targets) {
-        target.setBlendColor([0, 0, 0, 0]);
-        target.show();
-    }
-};
-
+    };
+    
 //-----------------------------------------------------------------------------
-// Sprite_Battleback
-//
-// The sprite for displaying a background image in battle.
-
-function Sprite_Battleback() {
-    this.initialize(...arguments);
-}
-
-Sprite_Battleback.prototype = Object.create(TilingSprite.prototype);
-Sprite_Battleback.prototype.constructor = Sprite_Battleback;
-
-Sprite_Battleback.prototype.initialize = function(type) {
-    TilingSprite.prototype.initialize.call(this);
-    if (type === 0) {
-        this.bitmap = this.battleback1Bitmap();
-    } else {
-        this.bitmap = this.battleback2Bitmap();
-    }
-};
-
-Sprite_Battleback.prototype.adjustPosition = function() {
-    this.width = Math.floor((1000 * Graphics.width) / 816);
-    this.height = Math.floor((740 * Graphics.height) / 624);
-    this.x = (Graphics.width - this.width) / 2;
-    if ($gameSystem.isSideView()) {
-        this.y = Graphics.height - this.height;
-    } else {
-        this.y = 0;
-    }
-    const ratioX = this.width / this.bitmap.width;
-    const ratioY = this.height / this.bitmap.height;
-    const scale = Math.max(ratioX, ratioY, 1.0);
-    this.scale.x = scale;
-    this.scale.y = scale;
-};
-
-Sprite_Battleback.prototype.battleback1Bitmap = function() {
-    return ImageManager.loadBattleback1(this.battleback1Name());
-};
-
-Sprite_Battleback.prototype.battleback2Bitmap = function() {
-    return ImageManager.loadBattleback2(this.battleback2Name());
-};
-
-Sprite_Battleback.prototype.battleback1Name = function() {
-    if (BattleManager.isBattleTest()) {
-        return $dataSystem.battleback1Name;
-    } else if ($gameMap.battleback1Name() !== null) {
-        return $gameMap.battleback1Name();
-    } else if ($gameMap.isOverworld()) {
-        return this.overworldBattleback1Name();
-    } else {
-        return "";
-    }
-};
-
-Sprite_Battleback.prototype.battleback2Name = function() {
-    if (BattleManager.isBattleTest()) {
-        return $dataSystem.battleback2Name;
-    } else if ($gameMap.battleback2Name() !== null) {
-        return $gameMap.battleback2Name();
-    } else if ($gameMap.isOverworld()) {
-        return this.overworldBattleback2Name();
-    } else {
-        return "";
-    }
-};
-
-Sprite_Battleback.prototype.overworldBattleback1Name = function() {
-    if ($gamePlayer.isInVehicle()) {
-        return this.shipBattleback1Name();
-    } else {
-        return this.normalBattleback1Name();
-    }
-};
-
-Sprite_Battleback.prototype.overworldBattleback2Name = function() {
-    if ($gamePlayer.isInVehicle()) {
-        return this.shipBattleback2Name();
-    } else {
-        return this.normalBattleback2Name();
-    }
-};
-
-Sprite_Battleback.prototype.normalBattleback1Name = function() {
-    return (
-        this.terrainBattleback1Name(this.autotileType(1)) ||
-        this.terrainBattleback1Name(this.autotileType(0)) ||
-        this.defaultBattleback1Name()
-    );
-};
-
-Sprite_Battleback.prototype.normalBattleback2Name = function() {
-    return (
-        this.terrainBattleback2Name(this.autotileType(1)) ||
-        this.terrainBattleback2Name(this.autotileType(0)) ||
-        this.defaultBattleback2Name()
-    );
-};
-
-Sprite_Battleback.prototype.terrainBattleback1Name = function(type) {
-    switch (type) {
-        case 24:
-        case 25:
-            return "Wasteland";
-        case 26:
-        case 27:
-            return "DirtField";
-        case 32:
-        case 33:
-            return "Desert";
-        case 34:
-            return "Lava1";
-        case 35:
-            return "Lava2";
-        case 40:
-        case 41:
-            return "Snowfield";
-        case 42:
-            return "Clouds";
-        case 4:
-        case 5:
-            return "PoisonSwamp";
-        default:
-            return null;
-    }
-};
-
-Sprite_Battleback.prototype.terrainBattleback2Name = function(type) {
-    switch (type) {
-        case 20:
-        case 21:
-            return "Forest";
-        case 22:
-        case 30:
-        case 38:
-            return "Cliff";
-        case 24:
-        case 25:
-        case 26:
-        case 27:
-            return "Wasteland";
-        case 32:
-        case 33:
-            return "Desert";
-        case 34:
-        case 35:
-            return "Lava";
-        case 40:
-        case 41:
-            return "Snowfield";
-        case 42:
-            return "Clouds";
-        case 4:
-        case 5:
-            return "PoisonSwamp";
-    }
-};
-
-Sprite_Battleback.prototype.defaultBattleback1Name = function() {
-    return "Grassland";
-};
-
-Sprite_Battleback.prototype.defaultBattleback2Name = function() {
-    return "Grassland";
-};
-
-Sprite_Battleback.prototype.shipBattleback1Name = function() {
-    return "Ship";
-};
-
-Sprite_Battleback.prototype.shipBattleback2Name = function() {
-    return "Ship";
-};
-
-Sprite_Battleback.prototype.autotileType = function(z) {
-    return $gameMap.autotileType($gamePlayer.x, $gamePlayer.y, z);
-};
-
-//-----------------------------------------------------------------------------
-// Sprite_Damage
-//
-// The sprite for displaying a popup damage.
-
-function Sprite_Damage() {
-    this.initialize(...arguments);
-}
-
-Sprite_Damage.prototype = Object.create(Sprite.prototype);
-Sprite_Damage.prototype.constructor = Sprite_Damage;
-
-Sprite_Damage.prototype.initialize = function() {
-    Sprite.prototype.initialize.call(this);
-    this._duration = 90;
-    this._flashColor = [0, 0, 0, 0];
-    this._flashDuration = 0;
-    this._colorType = 0;
-};
-
-Sprite_Damage.prototype.destroy = function(options) {
-    for (const child of this.children) {
-        if (child.bitmap) {
-            child.bitmap.destroy();
-        }
-    }
-    Sprite.prototype.destroy.call(this, options);
-};
-
-Sprite_Damage.prototype.setup = function(target) {
-    const result = target.result();
-    if (result.missed || result.evaded) {
-        this._colorType = 0;
-        this.createMiss();
-    } else if (result.hpAffected) {
-        this._colorType = result.hpDamage >= 0 ? 0 : 1;
-        this.createDigits(result.hpDamage);
-    } else if (target.isAlive() && result.mpDamage !== 0) {
-        this._colorType = result.mpDamage >= 0 ? 2 : 3;
-        this.createDigits(result.mpDamage);
-    }
-    if (result.critical) {
-        this.setupCriticalEffect();
-    }
-};
-
-Sprite_Damage.prototype.setupCriticalEffect = function() {
-    this._flashColor = [255, 0, 0, 160];
-    this._flashDuration = 60;
-};
-
-Sprite_Damage.prototype.fontFace = function() {
-    return $gameSystem.numberFontFace();
-};
-
-Sprite_Damage.prototype.fontSize = function() {
-    return $gameSystem.mainFontSize() + 4;
-};
-
-Sprite_Damage.prototype.damageColor = function() {
-    return ColorManager.damageColor(this._colorType);
-};
-
-Sprite_Damage.prototype.outlineColor = function() {
-    return "rgba(0, 0, 0, 0.7)";
-};
-
-Sprite_Damage.prototype.outlineWidth = function() {
-    return 4;
-};
-
-Sprite_Damage.prototype.createMiss = function() {
-    const h = this.fontSize();
-    const w = Math.floor(h * 3.0);
-    const sprite = this.createChildSprite(w, h);
-    sprite.bitmap.drawText("Miss", 0, 0, w, h, "center");
-    sprite.dy = 0;
-};
-
-Sprite_Damage.prototype.createDigits = function(value) {
-    const string = Math.abs(value).toString();
-    const h = this.fontSize();
-    const w = Math.floor(h * 0.75);
-    for (let i = 0; i < string.length; i++) {
-        const sprite = this.createChildSprite(w, h);
-        sprite.bitmap.drawText(string[i], 0, 0, w, h, "center");
-        sprite.x = (i - (string.length - 1) / 2) * w;
-        sprite.dy = -i;
-    }
-};
-
-Sprite_Damage.prototype.createChildSprite = function(width, height) {
-    const sprite = new Sprite();
-    sprite.bitmap = this.createBitmap(width, height);
-    sprite.anchor.x = 0.5;
-    sprite.anchor.y = 1;
-    sprite.y = -40;
-    sprite.ry = sprite.y;
-    this.addChild(sprite);
-    return sprite;
-};
-
-Sprite_Damage.prototype.createBitmap = function(width, height) {
-    const bitmap = new Bitmap(width, height);
-    bitmap.fontFace = this.fontFace();
-    bitmap.fontSize = this.fontSize();
-    bitmap.textColor = this.damageColor();
-    bitmap.outlineColor = this.outlineColor();
-    bitmap.outlineWidth = this.outlineWidth();
-    return bitmap;
-};
-
-Sprite_Damage.prototype.update = function() {
-    Sprite.prototype.update.call(this);
-    if (this._duration > 0) {
-        this._duration--;
-        for (const child of this.children) {
-            this.updateChild(child);
-        }
-    }
-    this.updateFlash();
-    this.updateOpacity();
-};
-
-Sprite_Damage.prototype.updateChild = function(sprite) {
-    sprite.dy += 0.5;
-    sprite.ry += sprite.dy;
-    if (sprite.ry >= 0) {
-        sprite.ry = 0;
-        sprite.dy *= -0.6;
-    }
-    sprite.y = Math.round(sprite.ry);
-    sprite.setBlendColor(this._flashColor);
-};
-
-Sprite_Damage.prototype.updateFlash = function() {
-    if (this._flashDuration > 0) {
-        const d = this._flashDuration--;
-        this._flashColor[3] *= (d - 1) / d;
-    }
-};
-
-Sprite_Damage.prototype.updateOpacity = function() {
-    if (this._duration < 10) {
-        this.opacity = (255 * this._duration) / 10;
-    }
-};
-
-Sprite_Damage.prototype.isPlaying = function() {
-    return this._duration > 0;
-};
-
-//-----------------------------------------------------------------------------
-// Sprite_Gauge
-//
-// The sprite for displaying a status gauge.
-
-function Sprite_Gauge() {
-    this.initialize(...arguments);
-}
-
-Sprite_Gauge.prototype = Object.create(Sprite.prototype);
-Sprite_Gauge.prototype.constructor = Sprite_Gauge;
-
-Sprite_Gauge.prototype.initialize = function() {
-    Sprite.prototype.initialize.call(this);
-    this.initMembers();
-    this.createBitmap();
-};
-
-Sprite_Gauge.prototype.initMembers = function() {
-    this._battler = null;
-    this._statusType = "";
-    this._value = NaN;
-    this._maxValue = NaN;
-    this._targetValue = NaN;
-    this._targetMaxValue = NaN;
-    this._duration = 0;
-    this._flashingCount = 0;
-};
-
-Sprite_Gauge.prototype.destroy = function(options) {
-    this.bitmap.destroy();
-    Sprite.prototype.destroy.call(this, options);
-};
-
-Sprite_Gauge.prototype.createBitmap = function() {
-    const width = this.bitmapWidth();
-    const height = this.bitmapHeight();
-    this.bitmap = new Bitmap(width, height);
-};
-
-Sprite_Gauge.prototype.bitmapWidth = function() {
-    return 128;
-};
-
-Sprite_Gauge.prototype.bitmapHeight = function() {
-    return 32;
-};
-
-Sprite_Gauge.prototype.textHeight = function() {
-    return 24;
-};
-
-Sprite_Gauge.prototype.gaugeHeight = function() {
-    return 12;
-};
-
-Sprite_Gauge.prototype.gaugeX = function() {
-    if (this._statusType === "time") {
-        return 0;
-    } else {
-        return this.measureLabelWidth() + 6;
-    }
-};
-
-Sprite_Gauge.prototype.labelY = function() {
-    return 3;
-};
-
-Sprite_Gauge.prototype.labelFontFace = function() {
-    return $gameSystem.mainFontFace();
-};
-
-Sprite_Gauge.prototype.labelFontSize = function() {
-    return $gameSystem.mainFontSize() - 2;
-};
-
-Sprite_Gauge.prototype.valueFontFace = function() {
-    return $gameSystem.numberFontFace();
-};
-
-Sprite_Gauge.prototype.valueFontSize = function() {
-    return $gameSystem.mainFontSize() - 6;
-};
-
-Sprite_Gauge.prototype.setup = function(battler, statusType) {
-    this._battler = battler;
-    this._statusType = statusType;
-    this._value = this.currentValue();
-    this._maxValue = this.currentMaxValue();
-    this.updateBitmap();
-};
-
-Sprite_Gauge.prototype.update = function() {
-    Sprite.prototype.update.call(this);
-    this.updateBitmap();
-};
-
-Sprite_Gauge.prototype.updateBitmap = function() {
-    const value = this.currentValue();
-    const maxValue = this.currentMaxValue();
-    if (value !== this._targetValue || maxValue !== this._targetMaxValue) {
-        this.updateTargetValue(value, maxValue);
-    }
-    this.updateGaugeAnimation();
-    this.updateFlashing();
-};
-
-Sprite_Gauge.prototype.updateTargetValue = function(value, maxValue) {
-    this._targetValue = value;
-    this._targetMaxValue = maxValue;
-    if (isNaN(this._value)) {
-        this._value = value;
-        this._maxValue = maxValue;
-        this.redraw();
-    } else {
-        this._duration = this.smoothness();
-    }
-};
-
-Sprite_Gauge.prototype.smoothness = function() {
-    return this._statusType === "time" ? 5 : 20;
-};
-
-Sprite_Gauge.prototype.updateGaugeAnimation = function() {
-    if (this._duration > 0) {
-        const d = this._duration;
-        this._value = (this._value * (d - 1) + this._targetValue) / d;
-        this._maxValue = (this._maxValue * (d - 1) + this._targetMaxValue) / d;
-        this._duration--;
-        this.redraw();
-    }
-};
-
-Sprite_Gauge.prototype.updateFlashing = function() {
-    if (this._statusType === "time") {
-        this._flashingCount++;
-        if (this._battler.isInputting()) {
-            if (this._flashingCount % 30 < 15) {
-                this.setBlendColor(this.flashingColor1());
-            } else {
-                this.setBlendColor(this.flashingColor2());
-            }
-        } else {
-            this.setBlendColor([0, 0, 0, 0]);
-        }
-    }
-};
-
-Sprite_Gauge.prototype.flashingColor1 = function() {
-    return [255, 255, 255, 64];
-};
-
-Sprite_Gauge.prototype.flashingColor2 = function() {
-    return [0, 0, 255, 48];
-};
-
-Sprite_Gauge.prototype.isValid = function() {
-    if (this._battler) {
-        if (this._statusType === "tp" && !this._battler.isPreserveTp()) {
-            return $gameParty.inBattle();
-        } else {
-            return true;
-        }
-    }
-    return false;
-};
-
-Sprite_Gauge.prototype.currentValue = function() {
-    if (this._battler) {
-        switch (this._statusType) {
-            case "hp":
-                return this._battler.hp;
-            case "mp":
-                return this._battler.mp;
-            case "tp":
-                return this._battler.tp;
-            case "time":
-                return this._battler.tpbChargeTime();
-        }
-    }
-    return NaN;
-};
-
-Sprite_Gauge.prototype.currentMaxValue = function() {
-    if (this._battler) {
-        switch (this._statusType) {
-            case "hp":
-                return this._battler.mhp;
-            case "mp":
-                return this._battler.mmp;
-            case "tp":
-                return this._battler.maxTp();
-            case "time":
-                return 1;
-        }
-    }
-    return NaN;
-};
-
-Sprite_Gauge.prototype.label = function() {
-    switch (this._statusType) {
-        case "hp":
-            return TextManager.hpA;
-        case "mp":
-            return TextManager.mpA;
-        case "tp":
-            return TextManager.tpA;
-        default:
-            return "";
-    }
-};
-
-Sprite_Gauge.prototype.gaugeBackColor = function() {
-    return ColorManager.gaugeBackColor();
-};
-
-Sprite_Gauge.prototype.gaugeColor1 = function() {
-    switch (this._statusType) {
-        case "hp":
-            return ColorManager.hpGaugeColor1();
-        case "mp":
-            return ColorManager.mpGaugeColor1();
-        case "tp":
-            return ColorManager.tpGaugeColor1();
-        case "time":
-            return ColorManager.ctGaugeColor1();
-        default:
-            return ColorManager.normalColor();
-    }
-};
-
-Sprite_Gauge.prototype.gaugeColor2 = function() {
-    switch (this._statusType) {
-        case "hp":
-            return ColorManager.hpGaugeColor2();
-        case "mp":
-            return ColorManager.mpGaugeColor2();
-        case "tp":
-            return ColorManager.tpGaugeColor2();
-        case "time":
-            return ColorManager.ctGaugeColor2();
-        default:
-            return ColorManager.normalColor();
-    }
-};
-
-Sprite_Gauge.prototype.labelColor = function() {
-    return ColorManager.systemColor();
-};
-
-Sprite_Gauge.prototype.labelOutlineColor = function() {
-    return ColorManager.outlineColor();
-};
-
-Sprite_Gauge.prototype.labelOutlineWidth = function() {
-    return 3;
-};
-
-Sprite_Gauge.prototype.valueColor = function() {
-    switch (this._statusType) {
-        case "hp":
-            return ColorManager.hpColor(this._battler);
-        case "mp":
-            return ColorManager.mpColor(this._battler);
-        case "tp":
-            return ColorManager.tpColor(this._battler);
-        default:
-            return ColorManager.normalColor();
-    }
-};
-
-Sprite_Gauge.prototype.valueOutlineColor = function() {
-    return "rgba(0, 0, 0, 1)";
-};
-
-Sprite_Gauge.prototype.valueOutlineWidth = function() {
-    return 2;
-};
-
-Sprite_Gauge.prototype.redraw = function() {
-    this.bitmap.clear();
-    const currentValue = this.currentValue();
-    if (!isNaN(currentValue)) {
-        this.drawGauge();
-        if (this._statusType !== "time") {
-            this.drawLabel();
-            if (this.isValid()) {
-                this.drawValue();
-            }
-        }
-    }
-};
-
-Sprite_Gauge.prototype.drawGauge = function() {
-    const gaugeX = this.gaugeX();
-    const gaugeY = this.textHeight() - this.gaugeHeight();
-    const gaugewidth = this.bitmapWidth() - gaugeX;
-    const gaugeHeight = this.gaugeHeight();
-    this.drawGaugeRect(gaugeX, gaugeY, gaugewidth, gaugeHeight);
-};
-
-Sprite_Gauge.prototype.drawGaugeRect = function(x, y, width, height) {
-    const rate = this.gaugeRate();
-    const fillW = Math.floor((width - 2) * rate);
-    const fillH = height - 2;
-    const color0 = this.gaugeBackColor();
-    const color1 = this.gaugeColor1();
-    const color2 = this.gaugeColor2();
-    this.bitmap.fillRect(x, y, width, height, color0);
-    this.bitmap.gradientFillRect(x + 1, y + 1, fillW, fillH, color1, color2);
-};
-
-Sprite_Gauge.prototype.gaugeRate = function() {
-    if (this.isValid()) {
-        const value = this._value;
-        const maxValue = this._maxValue;
-        return maxValue > 0 ? value / maxValue : 0;
-    } else {
-        return 0;
-    }
-};
-
-Sprite_Gauge.prototype.drawLabel = function() {
-    const label = this.label();
-    const x = this.labelOutlineWidth() / 2;
-    const y = this.labelY();
-    const width = this.bitmapWidth();
-    const height = this.textHeight();
-    this.setupLabelFont();
-    this.bitmap.paintOpacity = this.labelOpacity();
-    this.bitmap.drawText(label, x, y, width, height, "left");
-    this.bitmap.paintOpacity = 255;
-};
-
-Sprite_Gauge.prototype.setupLabelFont = function() {
-    this.bitmap.fontFace = this.labelFontFace();
-    this.bitmap.fontSize = this.labelFontSize();
-    this.bitmap.textColor = this.labelColor();
-    this.bitmap.outlineColor = this.labelOutlineColor();
-    this.bitmap.outlineWidth = this.labelOutlineWidth();
-};
-
-Sprite_Gauge.prototype.measureLabelWidth = function() {
-    this.setupLabelFont();
-    const labels = [TextManager.hpA, TextManager.mpA, TextManager.tpA];
-    const widths = labels.map(str => this.bitmap.measureTextWidth(str));
-    return Math.ceil(Math.max(...widths));
-};
-
-Sprite_Gauge.prototype.labelOpacity = function() {
-    return this.isValid() ? 255 : 160;
-};
-
-Sprite_Gauge.prototype.drawValue = function() {
-    const currentValue = this.currentValue();
-    const width = this.bitmapWidth();
-    const height = this.textHeight();
-    this.setupValueFont();
-    this.bitmap.drawText(currentValue, 0, 0, width, height, "right");
-};
-
-Sprite_Gauge.prototype.setupValueFont = function() {
-    this.bitmap.fontFace = this.valueFontFace();
-    this.bitmap.fontSize = this.valueFontSize();
-    this.bitmap.textColor = this.valueColor();
-    this.bitmap.outlineColor = this.valueOutlineColor();
-    this.bitmap.outlineWidth = this.valueOutlineWidth();
-};
-
-//-----------------------------------------------------------------------------
-// Sprite_Name
-//
-// The sprite for displaying a status gauge.
-
-function Sprite_Name() {
-    this.initialize(...arguments);
-}
-
-Sprite_Name.prototype = Object.create(Sprite.prototype);
-Sprite_Name.prototype.constructor = Sprite_Name;
-
-Sprite_Name.prototype.initialize = function() {
-    Sprite.prototype.initialize.call(this);
-    this.initMembers();
-    this.createBitmap();
-};
-
-Sprite_Name.prototype.initMembers = function() {
-    this._battler = null;
-    this._name = "";
-    this._textColor = "";
-};
-
-Sprite_Name.prototype.destroy = function(options) {
-    this.bitmap.destroy();
-    Sprite.prototype.destroy.call(this, options);
-};
-
-Sprite_Name.prototype.createBitmap = function() {
-    const width = this.bitmapWidth();
-    const height = this.bitmapHeight();
-    this.bitmap = new Bitmap(width, height);
-};
-
-Sprite_Name.prototype.bitmapWidth = function() {
-    return 128;
-};
-
-Sprite_Name.prototype.bitmapHeight = function() {
-    return 24;
-};
-
-Sprite_Name.prototype.fontFace = function() {
-    return $gameSystem.mainFontFace();
-};
-
-Sprite_Name.prototype.fontSize = function() {
-    return $gameSystem.mainFontSize();
-};
-
-Sprite_Name.prototype.setup = function(battler) {
-    this._battler = battler;
-    this.updateBitmap();
-};
-
-Sprite_Name.prototype.update = function() {
-    Sprite.prototype.update.call(this);
-    this.updateBitmap();
-};
-
-Sprite_Name.prototype.updateBitmap = function() {
-    const name = this.name();
-    const color = this.textColor();
-    if (name !== this._name || color !== this._textColor) {
-        this._name = name;
-        this._textColor = color;
-        this.redraw();
-    }
-};
-
-Sprite_Name.prototype.name = function() {
-    return this._battler ? this._battler.name() : "";
-};
-
-Sprite_Name.prototype.textColor = function() {
-    return ColorManager.hpColor(this._battler);
-};
-
-Sprite_Name.prototype.outlineColor = function() {
-    return ColorManager.outlineColor();
-};
-
-Sprite_Name.prototype.outlineWidth = function() {
-    return 3;
-};
-
-Sprite_Name.prototype.redraw = function() {
-    const name = this.name();
-    const width = this.bitmapWidth();
-    const height = this.bitmapHeight();
-    this.setupFont();
-    this.bitmap.clear();
-    this.bitmap.drawText(name, 0, 0, width, height, "left");
-};
-
-Sprite_Name.prototype.setupFont = function() {
-    this.bitmap.fontFace = this.fontFace();
-    this.bitmap.fontSize = this.fontSize();
-    this.bitmap.textColor = this.textColor();
-    this.bitmap.outlineColor = this.outlineColor();
-    this.bitmap.outlineWidth = this.outlineWidth();
-};
-
-//-----------------------------------------------------------------------------
-// Sprite_StateIcon
-//
-// The sprite for displaying state icons.
-
-function Sprite_StateIcon() {
-    this.initialize(...arguments);
-}
-
-Sprite_StateIcon.prototype = Object.create(Sprite.prototype);
-Sprite_StateIcon.prototype.constructor = Sprite_StateIcon;
-
-Sprite_StateIcon.prototype.initialize = function() {
-    Sprite.prototype.initialize.call(this);
-    this.initMembers();
-    this.loadBitmap();
-};
-
-Sprite_StateIcon.prototype.initMembers = function() {
-    this._battler = null;
-    this._iconIndex = 0;
-    this._animationCount = 0;
-    this._animationIndex = 0;
-    this.anchor.x = 0.5;
-    this.anchor.y = 0.5;
-};
-
-Sprite_StateIcon.prototype.loadBitmap = function() {
-    this.bitmap = ImageManager.loadSystem("IconSet");
-    this.setFrame(0, 0, 0, 0);
-};
-
-Sprite_StateIcon.prototype.setup = function(battler) {
-    if (this._battler !== battler) {
-        this._battler = battler;
-        this._animationCount = this.animationWait();
-    }
-};
-
-Sprite_StateIcon.prototype.update = function() {
-    Sprite.prototype.update.call(this);
-    this._animationCount++;
-    if (this._animationCount >= this.animationWait()) {
-        this.updateIcon();
-        this.updateFrame();
-        this._animationCount = 0;
-    }
-};
-
-Sprite_StateIcon.prototype.animationWait = function() {
-    return 40;
-};
-
-Sprite_StateIcon.prototype.updateIcon = function() {
-    const icons = [];
-    if (this.shouldDisplay()) {
-        icons.push(...this._battler.allIcons());
-    }
-    if (icons.length > 0) {
-        this._animationIndex++;
-        if (this._animationIndex >= icons.length) {
-            this._animationIndex = 0;
-        }
-        this._iconIndex = icons[this._animationIndex];
-    } else {
-        this._animationIndex = 0;
-        this._iconIndex = 0;
-    }
-};
-
-Sprite_StateIcon.prototype.shouldDisplay = function() {
-    const battler = this._battler;
-    return battler && (battler.isActor() || battler.isAlive());
-};
-
-Sprite_StateIcon.prototype.updateFrame = function() {
-    const pw = ImageManager.iconWidth;
-    const ph = ImageManager.iconHeight;
-    const sx = (this._iconIndex % 16) * pw;
-    const sy = Math.floor(this._iconIndex / 16) * ph;
-    this.setFrame(sx, sy, pw, ph);
-};
-
-//-----------------------------------------------------------------------------
-// Sprite_StateOverlay
-//
-// The sprite for displaying an overlay image for a state.
-
-function Sprite_StateOverlay() {
-    this.initialize(...arguments);
-}
-
-Sprite_StateOverlay.prototype = Object.create(Sprite.prototype);
-Sprite_StateOverlay.prototype.constructor = Sprite_StateOverlay;
-
-Sprite_StateOverlay.prototype.initialize = function() {
-    Sprite.prototype.initialize.call(this);
-    this.initMembers();
-    this.loadBitmap();
-};
-
-Sprite_StateOverlay.prototype.initMembers = function() {
-    this._battler = null;
-    this._overlayIndex = 0;
-    this._animationCount = 0;
-    this._pattern = 0;
-    this.anchor.x = 0.5;
-    this.anchor.y = 1;
-};
-
-Sprite_StateOverlay.prototype.loadBitmap = function() {
-    this.bitmap = ImageManager.loadSystem("States");
-    this.setFrame(0, 0, 0, 0);
-};
-
-Sprite_StateOverlay.prototype.setup = function(battler) {
-    this._battler = battler;
-};
-
-Sprite_StateOverlay.prototype.update = function() {
-    Sprite.prototype.update.call(this);
-    this._animationCount++;
-    if (this._animationCount >= this.animationWait()) {
-        this.updatePattern();
-        this.updateFrame();
-        this._animationCount = 0;
-    }
-};
-
-Sprite_StateOverlay.prototype.animationWait = function() {
-    return 8;
-};
-
-Sprite_StateOverlay.prototype.updatePattern = function() {
-    this._pattern++;
-    this._pattern %= 8;
-    if (this._battler) {
-        this._overlayIndex = this._battler.stateOverlayIndex();
-    } else {
-        this._overlayIndex = 0;
-    }
-};
-
-Sprite_StateOverlay.prototype.updateFrame = function() {
-    if (this._overlayIndex > 0) {
-        const w = 96;
-        const h = 96;
-        const sx = this._pattern * w;
-        const sy = (this._overlayIndex - 1) * h;
-        this.setFrame(sx, sy, w, h);
-    } else {
-        this.setFrame(0, 0, 0, 0);
-    }
-};
-
-//-----------------------------------------------------------------------------
-// Sprite_Weapon
-//
-// The sprite for displaying a weapon image for attacking.
-
-function Sprite_Weapon() {
-    this.initialize(...arguments);
-}
-
-Sprite_Weapon.prototype = Object.create(Sprite.prototype);
-Sprite_Weapon.prototype.constructor = Sprite_Weapon;
-
-Sprite_Weapon.prototype.initialize = function() {
-    Sprite.prototype.initialize.call(this);
-    this.initMembers();
-};
-
-Sprite_Weapon.prototype.initMembers = function() {
-    this._weaponImageId = 0;
-    this._animationCount = 0;
-    this._pattern = 0;
-    this.anchor.x = 0.5;
-    this.anchor.y = 1;
-    this.x = -16;
-};
-
-Sprite_Weapon.prototype.setup = function(weaponImageId) {
-    this._weaponImageId = weaponImageId;
-    this._animationCount = 0;
-    this._pattern = 0;
-    this.loadBitmap();
-    this.updateFrame();
-};
-
-Sprite_Weapon.prototype.update = function() {
-    Sprite.prototype.update.call(this);
-    this._animationCount++;
-    if (this._animationCount >= this.animationWait()) {
-        this.updatePattern();
-        this.updateFrame();
-        this._animationCount = 0;
-    }
-};
-
-Sprite_Weapon.prototype.animationWait = function() {
-    return 12;
-};
-
-Sprite_Weapon.prototype.updatePattern = function() {
-    this._pattern++;
-    if (this._pattern >= 3) {
-        this._weaponImageId = 0;
-    }
-};
-
-Sprite_Weapon.prototype.loadBitmap = function() {
-    const pageId = Math.floor((this._weaponImageId - 1) / 12) + 1;
-    if (pageId >= 1) {
-        this.bitmap = ImageManager.loadSystem("Weapons" + pageId);
-    } else {
-        this.bitmap = ImageManager.loadSystem("");
-    }
-};
-
-Sprite_Weapon.prototype.updateFrame = function() {
-    if (this._weaponImageId > 0) {
-        const index = (this._weaponImageId - 1) % 12;
-        const w = 96;
-        const h = 64;
-        const sx = (Math.floor(index / 6) * 3 + this._pattern) * w;
-        const sy = Math.floor(index % 6) * h;
-        this.setFrame(sx, sy, w, h);
-    } else {
-        this.setFrame(0, 0, 0, 0);
-    }
-};
-
-Sprite_Weapon.prototype.isPlaying = function() {
-    return this._weaponImageId > 0;
-};
-
-//-----------------------------------------------------------------------------
-// Sprite_Balloon
-//
-// The sprite for displaying a balloon icon.
-
-function Sprite_Balloon() {
-    this.initialize(...arguments);
-}
-
-Sprite_Balloon.prototype = Object.create(Sprite.prototype);
-Sprite_Balloon.prototype.constructor = Sprite_Balloon;
-
-Sprite_Balloon.prototype.initialize = function() {
-    Sprite.prototype.initialize.call(this);
-    this.initMembers();
-    this.loadBitmap();
-};
-
-Sprite_Balloon.prototype.initMembers = function() {
-    this._target = null;
-    this._balloonId = 0;
-    this._duration = 0;
-    this.anchor.x = 0.5;
-    this.anchor.y = 1;
-    this.z = 7;
-};
-
-Sprite_Balloon.prototype.loadBitmap = function() {
-    this.bitmap = ImageManager.loadSystem("Balloon");
-    this.setFrame(0, 0, 0, 0);
-};
-
-Sprite_Balloon.prototype.setup = function(targetSprite, balloonId) {
-    this._target = targetSprite;
-    this._balloonId = balloonId;
-    this._duration = 8 * this.speed() + this.waitTime();
-};
-
-Sprite_Balloon.prototype.update = function() {
-    Sprite.prototype.update.call(this);
-    if (this._duration > 0) {
-        this._duration--;
-        if (this._duration > 0) {
-            this.updatePosition();
-            this.updateFrame();
-        }
-    }
-};
-
-Sprite_Balloon.prototype.updatePosition = function() {
-    this.x = this._target.x;
-    this.y = this._target.y - this._target.height;
-};
-
-Sprite_Balloon.prototype.updateFrame = function() {
-    const w = 48;
-    const h = 48;
-    const sx = this.frameIndex() * w;
-    const sy = (this._balloonId - 1) * h;
-    this.setFrame(sx, sy, w, h);
-};
-
-Sprite_Balloon.prototype.speed = function() {
-    return 8;
-};
-
-Sprite_Balloon.prototype.waitTime = function() {
-    return 12;
-};
-
-Sprite_Balloon.prototype.frameIndex = function() {
-    const index = (this._duration - this.waitTime()) / this.speed();
-    return 7 - Math.max(Math.floor(index), 0);
-};
-
-Sprite_Balloon.prototype.isPlaying = function() {
-    return this._duration > 0;
-};
-
-//-----------------------------------------------------------------------------
-// Sprite_Picture
-//
-// The sprite for displaying a picture.
-
-function Sprite_Picture() {
-    this.initialize(...arguments);
-}
-
-Sprite_Picture.prototype = Object.create(Sprite_Clickable.prototype);
-Sprite_Picture.prototype.constructor = Sprite_Picture;
-
-Sprite_Picture.prototype.initialize = function(pictureId) {
-    Sprite_Clickable.prototype.initialize.call(this);
-    this._pictureId = pictureId;
-    this._pictureName = "";
-    this.update();
-};
-
-Sprite_Picture.prototype.picture = function() {
-    return $gameScreen.picture(this._pictureId);
-};
-
-Sprite_Picture.prototype.update = function() {
-    Sprite_Clickable.prototype.update.call(this);
-    this.updateBitmap();
-    if (this.visible) {
-        this.updateOrigin();
-        this.updatePosition();
-        this.updateScale();
-        this.updateTone();
-        this.updateOther();
-    }
-};
-
-Sprite_Picture.prototype.updateBitmap = function() {
-    const picture = this.picture();
-    if (picture) {
-        const pictureName = picture.name();
-        if (this._pictureName !== pictureName) {
-            this._pictureName = pictureName;
-            this.loadBitmap();
-        }
-        this.visible = true;
-    } else {
-        this._pictureName = "";
-        this.bitmap = null;
-        this.visible = false;
-    }
-};
-
-Sprite_Picture.prototype.updateOrigin = function() {
-    const picture = this.picture();
-    if (picture.origin() === 0) {
-        this.anchor.x = 0;
-        this.anchor.y = 0;
-    } else {
-        this.anchor.x = 0.5;
-        this.anchor.y = 0.5;
-    }
-};
-
-Sprite_Picture.prototype.updatePosition = function() {
-    const picture = this.picture();
-    this.x = Math.round(picture.x());
-    this.y = Math.round(picture.y());
-};
-
-Sprite_Picture.prototype.updateScale = function() {
-    const picture = this.picture();
-    this.scale.x = picture.scaleX() / 100;
-    this.scale.y = picture.scaleY() / 100;
-};
-
-Sprite_Picture.prototype.updateTone = function() {
-    const picture = this.picture();
-    if (picture.tone()) {
-        this.setColorTone(picture.tone());
-    } else {
-        this.setColorTone([0, 0, 0, 0]);
-    }
-};
-
-Sprite_Picture.prototype.updateOther = function() {
-    const picture = this.picture();
-    this.opacity = picture.opacity();
-    this.blendMode = picture.blendMode();
-    this.rotation = (picture.angle() * Math.PI) / 180;
-};
-
-Sprite_Picture.prototype.loadBitmap = function() {
-    this.bitmap = ImageManager.loadPicture(this._pictureName);
-};
-
-//-----------------------------------------------------------------------------
-// Sprite_Timer
-//
-// The sprite for displaying the timer.
-
-function Sprite_Timer() {
-    this.initialize(...arguments);
-}
-
-Sprite_Timer.prototype = Object.create(Sprite.prototype);
-Sprite_Timer.prototype.constructor = Sprite_Timer;
-
-Sprite_Timer.prototype.initialize = function() {
-    Sprite.prototype.initialize.call(this);
-    this._seconds = 0;
-    this.createBitmap();
-    this.update();
-};
-
-Sprite_Timer.prototype.destroy = function(options) {
-    this.bitmap.destroy();
-    Sprite.prototype.destroy.call(this, options);
-};
-
-Sprite_Timer.prototype.createBitmap = function() {
-    this.bitmap = new Bitmap(96, 48);
-    this.bitmap.fontFace = this.fontFace();
-    this.bitmap.fontSize = this.fontSize();
-    this.bitmap.outlineColor = ColorManager.outlineColor();
-};
-
-Sprite_Timer.prototype.fontFace = function() {
-    return $gameSystem.numberFontFace();
-};
-
-Sprite_Timer.prototype.fontSize = function() {
-    return $gameSystem.mainFontSize() + 8;
-};
-
-Sprite_Timer.prototype.update = function() {
-    Sprite.prototype.update.call(this);
-    this.updateBitmap();
-    this.updatePosition();
-    this.updateVisibility();
-};
-
-Sprite_Timer.prototype.updateBitmap = function() {
-    if (this._seconds !== $gameTimer.seconds()) {
-        this._seconds = $gameTimer.seconds();
-        this.redraw();
-    }
-};
-
-Sprite_Timer.prototype.redraw = function() {
-    const text = this.timerText();
-    const width = this.bitmap.width;
-    const height = this.bitmap.height;
-    this.bitmap.clear();
-    this.bitmap.drawText(text, 0, 0, width, height, "center");
-};
-
-Sprite_Timer.prototype.timerText = function() {
-    const min = Math.floor(this._seconds / 60) % 60;
-    const sec = this._seconds % 60;
-    return min.padZero(2) + ":" + sec.padZero(2);
-};
-
-Sprite_Timer.prototype.updatePosition = function() {
-    this.x = (Graphics.width - this.bitmap.width) / 2;
-    this.y = 0;
-};
-
-Sprite_Timer.prototype.updateVisibility = function() {
-    this.visible = $gameTimer.isWorking();
-};
-
-//-----------------------------------------------------------------------------
-// Sprite_Destination
-//
-// The sprite for displaying the destination place of the touch input.
-
-function Sprite_Destination() {
-    this.initialize(...arguments);
-}
-
-Sprite_Destination.prototype = Object.create(Sprite.prototype);
-Sprite_Destination.prototype.constructor = Sprite_Destination;
-
-Sprite_Destination.prototype.initialize = function() {
-    Sprite.prototype.initialize.call(this);
-    this.createBitmap();
-    this._frameCount = 0;
-};
-
-Sprite_Destination.prototype.destroy = function(options) {
-    if (this.bitmap) {
-        this.bitmap.destroy();
-    }
-    Sprite.prototype.destroy.call(this, options);
-};
-
-Sprite_Destination.prototype.update = function() {
-    Sprite.prototype.update.call(this);
-    if ($gameTemp.isDestinationValid()) {
-        this.updatePosition();
-        this.updateAnimation();
-        this.visible = true;
-    } else {
-        this._frameCount = 0;
-        this.visible = false;
-    }
-};
-
-Sprite_Destination.prototype.createBitmap = function() {
-    const tileWidth = $gameMap.tileWidth();
-    const tileHeight = $gameMap.tileHeight();
-    this.bitmap = new Bitmap(tileWidth, tileHeight);
-    this.bitmap.fillAll("white");
-    this.anchor.x = 0.5;
-    this.anchor.y = 0.5;
-    this.blendMode = 1;
-};
-
-Sprite_Destination.prototype.updatePosition = function() {
-    const tileWidth = $gameMap.tileWidth();
-    const tileHeight = $gameMap.tileHeight();
-    const x = $gameTemp.destinationX();
-    const y = $gameTemp.destinationY();
-    this.x = ($gameMap.adjustX(x) + 0.5) * tileWidth;
-    this.y = ($gameMap.adjustY(y) + 0.5) * tileHeight;
-};
-
-Sprite_Destination.prototype.updateAnimation = function() {
-    this._frameCount++;
-    this._frameCount %= 20;
-    this.opacity = (20 - this._frameCount) * 6;
-    this.scale.x = 1 + this._frameCount / 20;
-    this.scale.y = this.scale.x;
-};
-
-//-----------------------------------------------------------------------------
-// Spriteset_Base
-//
-// The superclass of Spriteset_Map and Spriteset_Battle.
-
-function Spriteset_Base() {
-    this.initialize(...arguments);
-}
-
-Spriteset_Base.prototype = Object.create(Sprite.prototype);
-Spriteset_Base.prototype.constructor = Spriteset_Base;
-
-Spriteset_Base.prototype.initialize = function() {
-    Sprite.prototype.initialize.call(this);
-    this.setFrame(0, 0, Graphics.width, Graphics.height);
-    this.loadSystemImages();
-    this.createLowerLayer();
-    this.createUpperLayer();
-    this._animationSprites = [];
-};
-
-Spriteset_Base.prototype.destroy = function(options) {
-    this.removeAllAnimations();
-    Sprite.prototype.destroy.call(this, options);
-};
-
-Spriteset_Base.prototype.loadSystemImages = function() {
-    //
-};
-
-Spriteset_Base.prototype.createLowerLayer = function() {
-    this.createBaseSprite();
-    this.createBaseFilters();
-};
-
-Spriteset_Base.prototype.createUpperLayer = function() {
-    this.createPictures();
-    this.createTimer();
-    this.createOverallFilters();
-};
-
-Spriteset_Base.prototype.update = function() {
-    Sprite.prototype.update.call(this);
-    this.updateBaseFilters();
-    this.updateOverallFilters();
-    this.updatePosition();
-    this.updateAnimations();
-};
-
-Spriteset_Base.prototype.createBaseSprite = function() {
-    this._baseSprite = new Sprite();
-    this._blackScreen = new ScreenSprite();
-    this._blackScreen.opacity = 255;
-    this.addChild(this._baseSprite);
-    this._baseSprite.addChild(this._blackScreen);
-};
-
-Spriteset_Base.prototype.createBaseFilters = function() {
-    this._baseSprite.filters = [];
-    this._baseColorFilter = new ColorFilter();
-    this._baseSprite.filters.push(this._baseColorFilter);
-};
-
-Spriteset_Base.prototype.createPictures = function() {
-    const rect = this.pictureContainerRect();
-    this._pictureContainer = new Sprite();
-    this._pictureContainer.setFrame(rect.x, rect.y, rect.width, rect.height);
-    for (let i = 1; i <= $gameScreen.maxPictures(); i++) {
-        this._pictureContainer.addChild(new Sprite_Picture(i));
-    }
-    this.addChild(this._pictureContainer);
-};
-
-Spriteset_Base.prototype.pictureContainerRect = function() {
-    return new Rectangle(0, 0, Graphics.width, Graphics.height);
-};
-
-Spriteset_Base.prototype.createTimer = function() {
-    this._timerSprite = new Sprite_Timer();
-    this.addChild(this._timerSprite);
-};
-
-Spriteset_Base.prototype.createOverallFilters = function() {
-    this.filters = [];
-    this._overallColorFilter = new ColorFilter();
-    this.filters.push(this._overallColorFilter);
-};
-
-Spriteset_Base.prototype.updateBaseFilters = function() {
-    const filter = this._baseColorFilter;
-    filter.setColorTone($gameScreen.tone());
-};
-
-Spriteset_Base.prototype.updateOverallFilters = function() {
-    const filter = this._overallColorFilter;
-    filter.setBlendColor($gameScreen.flashColor());
-    filter.setBrightness($gameScreen.brightness());
-};
-
-Spriteset_Base.prototype.updatePosition = function() {
-    const screen = $gameScreen;
-    const scale = screen.zoomScale();
-    this.scale.x = scale;
-    this.scale.y = scale;
-    this.x = Math.round(-screen.zoomX() * (scale - 1));
-    this.y = Math.round(-screen.zoomY() * (scale - 1));
-    this.x += Math.round(screen.shake());
-};
-
-Spriteset_Base.prototype.findTargetSprite = function(/*target*/) {
-    return null;
-};
-
-Spriteset_Base.prototype.updateAnimations = function() {
-    for (const sprite of this._animationSprites) {
-        if (!sprite.isPlaying()) {
-            this.removeAnimation(sprite);
-        }
-    }
-    this.processAnimationRequests();
-};
-
-Spriteset_Base.prototype.processAnimationRequests = function() {
-    for (;;) {
-        const request = $gameTemp.retrieveAnimation();
-        if (request) {
-            this.createAnimation(request);
-        } else {
-            break;
-        }
-    }
-};
-
-Spriteset_Base.prototype.createAnimation = function(request) {
-    const animation = $dataAnimations[request.animationId];
-    const targets = request.targets;
-    const mirror = request.mirror;
-    let delay = this.animationBaseDelay();
-    const nextDelay = this.animationNextDelay();
-    if (this.isAnimationForEach(animation)) {
-        for (const target of targets) {
-            this.createAnimationSprite([target], animation, mirror, delay);
-            delay += nextDelay;
-        }
-    } else {
-        this.createAnimationSprite(targets, animation, mirror, delay);
-    }
-};
-
-// prettier-ignore
-Spriteset_Base.prototype.createAnimationSprite = function(
-    targets, animation, mirror, delay
-) {
-    const mv = this.isMVAnimation(animation);
-    const sprite = new (mv ? Sprite_AnimationMV : Sprite_Animation)();
-    const targetSprites = this.makeTargetSprites(targets);
-    const baseDelay = this.animationBaseDelay();
-    const previous = delay > baseDelay ? this.lastAnimationSprite() : null;
-    if (this.animationShouldMirror(targets[0])) {
-        mirror = !mirror;
-    }
-    sprite.targetObjects = targets;
-    sprite.setup(targetSprites, animation, mirror, delay, previous);
-    this._effectsContainer.addChild(sprite);
-    this._animationSprites.push(sprite);
-};
-
-Spriteset_Base.prototype.isMVAnimation = function(animation) {
-    return !!animation.frames;
-};
-
-Spriteset_Base.prototype.makeTargetSprites = function(targets) {
-    const targetSprites = [];
-    for (const target of targets) {
-        const targetSprite = this.findTargetSprite(target);
-        if (targetSprite) {
-            targetSprites.push(targetSprite);
-        }
-    }
-    return targetSprites;
-};
-
-Spriteset_Base.prototype.lastAnimationSprite = function() {
-    return this._animationSprites[this._animationSprites.length - 1];
-};
-
-Spriteset_Base.prototype.isAnimationForEach = function(animation) {
-    const mv = this.isMVAnimation(animation);
-    return mv ? animation.position !== 3 : animation.displayType === 0;
-};
-
-Spriteset_Base.prototype.animationBaseDelay = function() {
-    return 8;
-};
-
-Spriteset_Base.prototype.animationNextDelay = function() {
-    return 12;
-};
-
-Spriteset_Base.prototype.animationShouldMirror = function(target) {
-    return target && target.isActor && target.isActor();
-};
-
-Spriteset_Base.prototype.removeAnimation = function(sprite) {
-    this._animationSprites.remove(sprite);
-    this._effectsContainer.removeChild(sprite);
-    for (const target of sprite.targetObjects) {
-        if (target.endAnimation) {
-            target.endAnimation();
-        }
-    }
-    sprite.destroy();
-};
-
-Spriteset_Base.prototype.removeAllAnimations = function() {
-    for (const sprite of this._animationSprites.clone()) {
-        this.removeAnimation(sprite);
-    }
-};
-
-Spriteset_Base.prototype.isAnimationPlaying = function() {
-    return this._animationSprites.length > 0;
-};
-
-//-----------------------------------------------------------------------------
-// Spriteset_Map
-//
-// The set of sprites on the map screen.
-
-function Spriteset_Map() {
-    this.initialize(...arguments);
-}
-
-Spriteset_Map.prototype = Object.create(Spriteset_Base.prototype);
-Spriteset_Map.prototype.constructor = Spriteset_Map;
-
-Spriteset_Map.prototype.initialize = function() {
-    Spriteset_Base.prototype.initialize.call(this);
-    this._balloonSprites = [];
-};
-
-Spriteset_Map.prototype.destroy = function(options) {
-    this.removeAllBalloons();
-    Spriteset_Base.prototype.destroy.call(this, options);
-};
-
-Spriteset_Map.prototype.loadSystemImages = function() {
-    Spriteset_Base.prototype.loadSystemImages.call(this);
-    ImageManager.loadSystem("Balloon");
-    ImageManager.loadSystem("Shadow1");
-};
-
-Spriteset_Map.prototype.createLowerLayer = function() {
-    Spriteset_Base.prototype.createLowerLayer.call(this);
-    this.createParallax();
-    this.createTilemap();
-    this.createCharacters();
-    this.createShadow();
-    this.createDestination();
-    this.createWeather();
-};
-
-Spriteset_Map.prototype.update = function() {
-    Spriteset_Base.prototype.update.call(this);
-    this.updateTileset();
-    this.updateParallax();
-    this.updateTilemap();
-    this.updateShadow();
-    this.updateWeather();
-    this.updateAnimations();
-    this.updateBalloons();
-};
-
-Spriteset_Map.prototype.hideCharacters = function() {
-    for (const sprite of this._characterSprites) {
-        if (!sprite.isTile() && !sprite.isObjectCharacter()) {
-            sprite.hide();
-        }
-    }
-};
-
-Spriteset_Map.prototype.createParallax = function() {
-    this._parallax = new TilingSprite();
-    this._parallax.move(0, 0, Graphics.width, Graphics.height);
-    this._baseSprite.addChild(this._parallax);
-};
-
-Spriteset_Map.prototype.createTilemap = function() {
-    const tilemap = new Tilemap();
-    tilemap.tileWidth = $gameMap.tileWidth();
-    tilemap.tileHeight = $gameMap.tileHeight();
-    tilemap.setData($gameMap.width(), $gameMap.height(), $gameMap.data());
-    tilemap.horizontalWrap = $gameMap.isLoopHorizontal();
-    tilemap.verticalWrap = $gameMap.isLoopVertical();
-    this._baseSprite.addChild(tilemap);
-    this._effectsContainer = tilemap;
-    this._tilemap = tilemap;
-    this.loadTileset();
-};
-
-Spriteset_Map.prototype.loadTileset = function() {
-    this._tileset = $gameMap.tileset();
-    if (this._tileset) {
-        const bitmaps = [];
-        const tilesetNames = this._tileset.tilesetNames;
-        for (const name of tilesetNames) {
-            bitmaps.push(ImageManager.loadTileset(name));
-        }
-        this._tilemap.setBitmaps(bitmaps);
-        this._tilemap.flags = $gameMap.tilesetFlags();
-    }
-};
-
-Spriteset_Map.prototype.createCharacters = function() {
-    this._characterSprites = [];
-    for (const event of $gameMap.events()) {
-        this._characterSprites.push(new Sprite_Character(event));
-    }
-    for (const vehicle of $gameMap.vehicles()) {
-        this._characterSprites.push(new Sprite_Character(vehicle));
-    }
-    for (const follower of $gamePlayer.followers().reverseData()) {
-        this._characterSprites.push(new Sprite_Character(follower));
-    }
-    this._characterSprites.push(new Sprite_Character($gamePlayer));
-    for (const sprite of this._characterSprites) {
-        this._tilemap.addChild(sprite);
-    }
-};
-
-Spriteset_Map.prototype.createShadow = function() {
-    this._shadowSprite = new Sprite();
-    this._shadowSprite.bitmap = ImageManager.loadSystem("Shadow1");
-    this._shadowSprite.anchor.x = 0.5;
-    this._shadowSprite.anchor.y = 1;
-    this._shadowSprite.z = 6;
-    this._tilemap.addChild(this._shadowSprite);
-};
-
-Spriteset_Map.prototype.createDestination = function() {
-    this._destinationSprite = new Sprite_Destination();
-    this._destinationSprite.z = 9;
-    this._tilemap.addChild(this._destinationSprite);
-};
-
-Spriteset_Map.prototype.createWeather = function() {
-    this._weather = new Weather();
-    this.addChild(this._weather);
-};
-
-Spriteset_Map.prototype.updateTileset = function() {
-    if (this._tileset !== $gameMap.tileset()) {
-        this.loadTileset();
-    }
-};
-
-Spriteset_Map.prototype.updateParallax = function() {
-    if (this._parallaxName !== $gameMap.parallaxName()) {
-        this._parallaxName = $gameMap.parallaxName();
-        this._parallax.bitmap = ImageManager.loadParallax(this._parallaxName);
-    }
-    if (this._parallax.bitmap) {
-        const bitmap = this._parallax.bitmap;
-        this._parallax.origin.x = $gameMap.parallaxOx() % bitmap.width;
-        this._parallax.origin.y = $gameMap.parallaxOy() % bitmap.height;
-    }
-};
-
-Spriteset_Map.prototype.updateTilemap = function() {
-    this._tilemap.origin.x = $gameMap.displayX() * $gameMap.tileWidth();
-    this._tilemap.origin.y = $gameMap.displayY() * $gameMap.tileHeight();
-};
-
-Spriteset_Map.prototype.updateShadow = function() {
-    const airship = $gameMap.airship();
-    this._shadowSprite.x = airship.shadowX();
-    this._shadowSprite.y = airship.shadowY();
-    this._shadowSprite.opacity = airship.shadowOpacity();
-};
-
-Spriteset_Map.prototype.updateWeather = function() {
-    this._weather.type = $gameScreen.weatherType();
-    this._weather.power = $gameScreen.weatherPower();
-    this._weather.origin.x = $gameMap.displayX() * $gameMap.tileWidth();
-    this._weather.origin.y = $gameMap.displayY() * $gameMap.tileHeight();
-};
-
-Spriteset_Map.prototype.updateBalloons = function() {
-    for (const sprite of this._balloonSprites) {
-        if (!sprite.isPlaying()) {
-            this.removeBalloon(sprite);
-        }
-    }
-    this.processBalloonRequests();
-};
-
-Spriteset_Map.prototype.processBalloonRequests = function() {
-    for (;;) {
-        const request = $gameTemp.retrieveBalloon();
-        if (request) {
-            this.createBalloon(request);
-        } else {
-            break;
-        }
-    }
-};
-
-Spriteset_Map.prototype.createBalloon = function(request) {
-    const targetSprite = this.findTargetSprite(request.target);
-    if (targetSprite) {
-        const sprite = new Sprite_Balloon();
-        sprite.targetObject = request.target;
-        sprite.setup(targetSprite, request.balloonId);
-        this._effectsContainer.addChild(sprite);
-        this._balloonSprites.push(sprite);
-    }
-};
-
-Spriteset_Map.prototype.removeBalloon = function(sprite) {
-    this._balloonSprites.remove(sprite);
-    this._effectsContainer.removeChild(sprite);
-    if (sprite.targetObject.endBalloon) {
-        sprite.targetObject.endBalloon();
-    }
-    sprite.destroy();
-};
-
-Spriteset_Map.prototype.removeAllBalloons = function() {
-    for (const sprite of this._balloonSprites.clone()) {
-        this.removeBalloon(sprite);
-    }
-};
-
-Spriteset_Map.prototype.findTargetSprite = function(target) {
-    return this._characterSprites.find(sprite => sprite.checkCharacter(target));
-};
-
-Spriteset_Map.prototype.animationBaseDelay = function() {
-    return 0;
-};
-
-//-----------------------------------------------------------------------------
-// Spriteset_Battle
-//
-// The set of sprites on the battle screen.
-
-function Spriteset_Battle() {
-    this.initialize(...arguments);
-}
-
-Spriteset_Battle.prototype = Object.create(Spriteset_Base.prototype);
-Spriteset_Battle.prototype.constructor = Spriteset_Battle;
-
-Spriteset_Battle.prototype.initialize = function() {
-    Spriteset_Base.prototype.initialize.call(this);
-    this._battlebackLocated = false;
-};
-
-Spriteset_Battle.prototype.loadSystemImages = function() {
-    Spriteset_Base.prototype.loadSystemImages.call(this);
-    ImageManager.loadSystem("Shadow2");
-    ImageManager.loadSystem("Weapons1");
-    ImageManager.loadSystem("Weapons2");
-    ImageManager.loadSystem("Weapons3");
-};
-
-Spriteset_Battle.prototype.createLowerLayer = function() {
-    Spriteset_Base.prototype.createLowerLayer.call(this);
-    this.createBackground();
-    this.createBattleback();
-    this.createBattleField();
-    this.createEnemies();
-    this.createActors();
-};
-
-Spriteset_Battle.prototype.createBackground = function() {
-    this._backgroundFilter = new PIXI.filters.BlurFilter();
-    this._backgroundSprite = new Sprite();
-    this._backgroundSprite.bitmap = SceneManager.backgroundBitmap();
-    this._backgroundSprite.filters = [this._backgroundFilter];
-    this._baseSprite.addChild(this._backgroundSprite);
-};
-
-Spriteset_Battle.prototype.createBattleback = function() {
-    this._back1Sprite = new Sprite_Battleback(0);
-    this._back2Sprite = new Sprite_Battleback(1);
-    this._baseSprite.addChild(this._back1Sprite);
-    this._baseSprite.addChild(this._back2Sprite);
-};
-
-Spriteset_Battle.prototype.createBattleField = function() {
-    const width = Graphics.boxWidth;
-    const height = Graphics.boxHeight;
-    const x = (Graphics.width - width) / 2;
-    const y = (Graphics.height - height) / 2;
-    this._battleField = new Sprite();
-    this._battleField.setFrame(0, 0, width, height);
-    this._battleField.x = x;
-    this._battleField.y = y - this.battleFieldOffsetY();
-    this._baseSprite.addChild(this._battleField);
-    this._effectsContainer = this._battleField;
-};
-
-Spriteset_Battle.prototype.battleFieldOffsetY = function() {
-    return 24;
-};
-
-Spriteset_Battle.prototype.update = function() {
-    Spriteset_Base.prototype.update.call(this);
-    this.updateActors();
-    this.updateBattleback();
-    this.updateAnimations();
-};
-
-Spriteset_Battle.prototype.updateBattleback = function() {
-    if (!this._battlebackLocated) {
-        this._back1Sprite.adjustPosition();
-        this._back2Sprite.adjustPosition();
-        this._battlebackLocated = true;
-    }
-};
-
-Spriteset_Battle.prototype.createEnemies = function() {
-    const enemies = $gameTroop.members();
-    const sprites = [];
-    for (const enemy of enemies) {
-        sprites.push(new Sprite_Enemy(enemy));
-    }
-    sprites.sort(this.compareEnemySprite.bind(this));
-    for (const sprite of sprites) {
-        this._battleField.addChild(sprite);
-    }
-    this._enemySprites = sprites;
-};
-
-Spriteset_Battle.prototype.compareEnemySprite = function(a, b) {
-    if (a.y !== b.y) {
-        return a.y - b.y;
-    } else {
-        return b.spriteId - a.spriteId;
-    }
-};
-
-Spriteset_Battle.prototype.createActors = function() {
-    this._actorSprites = [];
-    if ($gameSystem.isSideView()) {
-        for (let i = 0; i < $gameParty.maxBattleMembers(); i++) {
-            const sprite = new Sprite_Actor();
-            this._actorSprites.push(sprite);
-            this._battleField.addChild(sprite);
-        }
-    }
-};
-
-Spriteset_Battle.prototype.updateActors = function() {
-    const members = $gameParty.battleMembers();
-    for (let i = 0; i < this._actorSprites.length; i++) {
-        this._actorSprites[i].setBattler(members[i]);
-    }
-};
-
-Spriteset_Battle.prototype.findTargetSprite = function(target) {
-    return this.battlerSprites().find(sprite => sprite.checkBattler(target));
-};
-
-Spriteset_Battle.prototype.battlerSprites = function() {
-    return this._enemySprites.concat(this._actorSprites);
-};
-
-Spriteset_Battle.prototype.isEffecting = function() {
-    return this.battlerSprites().some(sprite => sprite.isEffecting());
-};
-
-Spriteset_Battle.prototype.isAnyoneMoving = function() {
-    return this.battlerSprites().some(sprite => sprite.isMoving());
-};
-
-Spriteset_Battle.prototype.isBusy = function() {
-    return this.isAnimationPlaying() || this.isAnyoneMoving();
-};
-
-//-----------------------------------------------------------------------------
+// PIXI
+    
+    // pixi tiltshift filter RPG Maker fixing:
+    // this.uniforms.texSize = new PIXI.Point(1024,1024);
+    
+    /*!
+    * pixi-filters - v3.1.0
+    * Compiled Wed, 11 Mar 2020 20:38:18 UTC
+    *
+    * pixi-filters is licensed under the MIT License.
+    * http://www.opensource.org/licenses/mit-license
+    */
+    var __filters=function(e,t,n,r,o,i,l,s){"use strict";var a="attribute vec2 aVertexPosition;\nattribute vec2 aTextureCoord;\n\nuniform mat3 projectionMatrix;\n\nvarying vec2 vTextureCoord;\n\nvoid main(void)\n{\n    gl_Position = vec4((projectionMatrix * vec3(aVertexPosition, 1.0)).xy, 0.0, 1.0);\n    vTextureCoord = aTextureCoord;\n}",u="varying vec2 vTextureCoord;\nuniform sampler2D uSampler;\n\nuniform float gamma;\nuniform float contrast;\nuniform float saturation;\nuniform float brightness;\nuniform float red;\nuniform float green;\nuniform float blue;\nuniform float alpha;\n\nvoid main(void)\n{\n    vec4 c = texture2D(uSampler, vTextureCoord);\n\n    if (c.a > 0.0) {\n    c.rgb /= c.a;\n\n    vec3 rgb = pow(c.rgb, vec3(1. / gamma));\n    rgb = mix(vec3(.5), mix(vec3(dot(vec3(.2125, .7154, .0721), rgb)), rgb, saturation), contrast);\n    rgb.r *= red;\n    rgb.g *= green;\n    rgb.b *= blue;\n    c.rgb = rgb * brightness;\n\n    c.rgb *= c.a;\n    }\n\n    gl_FragColor = c * alpha;\n}\n",c=function(e){function t(t){e.call(this,a,u),Object.assign(this,{gamma:1,saturation:1,contrast:1,brightness:1,red:1,green:1,blue:1,alpha:1},t)}return e&&(t.__proto__=e),t.prototype=Object.create(e&&e.prototype),t.prototype.constructor=t,t.prototype.apply=function(e,t,n,r){this.uniforms.gamma=Math.max(this.gamma,1e-4),this.uniforms.saturation=this.saturation,this.uniforms.contrast=this.contrast,this.uniforms.brightness=this.brightness,this.uniforms.red=this.red,this.uniforms.green=this.green,this.uniforms.blue=this.blue,this.uniforms.alpha=this.alpha,e.applyFilter(this,t,n,r)},t}(t.Filter),f=a,h="\nvarying vec2 vTextureCoord;\nuniform sampler2D uSampler;\n\nuniform vec2 uOffset;\n\nvoid main(void)\n{\n    vec4 color = vec4(0.0);\n\n    // Sample top left pixel\n    color += texture2D(uSampler, vec2(vTextureCoord.x - uOffset.x, vTextureCoord.y + uOffset.y));\n\n    // Sample top right pixel\n    color += texture2D(uSampler, vec2(vTextureCoord.x + uOffset.x, vTextureCoord.y + uOffset.y));\n\n    // Sample bottom right pixel\n    color += texture2D(uSampler, vec2(vTextureCoord.x + uOffset.x, vTextureCoord.y - uOffset.y));\n\n    // Sample bottom left pixel\n    color += texture2D(uSampler, vec2(vTextureCoord.x - uOffset.x, vTextureCoord.y - uOffset.y));\n\n    // Average\n    color *= 0.25;\n\n    gl_FragColor = color;\n}",p="\nvarying vec2 vTextureCoord;\nuniform sampler2D uSampler;\n\nuniform vec2 uOffset;\nuniform vec4 filterClamp;\n\nvoid main(void)\n{\n    vec4 color = vec4(0.0);\n\n    // Sample top left pixel\n    color += texture2D(uSampler, clamp(vec2(vTextureCoord.x - uOffset.x, vTextureCoord.y + uOffset.y), filterClamp.xy, filterClamp.zw));\n\n    // Sample top right pixel\n    color += texture2D(uSampler, clamp(vec2(vTextureCoord.x + uOffset.x, vTextureCoord.y + uOffset.y), filterClamp.xy, filterClamp.zw));\n\n    // Sample bottom right pixel\n    color += texture2D(uSampler, clamp(vec2(vTextureCoord.x + uOffset.x, vTextureCoord.y - uOffset.y), filterClamp.xy, filterClamp.zw));\n\n    // Sample bottom left pixel\n    color += texture2D(uSampler, clamp(vec2(vTextureCoord.x - uOffset.x, vTextureCoord.y - uOffset.y), filterClamp.xy, filterClamp.zw));\n\n    // Average\n    color *= 0.25;\n\n    gl_FragColor = color;\n}\n",d=function(e){function t(t,r,o){void 0===t&&(t=4),void 0===r&&(r=3),void 0===o&&(o=!1),e.call(this,f,o?p:h),this.uniforms.uOffset=new Float32Array(2),this._pixelSize=new n.Point,this.pixelSize=1,this._clamp=o,this._kernels=null,Array.isArray(t)?this.kernels=t:(this._blur=t,this.quality=r)}e&&(t.__proto__=e),t.prototype=Object.create(e&&e.prototype),t.prototype.constructor=t;var r={kernels:{configurable:!0},clamp:{configurable:!0},pixelSize:{configurable:!0},quality:{configurable:!0},blur:{configurable:!0}};return t.prototype.apply=function(e,t,n,r){var o,i=this.pixelSize.x/t._frame.width,l=this.pixelSize.y/t._frame.height;if(1===this._quality||0===this._blur)o=this._kernels[0]+.5,this.uniforms.uOffset[0]=o*i,this.uniforms.uOffset[1]=o*l,e.applyFilter(this,t,n,r);else{for(var s,a=e.getFilterTexture(),u=t,c=a,f=this._quality-1,h=0;h<f;h++)o=this._kernels[h]+.5,this.uniforms.uOffset[0]=o*i,this.uniforms.uOffset[1]=o*l,e.applyFilter(this,u,c,1),s=u,u=c,c=s;o=this._kernels[f]+.5,this.uniforms.uOffset[0]=o*i,this.uniforms.uOffset[1]=o*l,e.applyFilter(this,u,n,r),e.returnFilterTexture(a)}},t.prototype._generateKernels=function(){var e=this._blur,t=this._quality,n=[e];if(e>0)for(var r=e,o=e/t,i=1;i<t;i++)r-=o,n.push(r);this._kernels=n},r.kernels.get=function(){return this._kernels},r.kernels.set=function(e){Array.isArray(e)&&e.length>0?(this._kernels=e,this._quality=e.length,this._blur=Math.max.apply(Math,e)):(this._kernels=[0],this._quality=1)},r.clamp.get=function(){return this._clamp},r.pixelSize.set=function(e){"number"==typeof e?(this._pixelSize.x=e,this._pixelSize.y=e):Array.isArray(e)?(this._pixelSize.x=e[0],this._pixelSize.y=e[1]):e instanceof n.Point?(this._pixelSize.x=e.x,this._pixelSize.y=e.y):(this._pixelSize.x=1,this._pixelSize.y=1)},r.pixelSize.get=function(){return this._pixelSize},r.quality.get=function(){return this._quality},r.quality.set=function(e){this._quality=Math.max(1,Math.round(e)),this._generateKernels()},r.blur.get=function(){return this._blur},r.blur.set=function(e){this._blur=e,this._generateKernels()},Object.defineProperties(t.prototype,r),t}(t.Filter),m=a,g="\nuniform sampler2D uSampler;\nvarying vec2 vTextureCoord;\n\nuniform float threshold;\n\nvoid main() {\n    vec4 color = texture2D(uSampler, vTextureCoord);\n\n    // A simple & fast algorithm for getting brightness.\n    // It's inaccuracy , but good enought for this feature.\n    float _max = max(max(color.r, color.g), color.b);\n    float _min = min(min(color.r, color.g), color.b);\n    float brightness = (_max + _min) * 0.5;\n\n    if(brightness > threshold) {\n    gl_FragColor = color;\n    } else {\n    gl_FragColor = vec4(0.0, 0.0, 0.0, 0.0);\n    }\n}\n",v=function(e){function t(t){void 0===t&&(t=.5),e.call(this,m,g),this.threshold=t}e&&(t.__proto__=e),t.prototype=Object.create(e&&e.prototype),t.prototype.constructor=t;var n={threshold:{configurable:!0}};return n.threshold.get=function(){return this.uniforms.threshold},n.threshold.set=function(e){this.uniforms.threshold=e},Object.defineProperties(t.prototype,n),t}(t.Filter),x="uniform sampler2D uSampler;\nvarying vec2 vTextureCoord;\n\nuniform sampler2D bloomTexture;\nuniform float bloomScale;\nuniform float brightness;\n\nvoid main() {\n    vec4 color = texture2D(uSampler, vTextureCoord);\n    color.rgb *= brightness;\n    vec4 bloomColor = vec4(texture2D(bloomTexture, vTextureCoord).rgb, 0.0);\n    bloomColor.rgb *= bloomScale;\n    gl_FragColor = color + bloomColor;\n}\n",y=function(e){function t(t){e.call(this,m,x),"number"==typeof t&&(t={threshold:t}),t=Object.assign({threshold:.5,bloomScale:1,brightness:1,kernels:null,blur:8,quality:4,pixelSize:1,resolution:r.settings.RESOLUTION},t),this.bloomScale=t.bloomScale,this.brightness=t.brightness;var n=t.kernels,o=t.blur,i=t.quality,l=t.pixelSize,s=t.resolution;this._extractFilter=new v(t.threshold),this._extractFilter.resolution=s,this._blurFilter=n?new d(n):new d(o,i),this.pixelSize=l,this.resolution=s}e&&(t.__proto__=e),t.prototype=Object.create(e&&e.prototype),t.prototype.constructor=t;var n={resolution:{configurable:!0},threshold:{configurable:!0},kernels:{configurable:!0},blur:{configurable:!0},quality:{configurable:!0},pixelSize:{configurable:!0}};return t.prototype.apply=function(e,t,n,r,o){var i=e.getFilterTexture();this._extractFilter.apply(e,t,i,1,o);var l=e.getFilterTexture();this._blurFilter.apply(e,i,l,1,o),this.uniforms.bloomScale=this.bloomScale,this.uniforms.brightness=this.brightness,this.uniforms.bloomTexture=l,e.applyFilter(this,t,n,r),e.returnFilterTexture(l),e.returnFilterTexture(i)},n.resolution.get=function(){return this._resolution},n.resolution.set=function(e){this._resolution=e,this._extractFilter&&(this._extractFilter.resolution=e),this._blurFilter&&(this._blurFilter.resolution=e)},n.threshold.get=function(){return this._extractFilter.threshold},n.threshold.set=function(e){this._extractFilter.threshold=e},n.kernels.get=function(){return this._blurFilter.kernels},n.kernels.set=function(e){this._blurFilter.kernels=e},n.blur.get=function(){return this._blurFilter.blur},n.blur.set=function(e){this._blurFilter.blur=e},n.quality.get=function(){return this._blurFilter.quality},n.quality.set=function(e){this._blurFilter.quality=e},n.pixelSize.get=function(){return this._blurFilter.pixelSize},n.pixelSize.set=function(e){this._blurFilter.pixelSize=e},Object.defineProperties(t.prototype,n),t}(t.Filter),_=a,b="varying vec2 vTextureCoord;\n\nuniform vec4 filterArea;\nuniform float pixelSize;\nuniform sampler2D uSampler;\n\nvec2 mapCoord( vec2 coord )\n{\n    coord *= filterArea.xy;\n    coord += filterArea.zw;\n\n    return coord;\n}\n\nvec2 unmapCoord( vec2 coord )\n{\n    coord -= filterArea.zw;\n    coord /= filterArea.xy;\n\n    return coord;\n}\n\nvec2 pixelate(vec2 coord, vec2 size)\n{\n    return floor( coord / size ) * size;\n}\n\nvec2 getMod(vec2 coord, vec2 size)\n{\n    return mod( coord , size) / size;\n}\n\nfloat character(float n, vec2 p)\n{\n    p = floor(p*vec2(4.0, -4.0) + 2.5);\n\n    if (clamp(p.x, 0.0, 4.0) == p.x)\n    {\n    if (clamp(p.y, 0.0, 4.0) == p.y)\n    {\n        if (int(mod(n/exp2(p.x + 5.0*p.y), 2.0)) == 1) return 1.0;\n    }\n    }\n    return 0.0;\n}\n\nvoid main()\n{\n    vec2 coord = mapCoord(vTextureCoord);\n\n    // get the rounded color..\n    vec2 pixCoord = pixelate(coord, vec2(pixelSize));\n    pixCoord = unmapCoord(pixCoord);\n\n    vec4 color = texture2D(uSampler, pixCoord);\n\n    // determine the character to use\n    float gray = (color.r + color.g + color.b) / 3.0;\n\n    float n =  65536.0;         // .\n    if (gray > 0.2) n = 65600.0;    // :\n    if (gray > 0.3) n = 332772.0;   // *\n    if (gray > 0.4) n = 15255086.0; // o\n    if (gray > 0.5) n = 23385164.0; // &\n    if (gray > 0.6) n = 15252014.0; // 8\n    if (gray > 0.7) n = 13199452.0; // @\n    if (gray > 0.8) n = 11512810.0; // #\n\n    // get the mod..\n    vec2 modd = getMod(coord, vec2(pixelSize));\n\n    gl_FragColor = color * character( n, vec2(-1.0) + modd * 2.0);\n\n}\n",C=function(e){function t(t){void 0===t&&(t=8),e.call(this,_,b),this.size=t}e&&(t.__proto__=e),t.prototype=Object.create(e&&e.prototype),t.prototype.constructor=t;var n={size:{configurable:!0}};return n.size.get=function(){return this.uniforms.pixelSize},n.size.set=function(e){this.uniforms.pixelSize=e},Object.defineProperties(t.prototype,n),t}(t.Filter),S=a,F="precision mediump float;\n\nvarying vec2 vTextureCoord;\nuniform sampler2D uSampler;\nuniform vec4 filterArea;\n\nuniform float transformX;\nuniform float transformY;\nuniform vec3 lightColor;\nuniform float lightAlpha;\nuniform vec3 shadowColor;\nuniform float shadowAlpha;\n\nvoid main(void) {\n    vec2 transform = vec2(1.0 / filterArea) * vec2(transformX, transformY);\n    vec4 color = texture2D(uSampler, vTextureCoord);\n    float light = texture2D(uSampler, vTextureCoord - transform).a;\n    float shadow = texture2D(uSampler, vTextureCoord + transform).a;\n\n    color.rgb = mix(color.rgb, lightColor, clamp((color.a - light) * lightAlpha, 0.0, 1.0));\n    color.rgb = mix(color.rgb, shadowColor, clamp((color.a - shadow) * shadowAlpha, 0.0, 1.0));\n    gl_FragColor = vec4(color.rgb * color.a, color.a);\n}\n",z=function(e){function t(t){void 0===t&&(t={}),e.call(this,S,F),this.uniforms.lightColor=new Float32Array(3),this.uniforms.shadowColor=new Float32Array(3),t=Object.assign({rotation:45,thickness:2,lightColor:16777215,lightAlpha:.7,shadowColor:0,shadowAlpha:.7},t),this.rotation=t.rotation,this.thickness=t.thickness,this.lightColor=t.lightColor,this.lightAlpha=t.lightAlpha,this.shadowColor=t.shadowColor,this.shadowAlpha=t.shadowAlpha}e&&(t.__proto__=e),t.prototype=Object.create(e&&e.prototype),t.prototype.constructor=t;var r={rotation:{configurable:!0},thickness:{configurable:!0},lightColor:{configurable:!0},lightAlpha:{configurable:!0},shadowColor:{configurable:!0},shadowAlpha:{configurable:!0}};return t.prototype._updateTransform=function(){this.uniforms.transformX=this._thickness*Math.cos(this._angle),this.uniforms.transformY=this._thickness*Math.sin(this._angle)},r.rotation.get=function(){return this._angle/n.DEG_TO_RAD},r.rotation.set=function(e){this._angle=e*n.DEG_TO_RAD,this._updateTransform()},r.thickness.get=function(){return this._thickness},r.thickness.set=function(e){this._thickness=e,this._updateTransform()},r.lightColor.get=function(){return o.rgb2hex(this.uniforms.lightColor)},r.lightColor.set=function(e){o.hex2rgb(e,this.uniforms.lightColor)},r.lightAlpha.get=function(){return this.uniforms.lightAlpha},r.lightAlpha.set=function(e){this.uniforms.lightAlpha=e},r.shadowColor.get=function(){return o.rgb2hex(this.uniforms.shadowColor)},r.shadowColor.set=function(e){o.hex2rgb(e,this.uniforms.shadowColor)},r.shadowAlpha.get=function(){return this.uniforms.shadowAlpha},r.shadowAlpha.set=function(e){this.uniforms.shadowAlpha=e},Object.defineProperties(t.prototype,r),t}(t.Filter),A=function(e){function t(t,o,a,u){var c,f;void 0===t&&(t=2),void 0===o&&(o=4),void 0===a&&(a=r.settings.RESOLUTION),void 0===u&&(u=5),e.call(this),"number"==typeof t?(c=t,f=t):t instanceof n.Point?(c=t.x,f=t.y):Array.isArray(t)&&(c=t[0],f=t[1]),this.blurXFilter=new s.BlurFilterPass(!0,c,o,a,u),this.blurYFilter=new s.BlurFilterPass(!1,f,o,a,u),this.blurYFilter.blendMode=i.BLEND_MODES.SCREEN,this.defaultFilter=new l.AlphaFilter}e&&(t.__proto__=e),t.prototype=Object.create(e&&e.prototype),t.prototype.constructor=t;var o={blur:{configurable:!0},blurX:{configurable:!0},blurY:{configurable:!0}};return t.prototype.apply=function(e,t,n){var r=e.getFilterTexture(!0);this.defaultFilter.apply(e,t,n),this.blurXFilter.apply(e,t,r),this.blurYFilter.apply(e,r,n),e.returnFilterTexture(r)},o.blur.get=function(){return this.blurXFilter.blur},o.blur.set=function(e){this.blurXFilter.blur=this.blurYFilter.blur=e},o.blurX.get=function(){return this.blurXFilter.blur},o.blurX.set=function(e){this.blurXFilter.blur=e},o.blurY.get=function(){return this.blurYFilter.blur},o.blurY.set=function(e){this.blurYFilter.blur=e},Object.defineProperties(t.prototype,o),t}(t.Filter),w=a,T="uniform float radius;\nuniform float strength;\nuniform vec2 center;\nuniform sampler2D uSampler;\nvarying vec2 vTextureCoord;\n\nuniform vec4 filterArea;\nuniform vec4 filterClamp;\nuniform vec2 dimensions;\n\nvoid main()\n{\n    vec2 coord = vTextureCoord * filterArea.xy;\n    coord -= center * dimensions.xy;\n    float distance = length(coord);\n    if (distance < radius) {\n    float percent = distance / radius;\n    if (strength > 0.0) {\n        coord *= mix(1.0, smoothstep(0.0, radius / distance, percent), strength * 0.75);\n    } else {\n        coord *= mix(1.0, pow(percent, 1.0 + strength * 0.75) * radius / distance, 1.0 - percent);\n    }\n    }\n    coord += center * dimensions.xy;\n    coord /= filterArea.xy;\n    vec2 clampedCoord = clamp(coord, filterClamp.xy, filterClamp.zw);\n    vec4 color = texture2D(uSampler, clampedCoord);\n    if (coord != clampedCoord) {\n    color *= max(0.0, 1.0 - length(coord - clampedCoord));\n    }\n\n    gl_FragColor = color;\n}\n",O=function(e){function t(t){if(e.call(this,w,T),"object"!=typeof t){var n=arguments[0],r=arguments[1],o=arguments[2];t={},void 0!==n&&(t.center=n),void 0!==r&&(t.radius=r),void 0!==o&&(t.strength=o)}this.uniforms.dimensions=new Float32Array(2),Object.assign(this,{center:[.5,.5],radius:100,strength:1},t)}e&&(t.__proto__=e),t.prototype=Object.create(e&&e.prototype),t.prototype.constructor=t;var n={radius:{configurable:!0},strength:{configurable:!0},center:{configurable:!0}};return t.prototype.apply=function(e,t,n,r){this.uniforms.dimensions[0]=t.filterFrame.width,this.uniforms.dimensions[1]=t.filterFrame.height,e.applyFilter(this,t,n,r)},n.radius.get=function(){return this.uniforms.radius},n.radius.set=function(e){this.uniforms.radius=e},n.strength.get=function(){return this.uniforms.strength},n.strength.set=function(e){this.uniforms.strength=e},n.center.get=function(){return this.uniforms.center},n.center.set=function(e){this.uniforms.center=e},Object.defineProperties(t.prototype,n),t}(t.Filter),D=a,P="varying vec2 vTextureCoord;\nuniform sampler2D uSampler;\nuniform sampler2D colorMap;\nuniform float _mix;\nuniform float _size;\nuniform float _sliceSize;\nuniform float _slicePixelSize;\nuniform float _sliceInnerSize;\nvoid main() {\n    vec4 color = texture2D(uSampler, vTextureCoord.xy);\n\n    vec4 adjusted;\n    if (color.a > 0.0) {\n    color.rgb /= color.a;\n    float innerWidth = _size - 1.0;\n    float zSlice0 = min(floor(color.b * innerWidth), innerWidth);\n    float zSlice1 = min(zSlice0 + 1.0, innerWidth);\n    float xOffset = _slicePixelSize * 0.5 + color.r * _sliceInnerSize;\n    float s0 = xOffset + (zSlice0 * _sliceSize);\n    float s1 = xOffset + (zSlice1 * _sliceSize);\n    float yOffset = _sliceSize * 0.5 + color.g * (1.0 - _sliceSize);\n    vec4 slice0Color = texture2D(colorMap, vec2(s0,yOffset));\n    vec4 slice1Color = texture2D(colorMap, vec2(s1,yOffset));\n    float zOffset = fract(color.b * innerWidth);\n    adjusted = mix(slice0Color, slice1Color, zOffset);\n\n    color.rgb *= color.a;\n    }\n    gl_FragColor = vec4(mix(color, adjusted, _mix).rgb, color.a);\n\n}",M=function(e){function n(t,n,r){void 0===n&&(n=!1),void 0===r&&(r=1),e.call(this,D,P),this._size=0,this._sliceSize=0,this._slicePixelSize=0,this._sliceInnerSize=0,this._scaleMode=null,this._nearest=!1,this.nearest=n,this.mix=r,this.colorMap=t}e&&(n.__proto__=e),n.prototype=Object.create(e&&e.prototype),n.prototype.constructor=n;var r={colorSize:{configurable:!0},colorMap:{configurable:!0},nearest:{configurable:!0}};return n.prototype.apply=function(e,t,n,r){this.uniforms._mix=this.mix,e.applyFilter(this,t,n,r)},r.colorSize.get=function(){return this._size},r.colorMap.get=function(){return this._colorMap},r.colorMap.set=function(e){e instanceof t.Texture||(e=t.Texture.from(e)),e&&e.baseTexture&&(e.baseTexture.scaleMode=this._scaleMode,e.baseTexture.mipmap=!1,this._size=e.height,this._sliceSize=1/this._size,this._slicePixelSize=this._sliceSize/this._size,this._sliceInnerSize=this._slicePixelSize*(this._size-1),this.uniforms._size=this._size,this.uniforms._sliceSize=this._sliceSize,this.uniforms._slicePixelSize=this._slicePixelSize,this.uniforms._sliceInnerSize=this._sliceInnerSize,this.uniforms.colorMap=e),this._colorMap=e},r.nearest.get=function(){return this._nearest},r.nearest.set=function(e){this._nearest=e,this._scaleMode=e?i.SCALE_MODES.NEAREST:i.SCALE_MODES.LINEAR;var t=this._colorMap;t&&t.baseTexture&&(t.baseTexture._glTextures={},t.baseTexture.scaleMode=this._scaleMode,t.baseTexture.mipmap=!1,t._updateID++,t.baseTexture.emit("update",t.baseTexture))},n.prototype.updateColorMap=function(){var e=this._colorMap;e&&e.baseTexture&&(e._updateID++,e.baseTexture.emit("update",e.baseTexture),this.colorMap=e)},n.prototype.destroy=function(t){this._colorMap&&this._colorMap.destroy(t),e.prototype.destroy.call(this)},Object.defineProperties(n.prototype,r),n}(t.Filter),R=a,k="varying vec2 vTextureCoord;\nuniform sampler2D uSampler;\nuniform vec3 color;\nvoid main(void) {\n    vec4 currentColor = texture2D(uSampler, vTextureCoord);\n    vec3 colorOverlay = color * currentColor.a;\n    gl_FragColor = vec4(colorOverlay.r, colorOverlay.g, colorOverlay.b, currentColor.a);\n}\n",j=function(e){function t(t){void 0===t&&(t=0),e.call(this,R,k),this.uniforms.color=new Float32Array(3),this.color=t}e&&(t.__proto__=e),t.prototype=Object.create(e&&e.prototype),t.prototype.constructor=t;var n={color:{configurable:!0}};return n.color.set=function(e){var t=this.uniforms.color;"number"==typeof e?(o.hex2rgb(e,t),this._color=e):(t[0]=e[0],t[1]=e[1],t[2]=e[2],this._color=o.rgb2hex(t))},n.color.get=function(){return this._color},Object.defineProperties(t.prototype,n),t}(t.Filter),E=a,L="varying vec2 vTextureCoord;\nuniform sampler2D uSampler;\nuniform vec3 originalColor;\nuniform vec3 newColor;\nuniform float epsilon;\nvoid main(void) {\n    vec4 currentColor = texture2D(uSampler, vTextureCoord);\n    vec3 colorDiff = originalColor - (currentColor.rgb / max(currentColor.a, 0.0000000001));\n    float colorDistance = length(colorDiff);\n    float doReplace = step(colorDistance, epsilon);\n    gl_FragColor = vec4(mix(currentColor.rgb, (newColor + colorDiff) * currentColor.a, doReplace), currentColor.a);\n}\n",I=function(e){function t(t,n,r){void 0===t&&(t=16711680),void 0===n&&(n=0),void 0===r&&(r=.4),e.call(this,E,L),this.uniforms.originalColor=new Float32Array(3),this.uniforms.newColor=new Float32Array(3),this.originalColor=t,this.newColor=n,this.epsilon=r}e&&(t.__proto__=e),t.prototype=Object.create(e&&e.prototype),t.prototype.constructor=t;var n={originalColor:{configurable:!0},newColor:{configurable:!0},epsilon:{configurable:!0}};return n.originalColor.set=function(e){var t=this.uniforms.originalColor;"number"==typeof e?(o.hex2rgb(e,t),this._originalColor=e):(t[0]=e[0],t[1]=e[1],t[2]=e[2],this._originalColor=o.rgb2hex(t))},n.originalColor.get=function(){return this._originalColor},n.newColor.set=function(e){var t=this.uniforms.newColor;"number"==typeof e?(o.hex2rgb(e,t),this._newColor=e):(t[0]=e[0],t[1]=e[1],t[2]=e[2],this._newColor=o.rgb2hex(t))},n.newColor.get=function(){return this._newColor},n.epsilon.set=function(e){this.uniforms.epsilon=e},n.epsilon.get=function(){return this.uniforms.epsilon},Object.defineProperties(t.prototype,n),t}(t.Filter),X=a,B="precision mediump float;\n\nvarying mediump vec2 vTextureCoord;\n\nuniform sampler2D uSampler;\nuniform vec2 texelSize;\nuniform float matrix[9];\n\nvoid main(void)\n{\n   vec4 c11 = texture2D(uSampler, vTextureCoord - texelSize); // top left\n   vec4 c12 = texture2D(uSampler, vec2(vTextureCoord.x, vTextureCoord.y - texelSize.y)); // top center\n   vec4 c13 = texture2D(uSampler, vec2(vTextureCoord.x + texelSize.x, vTextureCoord.y - texelSize.y)); // top right\n\n   vec4 c21 = texture2D(uSampler, vec2(vTextureCoord.x - texelSize.x, vTextureCoord.y)); // mid left\n   vec4 c22 = texture2D(uSampler, vTextureCoord); // mid center\n   vec4 c23 = texture2D(uSampler, vec2(vTextureCoord.x + texelSize.x, vTextureCoord.y)); // mid right\n\n   vec4 c31 = texture2D(uSampler, vec2(vTextureCoord.x - texelSize.x, vTextureCoord.y + texelSize.y)); // bottom left\n   vec4 c32 = texture2D(uSampler, vec2(vTextureCoord.x, vTextureCoord.y + texelSize.y)); // bottom center\n   vec4 c33 = texture2D(uSampler, vTextureCoord + texelSize); // bottom right\n\n   gl_FragColor =\n       c11 * matrix[0] + c12 * matrix[1] + c13 * matrix[2] +\n       c21 * matrix[3] + c22 * matrix[4] + c23 * matrix[5] +\n       c31 * matrix[6] + c32 * matrix[7] + c33 * matrix[8];\n\n   gl_FragColor.a = c22.a;\n}\n",N=function(e){function t(t,n,r){void 0===n&&(n=200),void 0===r&&(r=200),e.call(this,X,B),this.uniforms.texelSize=new Float32Array(2),this.uniforms.matrix=new Float32Array(9),void 0!==t&&(this.matrix=t),this.width=n,this.height=r}e&&(t.__proto__=e),t.prototype=Object.create(e&&e.prototype),t.prototype.constructor=t;var n={matrix:{configurable:!0},width:{configurable:!0},height:{configurable:!0}};return n.matrix.get=function(){return this.uniforms.matrix},n.matrix.set=function(e){var t=this;e.forEach(function(e,n){return t.uniforms.matrix[n]=e})},n.width.get=function(){return 1/this.uniforms.texelSize[0]},n.width.set=function(e){this.uniforms.texelSize[0]=1/e},n.height.get=function(){return 1/this.uniforms.texelSize[1]},n.height.set=function(e){this.uniforms.texelSize[1]=1/e},Object.defineProperties(t.prototype,n),t}(t.Filter),G=a,q="precision mediump float;\n\nvarying vec2 vTextureCoord;\n\nuniform sampler2D uSampler;\n\nvoid main(void)\n{\n    float lum = length(texture2D(uSampler, vTextureCoord.xy).rgb);\n\n    gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);\n\n    if (lum < 1.00)\n    {\n    if (mod(gl_FragCoord.x + gl_FragCoord.y, 10.0) == 0.0)\n    {\n        gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);\n    }\n    }\n\n    if (lum < 0.75)\n    {\n    if (mod(gl_FragCoord.x - gl_FragCoord.y, 10.0) == 0.0)\n    {\n        gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);\n    }\n    }\n\n    if (lum < 0.50)\n    {\n    if (mod(gl_FragCoord.x + gl_FragCoord.y - 5.0, 10.0) == 0.0)\n    {\n        gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);\n    }\n    }\n\n    if (lum < 0.3)\n    {\n    if (mod(gl_FragCoord.x - gl_FragCoord.y - 5.0, 10.0) == 0.0)\n    {\n        gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);\n    }\n    }\n}\n",W=function(e){function t(){e.call(this,G,q)}return e&&(t.__proto__=e),t.prototype=Object.create(e&&e.prototype),t.prototype.constructor=t,t}(t.Filter),K=a,Y="varying vec2 vTextureCoord;\nuniform sampler2D uSampler;\n\nuniform vec4 filterArea;\nuniform vec2 dimensions;\n\nconst float SQRT_2 = 1.414213;\n\nconst float light = 1.0;\n\nuniform float curvature;\nuniform float lineWidth;\nuniform float lineContrast;\nuniform bool verticalLine;\nuniform float noise;\nuniform float noiseSize;\n\nuniform float vignetting;\nuniform float vignettingAlpha;\nuniform float vignettingBlur;\n\nuniform float seed;\nuniform float time;\n\nfloat rand(vec2 co) {\n    return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);\n}\n\nvoid main(void)\n{\n    vec2 pixelCoord = vTextureCoord.xy * filterArea.xy;\n    vec2 coord = pixelCoord / dimensions;\n\n    vec2 dir = vec2(coord - vec2(0.5, 0.5));\n\n    float _c = curvature > 0. ? curvature : 1.;\n    float k = curvature > 0. ?(length(dir * dir) * 0.25 * _c * _c + 0.935 * _c) : 1.;\n    vec2 uv = dir * k;\n\n    gl_FragColor = texture2D(uSampler, vTextureCoord);\n    vec3 rgb = gl_FragColor.rgb;\n\n\n    if (noise > 0.0 && noiseSize > 0.0)\n    {\n    pixelCoord.x = floor(pixelCoord.x / noiseSize);\n    pixelCoord.y = floor(pixelCoord.y / noiseSize);\n    float _noise = rand(pixelCoord * noiseSize * seed) - 0.5;\n    rgb += _noise * noise;\n    }\n\n    if (lineWidth > 0.0) {\n    float v = (verticalLine ? uv.x * dimensions.x : uv.y * dimensions.y) * min(1.0, 2.0 / lineWidth ) / _c;\n    float j = 1. + cos(v * 1.2 - time) * 0.5 * lineContrast;\n    rgb *= j;\n    float segment = verticalLine ? mod((dir.x + .5) * dimensions.x, 4.) : mod((dir.y + .5) * dimensions.y, 4.);\n    rgb *= 0.99 + ceil(segment) * 0.015;\n    }\n\n    if (vignetting > 0.0)\n    {\n    float outter = SQRT_2 - vignetting * SQRT_2;\n    float darker = clamp((outter - length(dir) * SQRT_2) / ( 0.00001 + vignettingBlur * SQRT_2), 0.0, 1.0);\n    rgb *= darker + (1.0 - darker) * (1.0 - vignettingAlpha);\n    }\n\n    gl_FragColor.rgb = rgb;\n}\n",Z=function(e){function t(t){e.call(this,K,Y),this.uniforms.dimensions=new Float32Array(2),this.time=0,this.seed=0,Object.assign(this,{curvature:1,lineWidth:1,lineContrast:.25,verticalLine:!1,noise:0,noiseSize:1,seed:0,vignetting:.3,vignettingAlpha:1,vignettingBlur:.3,time:0},t)}e&&(t.__proto__=e),t.prototype=Object.create(e&&e.prototype),t.prototype.constructor=t;var n={curvature:{configurable:!0},lineWidth:{configurable:!0},lineContrast:{configurable:!0},verticalLine:{configurable:!0},noise:{configurable:!0},noiseSize:{configurable:!0},vignetting:{configurable:!0},vignettingAlpha:{configurable:!0},vignettingBlur:{configurable:!0}};return t.prototype.apply=function(e,t,n,r){this.uniforms.dimensions[0]=t.filterFrame.width,this.uniforms.dimensions[1]=t.filterFrame.height,this.uniforms.seed=this.seed,this.uniforms.time=this.time,e.applyFilter(this,t,n,r)},n.curvature.set=function(e){this.uniforms.curvature=e},n.curvature.get=function(){return this.uniforms.curvature},n.lineWidth.set=function(e){this.uniforms.lineWidth=e},n.lineWidth.get=function(){return this.uniforms.lineWidth},n.lineContrast.set=function(e){this.uniforms.lineContrast=e},n.lineContrast.get=function(){return this.uniforms.lineContrast},n.verticalLine.set=function(e){this.uniforms.verticalLine=e},n.verticalLine.get=function(){return this.uniforms.verticalLine},n.noise.set=function(e){this.uniforms.noise=e},n.noise.get=function(){return this.uniforms.noise},n.noiseSize.set=function(e){this.uniforms.noiseSize=e},n.noiseSize.get=function(){return this.uniforms.noiseSize},n.vignetting.set=function(e){this.uniforms.vignetting=e},n.vignetting.get=function(){return this.uniforms.vignetting},n.vignettingAlpha.set=function(e){this.uniforms.vignettingAlpha=e},n.vignettingAlpha.get=function(){return this.uniforms.vignettingAlpha},n.vignettingBlur.set=function(e){this.uniforms.vignettingBlur=e},n.vignettingBlur.get=function(){return this.uniforms.vignettingBlur},Object.defineProperties(t.prototype,n),t}(t.Filter),Q=a,U="precision mediump float;\n\nvarying vec2 vTextureCoord;\nvarying vec4 vColor;\n\nuniform vec4 filterArea;\nuniform sampler2D uSampler;\n\nuniform float angle;\nuniform float scale;\n\nfloat pattern()\n{\n   float s = sin(angle), c = cos(angle);\n   vec2 tex = vTextureCoord * filterArea.xy;\n   vec2 point = vec2(\n       c * tex.x - s * tex.y,\n       s * tex.x + c * tex.y\n   ) * scale;\n   return (sin(point.x) * sin(point.y)) * 4.0;\n}\n\nvoid main()\n{\n   vec4 color = texture2D(uSampler, vTextureCoord);\n   float average = (color.r + color.g + color.b) / 3.0;\n   gl_FragColor = vec4(vec3(average * 10.0 - 5.0 + pattern()), color.a);\n}\n",V=function(e){function t(t,n){void 0===t&&(t=1),void 0===n&&(n=5),e.call(this,Q,U),this.scale=t,this.angle=n}e&&(t.__proto__=e),t.prototype=Object.create(e&&e.prototype),t.prototype.constructor=t;var n={scale:{configurable:!0},angle:{configurable:!0}};return n.scale.get=function(){return this.uniforms.scale},n.scale.set=function(e){this.uniforms.scale=e},n.angle.get=function(){return this.uniforms.angle},n.angle.set=function(e){this.uniforms.angle=e},Object.defineProperties(t.prototype,n),t}(t.Filter),H=a,$="varying vec2 vTextureCoord;\nuniform sampler2D uSampler;\nuniform float alpha;\nuniform vec3 color;\n\nuniform vec2 shift;\nuniform vec4 inputSize;\n\nvoid main(void){\n    vec4 sample = texture2D(uSampler, vTextureCoord - shift * inputSize.zw);\n\n    // Premultiply alpha\n    sample.rgb = color.rgb * sample.a;\n\n    // alpha user alpha\n    sample *= alpha;\n\n    gl_FragColor = sample;\n}",J=function(e){function t(t){t&&t.constructor!==Object&&(console.warn("DropShadowFilter now uses options instead of (rotation, distance, blur, color, alpha)"),t={rotation:t},void 0!==arguments[1]&&(t.distance=arguments[1]),void 0!==arguments[2]&&(t.blur=arguments[2]),void 0!==arguments[3]&&(t.color=arguments[3]),void 0!==arguments[4]&&(t.alpha=arguments[4])),t=Object.assign({rotation:45,distance:5,color:0,alpha:.5,shadowOnly:!1,kernels:null,blur:2,quality:3,pixelSize:1,resolution:r.settings.RESOLUTION},t),e.call(this);var o=t.kernels,i=t.blur,l=t.quality,s=t.pixelSize,a=t.resolution;this._tintFilter=new e(H,$),this._tintFilter.uniforms.color=new Float32Array(4),this._tintFilter.uniforms.shift=new n.Point,this._tintFilter.resolution=a,this._blurFilter=o?new d(o):new d(i,l),this.pixelSize=s,this.resolution=a;var u=t.shadowOnly,c=t.rotation,f=t.distance,h=t.alpha,p=t.color;this.shadowOnly=u,this.rotation=c,this.distance=f,this.alpha=h,this.color=p,this._updatePadding()}e&&(t.__proto__=e),t.prototype=Object.create(e&&e.prototype),t.prototype.constructor=t;var i={resolution:{configurable:!0},distance:{configurable:!0},rotation:{configurable:!0},alpha:{configurable:!0},color:{configurable:!0},kernels:{configurable:!0},blur:{configurable:!0},quality:{configurable:!0},pixelSize:{configurable:!0}};return t.prototype.apply=function(e,t,n,r){var o=e.getFilterTexture();this._tintFilter.apply(e,t,o,1),this._blurFilter.apply(e,o,n,r),!0!==this.shadowOnly&&e.applyFilter(this,t,n,0),e.returnFilterTexture(o)},t.prototype._updatePadding=function(){this.padding=this.distance+2*this.blur},t.prototype._updateShift=function(){this._tintFilter.uniforms.shift.set(this.distance*Math.cos(this.angle),this.distance*Math.sin(this.angle))},i.resolution.get=function(){return this._resolution},i.resolution.set=function(e){this._resolution=e,this._tintFilter&&(this._tintFilter.resolution=e),this._blurFilter&&(this._blurFilter.resolution=e)},i.distance.get=function(){return this._distance},i.distance.set=function(e){this._distance=e,this._updatePadding(),this._updateShift()},i.rotation.get=function(){return this.angle/n.DEG_TO_RAD},i.rotation.set=function(e){this.angle=e*n.DEG_TO_RAD,this._updateShift()},i.alpha.get=function(){return this._tintFilter.uniforms.alpha},i.alpha.set=function(e){this._tintFilter.uniforms.alpha=e},i.color.get=function(){return o.rgb2hex(this._tintFilter.uniforms.color)},i.color.set=function(e){o.hex2rgb(e,this._tintFilter.uniforms.color)},i.kernels.get=function(){return this._blurFilter.kernels},i.kernels.set=function(e){this._blurFilter.kernels=e},i.blur.get=function(){return this._blurFilter.blur},i.blur.set=function(e){this._blurFilter.blur=e,this._updatePadding()},i.quality.get=function(){return this._blurFilter.quality},i.quality.set=function(e){this._blurFilter.quality=e},i.pixelSize.get=function(){return this._blurFilter.pixelSize},i.pixelSize.set=function(e){this._blurFilter.pixelSize=e},Object.defineProperties(t.prototype,i),t}(t.Filter),ee=a,te="precision mediump float;\n\nvarying vec2 vTextureCoord;\n\nuniform sampler2D uSampler;\nuniform float strength;\nuniform vec4 filterArea;\n\n\nvoid main(void)\n{\n\tvec2 onePixel = vec2(1.0 / filterArea);\n\n\tvec4 color;\n\n\tcolor.rgb = vec3(0.5);\n\n\tcolor -= texture2D(uSampler, vTextureCoord - onePixel) * strength;\n\tcolor += texture2D(uSampler, vTextureCoord + onePixel) * strength;\n\n\tcolor.rgb = vec3((color.r + color.g + color.b) / 3.0);\n\n\tfloat alpha = texture2D(uSampler, vTextureCoord).a;\n\n\tgl_FragColor = vec4(color.rgb * alpha, alpha);\n}\n",ne=function(e){function t(t){void 0===t&&(t=5),e.call(this,ee,te),this.strength=t}e&&(t.__proto__=e),t.prototype=Object.create(e&&e.prototype),t.prototype.constructor=t;var n={strength:{configurable:!0}};return n.strength.get=function(){return this.uniforms.strength},n.strength.set=function(e){this.uniforms.strength=e},Object.defineProperties(t.prototype,n),t}(t.Filter),re=a,oe="// precision highp float;\n\nvarying vec2 vTextureCoord;\nuniform sampler2D uSampler;\n\nuniform vec4 filterArea;\nuniform vec4 filterClamp;\nuniform vec2 dimensions;\nuniform float aspect;\n\nuniform sampler2D displacementMap;\nuniform float offset;\nuniform float sinDir;\nuniform float cosDir;\nuniform int fillMode;\n\nuniform float seed;\nuniform vec2 red;\nuniform vec2 green;\nuniform vec2 blue;\n\nconst int TRANSPARENT = 0;\nconst int ORIGINAL = 1;\nconst int LOOP = 2;\nconst int CLAMP = 3;\nconst int MIRROR = 4;\n\nvoid main(void)\n{\n    vec2 coord = (vTextureCoord * filterArea.xy) / dimensions;\n\n    if (coord.x > 1.0 || coord.y > 1.0) {\n    return;\n    }\n\n    float cx = coord.x - 0.5;\n    float cy = (coord.y - 0.5) * aspect;\n    float ny = (-sinDir * cx + cosDir * cy) / aspect + 0.5;\n\n    // displacementMap: repeat\n    // ny = ny > 1.0 ? ny - 1.0 : (ny < 0.0 ? 1.0 + ny : ny);\n\n    // displacementMap: mirror\n    ny = ny > 1.0 ? 2.0 - ny : (ny < 0.0 ? -ny : ny);\n\n    vec4 dc = texture2D(displacementMap, vec2(0.5, ny));\n\n    float displacement = (dc.r - dc.g) * (offset / filterArea.x);\n\n    coord = vTextureCoord + vec2(cosDir * displacement, sinDir * displacement * aspect);\n\n    if (fillMode == CLAMP) {\n    coord = clamp(coord, filterClamp.xy, filterClamp.zw);\n    } else {\n    if( coord.x > filterClamp.z ) {\n        if (fillMode == TRANSPARENT) {\n        discard;\n        } else if (fillMode == LOOP) {\n        coord.x -= filterClamp.z;\n        } else if (fillMode == MIRROR) {\n        coord.x = filterClamp.z * 2.0 - coord.x;\n        }\n    } else if( coord.x < filterClamp.x ) {\n        if (fillMode == TRANSPARENT) {\n        discard;\n        } else if (fillMode == LOOP) {\n        coord.x += filterClamp.z;\n        } else if (fillMode == MIRROR) {\n        coord.x *= -filterClamp.z;\n        }\n    }\n\n    if( coord.y > filterClamp.w ) {\n        if (fillMode == TRANSPARENT) {\n        discard;\n        } else if (fillMode == LOOP) {\n        coord.y -= filterClamp.w;\n        } else if (fillMode == MIRROR) {\n        coord.y = filterClamp.w * 2.0 - coord.y;\n        }\n    } else if( coord.y < filterClamp.y ) {\n        if (fillMode == TRANSPARENT) {\n        discard;\n        } else if (fillMode == LOOP) {\n        coord.y += filterClamp.w;\n        } else if (fillMode == MIRROR) {\n        coord.y *= -filterClamp.w;\n        }\n    }\n    }\n\n    gl_FragColor.r = texture2D(uSampler, coord + red * (1.0 - seed * 0.4) / filterArea.xy).r;\n    gl_FragColor.g = texture2D(uSampler, coord + green * (1.0 - seed * 0.3) / filterArea.xy).g;\n    gl_FragColor.b = texture2D(uSampler, coord + blue * (1.0 - seed * 0.2) / filterArea.xy).b;\n    gl_FragColor.a = texture2D(uSampler, coord).a;\n}\n",ie=function(e){function r(n){void 0===n&&(n={}),e.call(this,re,oe),this.uniforms.dimensions=new Float32Array(2),n=Object.assign({slices:5,offset:100,direction:0,fillMode:0,average:!1,seed:0,red:[0,0],green:[0,0],blue:[0,0],minSize:8,sampleSize:512},n),this.direction=n.direction,this.red=n.red,this.green=n.green,this.blue=n.blue,this.offset=n.offset,this.fillMode=n.fillMode,this.average=n.average,this.seed=n.seed,this.minSize=n.minSize,this.sampleSize=n.sampleSize,this._canvas=document.createElement("canvas"),this._canvas.width=4,this._canvas.height=this.sampleSize,this.texture=t.Texture.from(this._canvas,{scaleMode:i.SCALE_MODES.NEAREST}),this._slices=0,this.slices=n.slices}e&&(r.__proto__=e),r.prototype=Object.create(e&&e.prototype),r.prototype.constructor=r;var o={sizes:{configurable:!0},offsets:{configurable:!0},slices:{configurable:!0},direction:{configurable:!0},red:{configurable:!0},green:{configurable:!0},blue:{configurable:!0}};return r.prototype.apply=function(e,t,n,r){var o=t.filterFrame.width,i=t.filterFrame.height;this.uniforms.dimensions[0]=o,this.uniforms.dimensions[1]=i,this.uniforms.aspect=i/o,this.uniforms.seed=this.seed,this.uniforms.offset=this.offset,this.uniforms.fillMode=this.fillMode,e.applyFilter(this,t,n,r)},r.prototype._randomizeSizes=function(){var e=this._sizes,t=this._slices-1,n=this.sampleSize,r=Math.min(this.minSize/n,.9/this._slices);if(this.average){for(var o=this._slices,i=1,l=0;l<t;l++){var s=i/(o-l),a=Math.max(s*(1-.6*Math.random()),r);e[l]=a,i-=a}e[t]=i}else{for(var u=1,c=Math.sqrt(1/this._slices),f=0;f<t;f++){var h=Math.max(c*u*Math.random(),r);e[f]=h,u-=h}e[t]=u}this.shuffle()},r.prototype.shuffle=function(){for(var e=this._sizes,t=this._slices-1;t>0;t--){var n=Math.random()*t>>0,r=e[t];e[t]=e[n],e[n]=r}},r.prototype._randomizeOffsets=function(){for(var e=0;e<this._slices;e++)this._offsets[e]=Math.random()*(Math.random()<.5?-1:1)},r.prototype.refresh=function(){this._randomizeSizes(),this._randomizeOffsets(),this.redraw()},r.prototype.redraw=function(){var e,t=this.sampleSize,n=this.texture,r=this._canvas.getContext("2d");r.clearRect(0,0,8,t);for(var o=0,i=0;i<this._slices;i++){e=Math.floor(256*this._offsets[i]);var l=this._sizes[i]*t,s=e>0?e:0,a=e<0?-e:0;r.fillStyle="rgba("+s+", "+a+", 0, 1)",r.fillRect(0,o>>0,t,l+1>>0),o+=l}n.baseTexture.update(),this.uniforms.displacementMap=n},o.sizes.set=function(e){for(var t=Math.min(this._slices,e.length),n=0;n<t;n++)this._sizes[n]=e[n]},o.sizes.get=function(){return this._sizes},o.offsets.set=function(e){for(var t=Math.min(this._slices,e.length),n=0;n<t;n++)this._offsets[n]=e[n]},o.offsets.get=function(){return this._offsets},o.slices.get=function(){return this._slices},o.slices.set=function(e){this._slices!==e&&(this._slices=e,this.uniforms.slices=e,this._sizes=this.uniforms.slicesWidth=new Float32Array(e),this._offsets=this.uniforms.slicesOffset=new Float32Array(e),this.refresh())},o.direction.get=function(){return this._direction},o.direction.set=function(e){if(this._direction!==e){this._direction=e;var t=e*n.DEG_TO_RAD;this.uniforms.sinDir=Math.sin(t),this.uniforms.cosDir=Math.cos(t)}},o.red.get=function(){return this.uniforms.red},o.red.set=function(e){this.uniforms.red=e},o.green.get=function(){return this.uniforms.green},o.green.set=function(e){this.uniforms.green=e},o.blue.get=function(){return this.uniforms.blue},o.blue.set=function(e){this.uniforms.blue=e},r.prototype.destroy=function(){this.texture.destroy(!0),this.texture=null,this._canvas=null,this.red=null,this.green=null,this.blue=null,this._sizes=null,this._offsets=null},Object.defineProperties(r.prototype,o),r}(t.Filter);ie.TRANSPARENT=0,ie.ORIGINAL=1,ie.LOOP=2,ie.CLAMP=3,ie.MIRROR=4;var le=a,se="varying vec2 vTextureCoord;\nvarying vec4 vColor;\n\nuniform sampler2D uSampler;\n\nuniform float outerStrength;\nuniform float innerStrength;\n\nuniform vec4 glowColor;\n\nuniform vec4 filterArea;\nuniform vec4 filterClamp;\nuniform bool knockout;\n\nconst float PI = 3.14159265358979323846264;\n\nconst float DIST = __DIST__;\nconst float ANGLE_STEP_SIZE = min(__ANGLE_STEP_SIZE__, PI * 2.0);\nconst float ANGLE_STEP_NUM = ceil(PI * 2.0 / ANGLE_STEP_SIZE);\n\nconst float MAX_TOTAL_ALPHA = ANGLE_STEP_NUM * DIST * (DIST + 1.0) / 2.0;\n\nvoid main(void) {\n    vec2 px = vec2(1.0 / filterArea.x, 1.0 / filterArea.y);\n\n    float totalAlpha = 0.0;\n\n    vec2 direction;\n    vec2 displaced;\n    vec4 curColor;\n\n    for (float angle = 0.0; angle < PI * 2.0; angle += ANGLE_STEP_SIZE) {\n       direction = vec2(cos(angle), sin(angle)) * px;\n\n       for (float curDistance = 0.0; curDistance < DIST; curDistance++) {\n       displaced = clamp(vTextureCoord + direction * \n           (curDistance + 1.0), filterClamp.xy, filterClamp.zw);\n\n       curColor = texture2D(uSampler, displaced);\n\n       totalAlpha += (DIST - curDistance) * curColor.a;\n       }\n    }\n    \n    curColor = texture2D(uSampler, vTextureCoord);\n\n    float alphaRatio = (totalAlpha / MAX_TOTAL_ALPHA);\n\n    float innerGlowAlpha = (1.0 - alphaRatio) * innerStrength * curColor.a;\n    float innerGlowStrength = min(1.0, innerGlowAlpha);\n    \n    vec4 innerColor = mix(curColor, glowColor, innerGlowStrength);\n\n    float outerGlowAlpha = alphaRatio * outerStrength * (1. - curColor.a);\n    float outerGlowStrength = min(1.0 - innerColor.a, outerGlowAlpha);\n\n    vec4 outerGlowColor = outerGlowStrength * glowColor.rgba;\n    \n    if (knockout) {\n      float resultAlpha = outerGlowAlpha + innerGlowAlpha;\n      gl_FragColor = vec4(glowColor.rgb * resultAlpha, resultAlpha);\n    }\n    else {\n      gl_FragColor = innerColor + outerGlowColor;\n    }\n}\n",ae=function(e){function t(n){var r=Object.assign({},t.defaults,n),o=r.distance,i=r.outerStrength,l=r.innerStrength,s=r.color,a=r.knockout,u=r.quality;o=Math.round(o),e.call(this,le,se.replace(/__ANGLE_STEP_SIZE__/gi,""+(1/u/o).toFixed(7)).replace(/__DIST__/gi,o.toFixed(0)+".0")),this.uniforms.glowColor=new Float32Array([0,0,0,1]),Object.assign(this,{color:s,outerStrength:i,innerStrength:l,padding:o,knockout:a})}e&&(t.__proto__=e),t.prototype=Object.create(e&&e.prototype),t.prototype.constructor=t;var n={color:{configurable:!0},outerStrength:{configurable:!0},innerStrength:{configurable:!0},knockout:{configurable:!0}};return n.color.get=function(){return o.rgb2hex(this.uniforms.glowColor)},n.color.set=function(e){o.hex2rgb(e,this.uniforms.glowColor)},n.outerStrength.get=function(){return this.uniforms.outerStrength},n.outerStrength.set=function(e){this.uniforms.outerStrength=e},n.innerStrength.get=function(){return this.uniforms.innerStrength},n.innerStrength.set=function(e){this.uniforms.innerStrength=e},n.knockout.get=function(){return this.uniforms.knockout},n.knockout.set=function(e){this.uniforms.knockout=e},Object.defineProperties(t.prototype,n),t}(t.Filter);ae.defaults={distance:10,outerStrength:4,innerStrength:0,color:16777215,quality:.1,knockout:!1};var ue=a,ce="vec3 mod289(vec3 x)\n{\n    return x - floor(x * (1.0 / 289.0)) * 289.0;\n}\nvec4 mod289(vec4 x)\n{\n    return x - floor(x * (1.0 / 289.0)) * 289.0;\n}\nvec4 permute(vec4 x)\n{\n    return mod289(((x * 34.0) + 1.0) * x);\n}\nvec4 taylorInvSqrt(vec4 r)\n{\n    return 1.79284291400159 - 0.85373472095314 * r;\n}\nvec3 fade(vec3 t)\n{\n    return t * t * t * (t * (t * 6.0 - 15.0) + 10.0);\n}\n// Classic Perlin noise, periodic variant\nfloat pnoise(vec3 P, vec3 rep)\n{\n    vec3 Pi0 = mod(floor(P), rep); // Integer part, modulo period\n    vec3 Pi1 = mod(Pi0 + vec3(1.0), rep); // Integer part + 1, mod period\n    Pi0 = mod289(Pi0);\n    Pi1 = mod289(Pi1);\n    vec3 Pf0 = fract(P); // Fractional part for interpolation\n    vec3 Pf1 = Pf0 - vec3(1.0); // Fractional part - 1.0\n    vec4 ix = vec4(Pi0.x, Pi1.x, Pi0.x, Pi1.x);\n    vec4 iy = vec4(Pi0.yy, Pi1.yy);\n    vec4 iz0 = Pi0.zzzz;\n    vec4 iz1 = Pi1.zzzz;\n    vec4 ixy = permute(permute(ix) + iy);\n    vec4 ixy0 = permute(ixy + iz0);\n    vec4 ixy1 = permute(ixy + iz1);\n    vec4 gx0 = ixy0 * (1.0 / 7.0);\n    vec4 gy0 = fract(floor(gx0) * (1.0 / 7.0)) - 0.5;\n    gx0 = fract(gx0);\n    vec4 gz0 = vec4(0.5) - abs(gx0) - abs(gy0);\n    vec4 sz0 = step(gz0, vec4(0.0));\n    gx0 -= sz0 * (step(0.0, gx0) - 0.5);\n    gy0 -= sz0 * (step(0.0, gy0) - 0.5);\n    vec4 gx1 = ixy1 * (1.0 / 7.0);\n    vec4 gy1 = fract(floor(gx1) * (1.0 / 7.0)) - 0.5;\n    gx1 = fract(gx1);\n    vec4 gz1 = vec4(0.5) - abs(gx1) - abs(gy1);\n    vec4 sz1 = step(gz1, vec4(0.0));\n    gx1 -= sz1 * (step(0.0, gx1) - 0.5);\n    gy1 -= sz1 * (step(0.0, gy1) - 0.5);\n    vec3 g000 = vec3(gx0.x, gy0.x, gz0.x);\n    vec3 g100 = vec3(gx0.y, gy0.y, gz0.y);\n    vec3 g010 = vec3(gx0.z, gy0.z, gz0.z);\n    vec3 g110 = vec3(gx0.w, gy0.w, gz0.w);\n    vec3 g001 = vec3(gx1.x, gy1.x, gz1.x);\n    vec3 g101 = vec3(gx1.y, gy1.y, gz1.y);\n    vec3 g011 = vec3(gx1.z, gy1.z, gz1.z);\n    vec3 g111 = vec3(gx1.w, gy1.w, gz1.w);\n    vec4 norm0 = taylorInvSqrt(vec4(dot(g000, g000), dot(g010, g010), dot(g100, g100), dot(g110, g110)));\n    g000 *= norm0.x;\n    g010 *= norm0.y;\n    g100 *= norm0.z;\n    g110 *= norm0.w;\n    vec4 norm1 = taylorInvSqrt(vec4(dot(g001, g001), dot(g011, g011), dot(g101, g101), dot(g111, g111)));\n    g001 *= norm1.x;\n    g011 *= norm1.y;\n    g101 *= norm1.z;\n    g111 *= norm1.w;\n    float n000 = dot(g000, Pf0);\n    float n100 = dot(g100, vec3(Pf1.x, Pf0.yz));\n    float n010 = dot(g010, vec3(Pf0.x, Pf1.y, Pf0.z));\n    float n110 = dot(g110, vec3(Pf1.xy, Pf0.z));\n    float n001 = dot(g001, vec3(Pf0.xy, Pf1.z));\n    float n101 = dot(g101, vec3(Pf1.x, Pf0.y, Pf1.z));\n    float n011 = dot(g011, vec3(Pf0.x, Pf1.yz));\n    float n111 = dot(g111, Pf1);\n    vec3 fade_xyz = fade(Pf0);\n    vec4 n_z = mix(vec4(n000, n100, n010, n110), vec4(n001, n101, n011, n111), fade_xyz.z);\n    vec2 n_yz = mix(n_z.xy, n_z.zw, fade_xyz.y);\n    float n_xyz = mix(n_yz.x, n_yz.y, fade_xyz.x);\n    return 2.2 * n_xyz;\n}\nfloat turb(vec3 P, vec3 rep, float lacunarity, float gain)\n{\n    float sum = 0.0;\n    float sc = 1.0;\n    float totalgain = 1.0;\n    for (float i = 0.0; i < 6.0; i++)\n    {\n    sum += totalgain * pnoise(P * sc, rep);\n    sc *= lacunarity;\n    totalgain *= gain;\n    }\n    return abs(sum);\n}\n",fe="varying vec2 vTextureCoord;\nuniform sampler2D uSampler;\nuniform vec4 filterArea;\nuniform vec2 dimensions;\n\nuniform vec2 light;\nuniform bool parallel;\nuniform float aspect;\n\nuniform float gain;\nuniform float lacunarity;\nuniform float time;\n\n${perlin}\n\nvoid main(void) {\n    vec2 coord = vTextureCoord * filterArea.xy / dimensions.xy;\n\n    float d;\n\n    if (parallel) {\n    float _cos = light.x;\n    float _sin = light.y;\n    d = (_cos * coord.x) + (_sin * coord.y * aspect);\n    } else {\n    float dx = coord.x - light.x / dimensions.x;\n    float dy = (coord.y - light.y / dimensions.y) * aspect;\n    float dis = sqrt(dx * dx + dy * dy) + 0.00001;\n    d = dy / dis;\n    }\n\n    vec3 dir = vec3(d, d, 0.0);\n\n    float noise = turb(dir + vec3(time, 0.0, 62.1 + time) * 0.05, vec3(480.0, 320.0, 480.0), lacunarity, gain);\n    noise = mix(noise, 0.0, 0.3);\n    //fade vertically.\n    vec4 mist = vec4(noise, noise, noise, 1.0) * (1.0 - coord.y);\n    mist.a = 1.0;\n\n    gl_FragColor = texture2D(uSampler, vTextureCoord) + mist;\n}\n",he=function(e){function t(t){e.call(this,ue,fe.replace("${perlin}",ce)),this.uniforms.dimensions=new Float32Array(2),"number"==typeof t&&(console.warn("GodrayFilter now uses options instead of (angle, gain, lacunarity, time)"),t={angle:t},void 0!==arguments[1]&&(t.gain=arguments[1]),void 0!==arguments[2]&&(t.lacunarity=arguments[2]),void 0!==arguments[3]&&(t.time=arguments[3])),t=Object.assign({angle:30,gain:.5,lacunarity:2.5,time:0,parallel:!0,center:[0,0]},t),this._angleLight=new n.Point,this.angle=t.angle,this.gain=t.gain,this.lacunarity=t.lacunarity,this.parallel=t.parallel,this.center=t.center,this.time=t.time}e&&(t.__proto__=e),t.prototype=Object.create(e&&e.prototype),t.prototype.constructor=t;var r={angle:{configurable:!0},gain:{configurable:!0},lacunarity:{configurable:!0}};return t.prototype.apply=function(e,t,n,r){var o=t.filterFrame,i=o.width,l=o.height;this.uniforms.light=this.parallel?this._angleLight:this.center,this.uniforms.parallel=this.parallel,this.uniforms.dimensions[0]=i,this.uniforms.dimensions[1]=l,this.uniforms.aspect=l/i,this.uniforms.time=this.time,e.applyFilter(this,t,n,r)},r.angle.get=function(){return this._angle},r.angle.set=function(e){this._angle=e;var t=e*n.DEG_TO_RAD;this._angleLight.x=Math.cos(t),this._angleLight.y=Math.sin(t)},r.gain.get=function(){return this.uniforms.gain},r.gain.set=function(e){this.uniforms.gain=e},r.lacunarity.get=function(){return this.uniforms.lacunarity},r.lacunarity.set=function(e){this.uniforms.lacunarity=e},Object.defineProperties(t.prototype,r),t}(t.Filter),pe=a,de="varying vec2 vTextureCoord;\nuniform sampler2D uSampler;\nuniform vec4 filterArea;\n\nuniform vec2 uVelocity;\nuniform int uKernelSize;\nuniform float uOffset;\n\nconst int MAX_KERNEL_SIZE = 2048;\n\n// Notice:\n// the perfect way:\n//    int kernelSize = min(uKernelSize, MAX_KERNELSIZE);\n// BUT in real use-case , uKernelSize < MAX_KERNELSIZE almost always.\n// So use uKernelSize directly.\n\nvoid main(void)\n{\n    vec4 color = texture2D(uSampler, vTextureCoord);\n\n    if (uKernelSize == 0)\n    {\n    gl_FragColor = color;\n    return;\n    }\n\n    vec2 velocity = uVelocity / filterArea.xy;\n    float offset = -uOffset / length(uVelocity) - 0.5;\n    int k = uKernelSize - 1;\n\n    for(int i = 0; i < MAX_KERNEL_SIZE - 1; i++) {\n    if (i == k) {\n        break;\n    }\n    vec2 bias = velocity * (float(i) / float(k) + offset);\n    color += texture2D(uSampler, vTextureCoord + bias);\n    }\n    gl_FragColor = color / float(uKernelSize);\n}\n",me=function(e){function t(t,r,o){void 0===t&&(t=[0,0]),void 0===r&&(r=5),void 0===o&&(o=0),e.call(this,pe,de),this.uniforms.uVelocity=new Float32Array(2),this._velocity=new n.ObservablePoint(this.velocityChanged,this),this.velocity=t,this.kernelSize=r,this.offset=o}e&&(t.__proto__=e),t.prototype=Object.create(e&&e.prototype),t.prototype.constructor=t;var r={velocity:{configurable:!0},offset:{configurable:!0}};return t.prototype.apply=function(e,t,n,r){var o=this.velocity,i=o.x,l=o.y;this.uniforms.uKernelSize=0!==i||0!==l?this.kernelSize:0,e.applyFilter(this,t,n,r)},r.velocity.set=function(e){Array.isArray(e)?this._velocity.set(e[0],e[1]):(e instanceof n.Point||e instanceof n.ObservablePoint)&&this._velocity.copyFrom(e)},r.velocity.get=function(){return this._velocity},t.prototype.velocityChanged=function(){this.uniforms.uVelocity[0]=this._velocity.x,this.uniforms.uVelocity[1]=this._velocity.y},r.offset.set=function(e){this.uniforms.uOffset=e},r.offset.get=function(){return this.uniforms.uOffset},Object.defineProperties(t.prototype,r),t}(t.Filter),ge=a,ve="varying vec2 vTextureCoord;\nuniform sampler2D uSampler;\n\nuniform float epsilon;\n\nconst int MAX_COLORS = %maxColors%;\n\nuniform vec3 originalColors[MAX_COLORS];\nuniform vec3 targetColors[MAX_COLORS];\n\nvoid main(void)\n{\n    gl_FragColor = texture2D(uSampler, vTextureCoord);\n\n    float alpha = gl_FragColor.a;\n    if (alpha < 0.0001)\n    {\n      return;\n    }\n\n    vec3 color = gl_FragColor.rgb / alpha;\n\n    for(int i = 0; i < MAX_COLORS; i++)\n    {\n      vec3 origColor = originalColors[i];\n      if (origColor.r < 0.0)\n      {\n    break;\n      }\n      vec3 colorDiff = origColor - color;\n      if (length(colorDiff) < epsilon)\n      {\n    vec3 targetColor = targetColors[i];\n    gl_FragColor = vec4((targetColor + colorDiff) * alpha, alpha);\n    return;\n      }\n    }\n}\n",xe=function(e){function t(t,n,r){void 0===n&&(n=.05),void 0===r&&(r=null),r=r||t.length,e.call(this,ge,ve.replace(/%maxColors%/g,r)),this.epsilon=n,this._maxColors=r,this._replacements=null,this.uniforms.originalColors=new Float32Array(3*r),this.uniforms.targetColors=new Float32Array(3*r),this.replacements=t}e&&(t.__proto__=e),t.prototype=Object.create(e&&e.prototype),t.prototype.constructor=t;var n={replacements:{configurable:!0},maxColors:{configurable:!0},epsilon:{configurable:!0}};return n.replacements.set=function(e){var t=this.uniforms.originalColors,n=this.uniforms.targetColors,r=e.length;if(r>this._maxColors)throw"Length of replacements ("+r+") exceeds the maximum colors length ("+this._maxColors+")";t[3*r]=-1;for(var i=0;i<r;i++){var l=e[i],s=l[0];"number"==typeof s?s=o.hex2rgb(s):l[0]=o.rgb2hex(s),t[3*i]=s[0],t[3*i+1]=s[1],t[3*i+2]=s[2];var a=l[1];"number"==typeof a?a=o.hex2rgb(a):l[1]=o.rgb2hex(a),n[3*i]=a[0],n[3*i+1]=a[1],n[3*i+2]=a[2]}this._replacements=e},n.replacements.get=function(){return this._replacements},t.prototype.refresh=function(){this.replacements=this._replacements},n.maxColors.get=function(){return this._maxColors},n.epsilon.set=function(e){this.uniforms.epsilon=e},n.epsilon.get=function(){return this.uniforms.epsilon},Object.defineProperties(t.prototype,n),t}(t.Filter),ye=a,_e="varying vec2 vTextureCoord;\nuniform sampler2D uSampler;\nuniform vec4 filterArea;\nuniform vec2 dimensions;\n\nuniform float sepia;\nuniform float noise;\nuniform float noiseSize;\nuniform float scratch;\nuniform float scratchDensity;\nuniform float scratchWidth;\nuniform float vignetting;\nuniform float vignettingAlpha;\nuniform float vignettingBlur;\nuniform float seed;\n\nconst float SQRT_2 = 1.414213;\nconst vec3 SEPIA_RGB = vec3(112.0 / 255.0, 66.0 / 255.0, 20.0 / 255.0);\n\nfloat rand(vec2 co) {\n    return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);\n}\n\nvec3 Overlay(vec3 src, vec3 dst)\n{\n    // if (dst <= 0.5) then: 2 * src * dst\n    // if (dst > 0.5) then: 1 - 2 * (1 - dst) * (1 - src)\n    return vec3((dst.x <= 0.5) ? (2.0 * src.x * dst.x) : (1.0 - 2.0 * (1.0 - dst.x) * (1.0 - src.x)),\n        (dst.y <= 0.5) ? (2.0 * src.y * dst.y) : (1.0 - 2.0 * (1.0 - dst.y) * (1.0 - src.y)),\n        (dst.z <= 0.5) ? (2.0 * src.z * dst.z) : (1.0 - 2.0 * (1.0 - dst.z) * (1.0 - src.z)));\n}\n\n\nvoid main()\n{\n    gl_FragColor = texture2D(uSampler, vTextureCoord);\n    vec3 color = gl_FragColor.rgb;\n\n    if (sepia > 0.0)\n    {\n    float gray = (color.x + color.y + color.z) / 3.0;\n    vec3 grayscale = vec3(gray);\n\n    color = Overlay(SEPIA_RGB, grayscale);\n\n    color = grayscale + sepia * (color - grayscale);\n    }\n\n    vec2 coord = vTextureCoord * filterArea.xy / dimensions.xy;\n\n    if (vignetting > 0.0)\n    {\n    float outter = SQRT_2 - vignetting * SQRT_2;\n    vec2 dir = vec2(vec2(0.5, 0.5) - coord);\n    dir.y *= dimensions.y / dimensions.x;\n    float darker = clamp((outter - length(dir) * SQRT_2) / ( 0.00001 + vignettingBlur * SQRT_2), 0.0, 1.0);\n    color.rgb *= darker + (1.0 - darker) * (1.0 - vignettingAlpha);\n    }\n\n    if (scratchDensity > seed && scratch != 0.0)\n    {\n    float phase = seed * 256.0;\n    float s = mod(floor(phase), 2.0);\n    float dist = 1.0 / scratchDensity;\n    float d = distance(coord, vec2(seed * dist, abs(s - seed * dist)));\n    if (d < seed * 0.6 + 0.4)\n    {\n        highp float period = scratchDensity * 10.0;\n\n        float xx = coord.x * period + phase;\n        float aa = abs(mod(xx, 0.5) * 4.0);\n        float bb = mod(floor(xx / 0.5), 2.0);\n        float yy = (1.0 - bb) * aa + bb * (2.0 - aa);\n\n        float kk = 2.0 * period;\n        float dw = scratchWidth / dimensions.x * (0.75 + seed);\n        float dh = dw * kk;\n\n        float tine = (yy - (2.0 - dh));\n\n        if (tine > 0.0) {\n        float _sign = sign(scratch);\n\n        tine = s * tine / period + scratch + 0.1;\n        tine = clamp(tine + 1.0, 0.5 + _sign * 0.5, 1.5 + _sign * 0.5);\n\n        color.rgb *= tine;\n        }\n    }\n    }\n\n    if (noise > 0.0 && noiseSize > 0.0)\n    {\n    vec2 pixelCoord = vTextureCoord.xy * filterArea.xy;\n    pixelCoord.x = floor(pixelCoord.x / noiseSize);\n    pixelCoord.y = floor(pixelCoord.y / noiseSize);\n    // vec2 d = pixelCoord * noiseSize * vec2(1024.0 + seed * 512.0, 1024.0 - seed * 512.0);\n    // float _noise = snoise(d) * 0.5;\n    float _noise = rand(pixelCoord * noiseSize * seed) - 0.5;\n    color += _noise * noise;\n    }\n\n    gl_FragColor.rgb = color;\n}\n",be=function(e){function t(t,n){void 0===n&&(n=0),e.call(this,ye,_e),this.uniforms.dimensions=new Float32Array(2),"number"==typeof t?(this.seed=t,t=null):this.seed=n,Object.assign(this,{sepia:.3,noise:.3,noiseSize:1,scratch:.5,scratchDensity:.3,scratchWidth:1,vignetting:.3,vignettingAlpha:1,vignettingBlur:.3},t)}e&&(t.__proto__=e),t.prototype=Object.create(e&&e.prototype),t.prototype.constructor=t;var n={sepia:{configurable:!0},noise:{configurable:!0},noiseSize:{configurable:!0},scratch:{configurable:!0},scratchDensity:{configurable:!0},scratchWidth:{configurable:!0},vignetting:{configurable:!0},vignettingAlpha:{configurable:!0},vignettingBlur:{configurable:!0}};return t.prototype.apply=function(e,t,n,r){this.uniforms.dimensions[0]=t.filterFrame.width,this.uniforms.dimensions[1]=t.filterFrame.height,this.uniforms.seed=this.seed,e.applyFilter(this,t,n,r)},n.sepia.set=function(e){this.uniforms.sepia=e},n.sepia.get=function(){return this.uniforms.sepia},n.noise.set=function(e){this.uniforms.noise=e},n.noise.get=function(){return this.uniforms.noise},n.noiseSize.set=function(e){this.uniforms.noiseSize=e},n.noiseSize.get=function(){return this.uniforms.noiseSize},n.scratch.set=function(e){this.uniforms.scratch=e},n.scratch.get=function(){return this.uniforms.scratch},n.scratchDensity.set=function(e){this.uniforms.scratchDensity=e},n.scratchDensity.get=function(){return this.uniforms.scratchDensity},n.scratchWidth.set=function(e){this.uniforms.scratchWidth=e},n.scratchWidth.get=function(){return this.uniforms.scratchWidth},n.vignetting.set=function(e){this.uniforms.vignetting=e},n.vignetting.get=function(){return this.uniforms.vignetting},n.vignettingAlpha.set=function(e){this.uniforms.vignettingAlpha=e},n.vignettingAlpha.get=function(){return this.uniforms.vignettingAlpha},n.vignettingBlur.set=function(e){this.uniforms.vignettingBlur=e},n.vignettingBlur.get=function(){return this.uniforms.vignettingBlur},Object.defineProperties(t.prototype,n),t}(t.Filter),Ce=a,Se="varying vec2 vTextureCoord;\nuniform sampler2D uSampler;\n\nuniform vec2 thickness;\nuniform vec4 outlineColor;\nuniform vec4 filterClamp;\n\nconst float DOUBLE_PI = 3.14159265358979323846264 * 2.;\n\nvoid main(void) {\n    vec4 ownColor = texture2D(uSampler, vTextureCoord);\n    vec4 curColor;\n    float maxAlpha = 0.;\n    vec2 displaced;\n    for (float angle = 0.; angle <= DOUBLE_PI; angle += ${angleStep}) {\n    displaced.x = vTextureCoord.x + thickness.x * cos(angle);\n    displaced.y = vTextureCoord.y + thickness.y * sin(angle);\n    curColor = texture2D(uSampler, clamp(displaced, filterClamp.xy, filterClamp.zw));\n    maxAlpha = max(maxAlpha, curColor.a);\n    }\n    float resultAlpha = max(maxAlpha, ownColor.a);\n    gl_FragColor = vec4((ownColor.rgb + outlineColor.rgb * (1. - ownColor.a)) * resultAlpha, resultAlpha);\n}\n",Fe=function(e){function t(n,r,o){void 0===n&&(n=1),void 0===r&&(r=0),void 0===o&&(o=.1);var i=Math.max(o*t.MAX_SAMPLES,t.MIN_SAMPLES),l=(2*Math.PI/i).toFixed(7);e.call(this,Ce,Se.replace(/\$\{angleStep\}/,l)),this.uniforms.thickness=new Float32Array([0,0]),this.thickness=n,this.uniforms.outlineColor=new Float32Array([0,0,0,1]),this.color=r,this.quality=o}e&&(t.__proto__=e),t.prototype=Object.create(e&&e.prototype),t.prototype.constructor=t;var n={color:{configurable:!0}};return t.prototype.apply=function(e,t,n,r){this.uniforms.thickness[0]=this.thickness/t._frame.width,this.uniforms.thickness[1]=this.thickness/t._frame.height,e.applyFilter(this,t,n,r)},n.color.get=function(){return o.rgb2hex(this.uniforms.outlineColor)},n.color.set=function(e){o.hex2rgb(e,this.uniforms.outlineColor)},Object.defineProperties(t.prototype,n),t}(t.Filter);Fe.MIN_SAMPLES=1,Fe.MAX_SAMPLES=100;var ze=a,Ae="precision mediump float;\n\nvarying vec2 vTextureCoord;\n\nuniform vec2 size;\nuniform sampler2D uSampler;\n\nuniform vec4 filterArea;\n\nvec2 mapCoord( vec2 coord )\n{\n    coord *= filterArea.xy;\n    coord += filterArea.zw;\n\n    return coord;\n}\n\nvec2 unmapCoord( vec2 coord )\n{\n    coord -= filterArea.zw;\n    coord /= filterArea.xy;\n\n    return coord;\n}\n\nvec2 pixelate(vec2 coord, vec2 size)\n{\n\treturn floor( coord / size ) * size;\n}\n\nvoid main(void)\n{\n    vec2 coord = mapCoord(vTextureCoord);\n\n    coord = pixelate(coord, size);\n\n    coord = unmapCoord(coord);\n\n    gl_FragColor = texture2D(uSampler, coord);\n}\n",we=function(e){function t(t){void 0===t&&(t=10),e.call(this,ze,Ae),this.size=t}e&&(t.__proto__=e),t.prototype=Object.create(e&&e.prototype),t.prototype.constructor=t;var n={size:{configurable:!0}};return n.size.get=function(){return this.uniforms.size},n.size.set=function(e){"number"==typeof e&&(e=[e,e]),this.uniforms.size=e},Object.defineProperties(t.prototype,n),t}(t.Filter),Te=a,Oe="varying vec2 vTextureCoord;\nuniform sampler2D uSampler;\nuniform vec4 filterArea;\n\nuniform float uRadian;\nuniform vec2 uCenter;\nuniform float uRadius;\nuniform int uKernelSize;\n\nconst int MAX_KERNEL_SIZE = 2048;\n\nvoid main(void)\n{\n    vec4 color = texture2D(uSampler, vTextureCoord);\n\n    if (uKernelSize == 0)\n    {\n    gl_FragColor = color;\n    return;\n    }\n\n    float aspect = filterArea.y / filterArea.x;\n    vec2 center = uCenter.xy / filterArea.xy;\n    float gradient = uRadius / filterArea.x * 0.3;\n    float radius = uRadius / filterArea.x - gradient * 0.5;\n    int k = uKernelSize - 1;\n\n    vec2 coord = vTextureCoord;\n    vec2 dir = vec2(center - coord);\n    float dist = length(vec2(dir.x, dir.y * aspect));\n\n    float radianStep = uRadian;\n    if (radius >= 0.0 && dist > radius) {\n    float delta = dist - radius;\n    float gap = gradient;\n    float scale = 1.0 - abs(delta / gap);\n    if (scale <= 0.0) {\n        gl_FragColor = color;\n        return;\n    }\n    radianStep *= scale;\n    }\n    radianStep /= float(k);\n\n    float s = sin(radianStep);\n    float c = cos(radianStep);\n    mat2 rotationMatrix = mat2(vec2(c, -s), vec2(s, c));\n\n    for(int i = 0; i < MAX_KERNEL_SIZE - 1; i++) {\n    if (i == k) {\n        break;\n    }\n\n    coord -= center;\n    coord.y *= aspect;\n    coord = rotationMatrix * coord;\n    coord.y /= aspect;\n    coord += center;\n\n    vec4 sample = texture2D(uSampler, coord);\n\n    // switch to pre-multiplied alpha to correctly blur transparent images\n    // sample.rgb *= sample.a;\n\n    color += sample;\n    }\n\n    gl_FragColor = color / float(uKernelSize);\n}\n",De=function(e){function t(t,n,r,o){void 0===t&&(t=0),void 0===n&&(n=[0,0]),void 0===r&&(r=5),void 0===o&&(o=-1),e.call(this,Te,Oe),this._angle=0,this.angle=t,this.center=n,this.kernelSize=r,this.radius=o}e&&(t.__proto__=e),t.prototype=Object.create(e&&e.prototype),t.prototype.constructor=t;var n={angle:{configurable:!0},center:{configurable:!0},radius:{configurable:!0}};return t.prototype.apply=function(e,t,n,r){this.uniforms.uKernelSize=0!==this._angle?this.kernelSize:0,e.applyFilter(this,t,n,r)},n.angle.set=function(e){this._angle=e,this.uniforms.uRadian=e*Math.PI/180},n.angle.get=function(){return this._angle},n.center.get=function(){return this.uniforms.uCenter},n.center.set=function(e){this.uniforms.uCenter=e},n.radius.get=function(){return this.uniforms.uRadius},n.radius.set=function(e){(e<0||e===1/0)&&(e=-1),this.uniforms.uRadius=e},Object.defineProperties(t.prototype,n),t}(t.Filter),Pe=a,Me="varying vec2 vTextureCoord;\nuniform sampler2D uSampler;\n\nuniform vec4 filterArea;\nuniform vec4 filterClamp;\nuniform vec2 dimensions;\n\nuniform bool mirror;\nuniform float boundary;\nuniform vec2 amplitude;\nuniform vec2 waveLength;\nuniform vec2 alpha;\nuniform float time;\n\nfloat rand(vec2 co) {\n    return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 43758.5453);\n}\n\nvoid main(void)\n{\n    vec2 pixelCoord = vTextureCoord.xy * filterArea.xy;\n    vec2 coord = pixelCoord / dimensions;\n\n    if (coord.y < boundary) {\n    gl_FragColor = texture2D(uSampler, vTextureCoord);\n    return;\n    }\n\n    float k = (coord.y - boundary) / (1. - boundary + 0.0001);\n    float areaY = boundary * dimensions.y / filterArea.y;\n    float v = areaY + areaY - vTextureCoord.y;\n    float y = mirror ? v : vTextureCoord.y;\n\n    float _amplitude = ((amplitude.y - amplitude.x) * k + amplitude.x ) / filterArea.x;\n    float _waveLength = ((waveLength.y - waveLength.x) * k + waveLength.x) / filterArea.y;\n    float _alpha = (alpha.y - alpha.x) * k + alpha.x;\n\n    float x = vTextureCoord.x + cos(v * 6.28 / _waveLength - time) * _amplitude;\n    x = clamp(x, filterClamp.x, filterClamp.z);\n\n    vec4 color = texture2D(uSampler, vec2(x, y));\n\n    gl_FragColor = color * _alpha;\n}\n",Re=function(e){function t(t){e.call(this,Pe,Me),this.uniforms.amplitude=new Float32Array(2),this.uniforms.waveLength=new Float32Array(2),this.uniforms.alpha=new Float32Array(2),this.uniforms.dimensions=new Float32Array(2),Object.assign(this,{mirror:!0,boundary:.5,amplitude:[0,20],waveLength:[30,100],alpha:[1,1],time:0},t)}e&&(t.__proto__=e),t.prototype=Object.create(e&&e.prototype),t.prototype.constructor=t;var n={mirror:{configurable:!0},boundary:{configurable:!0},amplitude:{configurable:!0},waveLength:{configurable:!0},alpha:{configurable:!0}};return t.prototype.apply=function(e,t,n,r){this.uniforms.dimensions[0]=t.filterFrame.width,this.uniforms.dimensions[1]=t.filterFrame.height,this.uniforms.time=this.time,e.applyFilter(this,t,n,r)},n.mirror.set=function(e){this.uniforms.mirror=e},n.mirror.get=function(){return this.uniforms.mirror},n.boundary.set=function(e){this.uniforms.boundary=e},n.boundary.get=function(){return this.uniforms.boundary},n.amplitude.set=function(e){this.uniforms.amplitude[0]=e[0],this.uniforms.amplitude[1]=e[1]},n.amplitude.get=function(){return this.uniforms.amplitude},n.waveLength.set=function(e){this.uniforms.waveLength[0]=e[0],this.uniforms.waveLength[1]=e[1]},n.waveLength.get=function(){return this.uniforms.waveLength},n.alpha.set=function(e){this.uniforms.alpha[0]=e[0],this.uniforms.alpha[1]=e[1]},n.alpha.get=function(){return this.uniforms.alpha},Object.defineProperties(t.prototype,n),t}(t.Filter),ke=a,je="precision mediump float;\n\nvarying vec2 vTextureCoord;\n\nuniform sampler2D uSampler;\nuniform vec4 filterArea;\nuniform vec2 red;\nuniform vec2 green;\nuniform vec2 blue;\n\nvoid main(void)\n{\n   gl_FragColor.r = texture2D(uSampler, vTextureCoord + red/filterArea.xy).r;\n   gl_FragColor.g = texture2D(uSampler, vTextureCoord + green/filterArea.xy).g;\n   gl_FragColor.b = texture2D(uSampler, vTextureCoord + blue/filterArea.xy).b;\n   gl_FragColor.a = texture2D(uSampler, vTextureCoord).a;\n}\n",Ee=function(e){function t(t,n,r){void 0===t&&(t=[-10,0]),void 0===n&&(n=[0,10]),void 0===r&&(r=[0,0]),e.call(this,ke,je),this.red=t,this.green=n,this.blue=r}e&&(t.__proto__=e),t.prototype=Object.create(e&&e.prototype),t.prototype.constructor=t;var n={red:{configurable:!0},green:{configurable:!0},blue:{configurable:!0}};return n.red.get=function(){return this.uniforms.red},n.red.set=function(e){this.uniforms.red=e},n.green.get=function(){return this.uniforms.green},n.green.set=function(e){this.uniforms.green=e},n.blue.get=function(){return this.uniforms.blue},n.blue.set=function(e){this.uniforms.blue=e},Object.defineProperties(t.prototype,n),t}(t.Filter),Le=a,Ie="varying vec2 vTextureCoord;\nuniform sampler2D uSampler;\nuniform vec4 filterArea;\nuniform vec4 filterClamp;\n\nuniform vec2 center;\n\nuniform float amplitude;\nuniform float wavelength;\n// uniform float power;\nuniform float brightness;\nuniform float speed;\nuniform float radius;\n\nuniform float time;\n\nconst float PI = 3.14159;\n\nvoid main()\n{\n    float halfWavelength = wavelength * 0.5 / filterArea.x;\n    float maxRadius = radius / filterArea.x;\n    float currentRadius = time * speed / filterArea.x;\n\n    float fade = 1.0;\n\n    if (maxRadius > 0.0) {\n    if (currentRadius > maxRadius) {\n        gl_FragColor = texture2D(uSampler, vTextureCoord);\n        return;\n    }\n    fade = 1.0 - pow(currentRadius / maxRadius, 2.0);\n    }\n\n    vec2 dir = vec2(vTextureCoord - center / filterArea.xy);\n    dir.y *= filterArea.y / filterArea.x;\n    float dist = length(dir);\n\n    if (dist <= 0.0 || dist < currentRadius - halfWavelength || dist > currentRadius + halfWavelength) {\n    gl_FragColor = texture2D(uSampler, vTextureCoord);\n    return;\n    }\n\n    vec2 diffUV = normalize(dir);\n\n    float diff = (dist - currentRadius) / halfWavelength;\n\n    float p = 1.0 - pow(abs(diff), 2.0);\n\n    // float powDiff = diff * pow(p, 2.0) * ( amplitude * fade );\n    float powDiff = 1.25 * sin(diff * PI) * p * ( amplitude * fade );\n\n    vec2 offset = diffUV * powDiff / filterArea.xy;\n\n    // Do clamp :\n    vec2 coord = vTextureCoord + offset;\n    vec2 clampedCoord = clamp(coord, filterClamp.xy, filterClamp.zw);\n    vec4 color = texture2D(uSampler, clampedCoord);\n    if (coord != clampedCoord) {\n    color *= max(0.0, 1.0 - length(coord - clampedCoord));\n    }\n\n    // No clamp :\n    // gl_FragColor = texture2D(uSampler, vTextureCoord + offset);\n\n    color.rgb *= 1.0 + (brightness - 1.0) * p * fade;\n\n    gl_FragColor = color;\n}\n",Xe=function(e){function t(t,n,r){void 0===t&&(t=[0,0]),void 0===n&&(n={}),void 0===r&&(r=0),e.call(this,Le,Ie),this.center=t,Array.isArray(n)&&(console.warn("Deprecated Warning: ShockwaveFilter params Array has been changed to options Object."),n={}),n=Object.assign({amplitude:30,wavelength:160,brightness:1,speed:500,radius:-1},n),this.amplitude=n.amplitude,this.wavelength=n.wavelength,this.brightness=n.brightness,this.speed=n.speed,this.radius=n.radius,this.time=r}e&&(t.__proto__=e),t.prototype=Object.create(e&&e.prototype),t.prototype.constructor=t;var n={center:{configurable:!0},amplitude:{configurable:!0},wavelength:{configurable:!0},brightness:{configurable:!0},speed:{configurable:!0},radius:{configurable:!0}};return t.prototype.apply=function(e,t,n,r){this.uniforms.time=this.time,e.applyFilter(this,t,n,r)},n.center.get=function(){return this.uniforms.center},n.center.set=function(e){this.uniforms.center=e},n.amplitude.get=function(){return this.uniforms.amplitude},n.amplitude.set=function(e){this.uniforms.amplitude=e},n.wavelength.get=function(){return this.uniforms.wavelength},n.wavelength.set=function(e){this.uniforms.wavelength=e},n.brightness.get=function(){return this.uniforms.brightness},n.brightness.set=function(e){this.uniforms.brightness=e},n.speed.get=function(){return this.uniforms.speed},n.speed.set=function(e){this.uniforms.speed=e},n.radius.get=function(){return this.uniforms.radius},n.radius.set=function(e){this.uniforms.radius=e},Object.defineProperties(t.prototype,n),t}(t.Filter),Be=a,Ne="varying vec2 vTextureCoord;\nuniform sampler2D uSampler;\nuniform sampler2D uLightmap;\nuniform vec4 filterArea;\nuniform vec2 dimensions;\nuniform vec4 ambientColor;\nvoid main() {\n    vec4 diffuseColor = texture2D(uSampler, vTextureCoord);\n    vec2 lightCoord = (vTextureCoord * filterArea.xy) / dimensions;\n    vec4 light = texture2D(uLightmap, lightCoord);\n    vec3 ambient = ambientColor.rgb * ambientColor.a;\n    vec3 intensity = ambient + light.rgb;\n    vec3 finalColor = diffuseColor.rgb * intensity;\n    gl_FragColor = vec4(finalColor, diffuseColor.a);\n}\n",Ge=function(e){function t(t,n,r){void 0===n&&(n=0),void 0===r&&(r=1),e.call(this,Be,Ne),this.uniforms.dimensions=new Float32Array(2),this.uniforms.ambientColor=new Float32Array([0,0,0,r]),this.texture=t,this.color=n}e&&(t.__proto__=e),t.prototype=Object.create(e&&e.prototype),t.prototype.constructor=t;var n={texture:{configurable:!0},color:{configurable:!0},alpha:{configurable:!0}};return t.prototype.apply=function(e,t,n,r){this.uniforms.dimensions[0]=t.filterFrame.width,this.uniforms.dimensions[1]=t.filterFrame.height,e.applyFilter(this,t,n,r)},n.texture.get=function(){return this.uniforms.uLightmap},n.texture.set=function(e){this.uniforms.uLightmap=e},n.color.set=function(e){var t=this.uniforms.ambientColor;"number"==typeof e?(o.hex2rgb(e,t),this._color=e):(t[0]=e[0],t[1]=e[1],t[2]=e[2],t[3]=e[3],this._color=o.rgb2hex(t))},n.color.get=function(){return this._color},n.alpha.get=function(){return this.uniforms.ambientColor[3]},n.alpha.set=function(e){this.uniforms.ambientColor[3]=e},Object.defineProperties(t.prototype,n),t}(t.Filter),qe=a,We="varying vec2 vTextureCoord;\n\nuniform sampler2D uSampler;\nuniform float blur;\nuniform float gradientBlur;\nuniform vec2 start;\nuniform vec2 end;\nuniform vec2 delta;\nuniform vec2 texSize;\n\nfloat random(vec3 scale, float seed)\n{\n    return fract(sin(dot(gl_FragCoord.xyz + seed, scale)) * 43758.5453 + seed);\n}\n\nvoid main(void)\n{\n    vec4 color = vec4(0.0);\n    float total = 0.0;\n\n    float offset = random(vec3(12.9898, 78.233, 151.7182), 0.0);\n    vec2 normal = normalize(vec2(start.y - end.y, end.x - start.x));\n    float radius = smoothstep(0.0, 1.0, abs(dot(vTextureCoord * texSize - start, normal)) / gradientBlur) * blur;\n\n    for (float t = -30.0; t <= 30.0; t++)\n    {\n    float percent = (t + offset - 0.5) / 30.0;\n    float weight = 1.0 - abs(percent);\n    vec4 sample = texture2D(uSampler, vTextureCoord + delta / texSize * percent * radius);\n    sample.rgb *= sample.a;\n    color += sample * weight;\n    total += weight;\n    }\n\n    color /= total;\n    color.rgb /= color.a + 0.00001;\n\n    gl_FragColor = color;\n}\n",Ke=function(e){function t(t,r,o,i){void 0===t&&(t=100),void 0===r&&(r=600),void 0===o&&(o=null),void 0===i&&(i=null),e.call(this,qe,We),this.uniforms.blur=t,this.uniforms.gradientBlur=r,this.uniforms.start=o||new n.Point(0,window.innerHeight/2),this.uniforms.end=i||new n.Point(600,window.innerHeight/2),this.uniforms.delta=new n.Point(30,30),this.uniforms.texSize=new n.Point(1024,1024),this.updateDelta()}e&&(t.__proto__=e),t.prototype=Object.create(e&&e.prototype),t.prototype.constructor=t;var r={blur:{configurable:!0},gradientBlur:{configurable:!0},start:{configurable:!0},end:{configurable:!0}};return t.prototype.updateDelta=function(){this.uniforms.delta.x=0,this.uniforms.delta.y=0},r.blur.get=function(){return this.uniforms.blur},r.blur.set=function(e){this.uniforms.blur=e},r.gradientBlur.get=function(){return this.uniforms.gradientBlur},r.gradientBlur.set=function(e){this.uniforms.gradientBlur=e},r.start.get=function(){return this.uniforms.start},r.start.set=function(e){this.uniforms.start=e,this.updateDelta()},r.end.get=function(){return this.uniforms.end},r.end.set=function(e){this.uniforms.end=e,this.updateDelta()},Object.defineProperties(t.prototype,r),t}(t.Filter),Ye=function(e){function t(){e.apply(this,arguments)}return e&&(t.__proto__=e),t.prototype=Object.create(e&&e.prototype),t.prototype.constructor=t,t.prototype.updateDelta=function(){var e=this.uniforms.end.x-this.uniforms.start.x,t=this.uniforms.end.y-this.uniforms.start.y,n=Math.sqrt(e*e+t*t);this.uniforms.delta.x=e/n,this.uniforms.delta.y=t/n},t}(Ke),Ze=function(e){function t(){e.apply(this,arguments)}return e&&(t.__proto__=e),t.prototype=Object.create(e&&e.prototype),t.prototype.constructor=t,t.prototype.updateDelta=function(){var e=this.uniforms.end.x-this.uniforms.start.x,t=this.uniforms.end.y-this.uniforms.start.y,n=Math.sqrt(e*e+t*t);this.uniforms.delta.x=-t/n,this.uniforms.delta.y=e/n},t}(Ke),Qe=function(e){function t(t,n,r,o){void 0===t&&(t=100),void 0===n&&(n=600),void 0===r&&(r=null),void 0===o&&(o=null),e.call(this),this.tiltShiftXFilter=new Ye(t,n,r,o),this.tiltShiftYFilter=new Ze(t,n,r,o)}e&&(t.__proto__=e),t.prototype=Object.create(e&&e.prototype),t.prototype.constructor=t;var n={blur:{configurable:!0},gradientBlur:{configurable:!0},start:{configurable:!0},end:{configurable:!0}};return t.prototype.apply=function(e,t,n){var r=e.getFilterTexture();this.tiltShiftXFilter.apply(e,t,r),this.tiltShiftYFilter.apply(e,r,n),e.returnFilterTexture(r)},n.blur.get=function(){return this.tiltShiftXFilter.blur},n.blur.set=function(e){this.tiltShiftXFilter.blur=this.tiltShiftYFilter.blur=e},n.gradientBlur.get=function(){return this.tiltShiftXFilter.gradientBlur},n.gradientBlur.set=function(e){this.tiltShiftXFilter.gradientBlur=this.tiltShiftYFilter.gradientBlur=e},n.start.get=function(){return this.tiltShiftXFilter.start},n.start.set=function(e){this.tiltShiftXFilter.start=this.tiltShiftYFilter.start=e},n.end.get=function(){return this.tiltShiftXFilter.end},n.end.set=function(e){this.tiltShiftXFilter.end=this.tiltShiftYFilter.end=e},Object.defineProperties(t.prototype,n),t}(t.Filter),Ue=a,Ve="varying vec2 vTextureCoord;\n\nuniform sampler2D uSampler;\nuniform float radius;\nuniform float angle;\nuniform vec2 offset;\nuniform vec4 filterArea;\n\nvec2 mapCoord( vec2 coord )\n{\n    coord *= filterArea.xy;\n    coord += filterArea.zw;\n\n    return coord;\n}\n\nvec2 unmapCoord( vec2 coord )\n{\n    coord -= filterArea.zw;\n    coord /= filterArea.xy;\n\n    return coord;\n}\n\nvec2 twist(vec2 coord)\n{\n    coord -= offset;\n\n    float dist = length(coord);\n\n    if (dist < radius)\n    {\n    float ratioDist = (radius - dist) / radius;\n    float angleMod = ratioDist * ratioDist * angle;\n    float s = sin(angleMod);\n    float c = cos(angleMod);\n    coord = vec2(coord.x * c - coord.y * s, coord.x * s + coord.y * c);\n    }\n\n    coord += offset;\n\n    return coord;\n}\n\nvoid main(void)\n{\n\n    vec2 coord = mapCoord(vTextureCoord);\n\n    coord = twist(coord);\n\n    coord = unmapCoord(coord);\n\n    gl_FragColor = texture2D(uSampler, coord );\n\n}\n",He=function(e){function t(t,n,r){void 0===t&&(t=200),void 0===n&&(n=4),void 0===r&&(r=20),e.call(this,Ue,Ve),this.radius=t,this.angle=n,this.padding=r}e&&(t.__proto__=e),t.prototype=Object.create(e&&e.prototype),t.prototype.constructor=t;var n={offset:{configurable:!0},radius:{configurable:!0},angle:{configurable:!0}};return n.offset.get=function(){return this.uniforms.offset},n.offset.set=function(e){this.uniforms.offset=e},n.radius.get=function(){return this.uniforms.radius},n.radius.set=function(e){this.uniforms.radius=e},n.angle.get=function(){return this.uniforms.angle},n.angle.set=function(e){this.uniforms.angle=e},Object.defineProperties(t.prototype,n),t}(t.Filter),$e=a,Je="varying vec2 vTextureCoord;\nuniform sampler2D uSampler;\nuniform vec4 filterArea;\n\nuniform vec2 uCenter;\nuniform float uStrength;\nuniform float uInnerRadius;\nuniform float uRadius;\n\nconst float MAX_KERNEL_SIZE = 32.0;\n\n// author: http://byteblacksmith.com/improvements-to-the-canonical-one-liner-glsl-rand-for-opengl-es-2-0/\nhighp float rand(vec2 co, float seed) {\n    const highp float a = 12.9898, b = 78.233, c = 43758.5453;\n    highp float dt = dot(co + seed, vec2(a, b)), sn = mod(dt, 3.14159);\n    return fract(sin(sn) * c + seed);\n}\n\nvoid main() {\n\n    float minGradient = uInnerRadius * 0.3;\n    float innerRadius = (uInnerRadius + minGradient * 0.5) / filterArea.x;\n\n    float gradient = uRadius * 0.3;\n    float radius = (uRadius - gradient * 0.5) / filterArea.x;\n\n    float countLimit = MAX_KERNEL_SIZE;\n\n    vec2 dir = vec2(uCenter.xy / filterArea.xy - vTextureCoord);\n    float dist = length(vec2(dir.x, dir.y * filterArea.y / filterArea.x));\n\n    float strength = uStrength;\n\n    float delta = 0.0;\n    float gap;\n    if (dist < innerRadius) {\n    delta = innerRadius - dist;\n    gap = minGradient;\n    } else if (radius >= 0.0 && dist > radius) { // radius < 0 means it's infinity\n    delta = dist - radius;\n    gap = gradient;\n    }\n\n    if (delta > 0.0) {\n    float normalCount = gap / filterArea.x;\n    delta = (normalCount - delta) / normalCount;\n    countLimit *= delta;\n    strength *= delta;\n    if (countLimit < 1.0)\n    {\n        gl_FragColor = texture2D(uSampler, vTextureCoord);\n        return;\n    }\n    }\n\n    // randomize the lookup values to hide the fixed number of samples\n    float offset = rand(vTextureCoord, 0.0);\n\n    float total = 0.0;\n    vec4 color = vec4(0.0);\n\n    dir *= strength;\n\n    for (float t = 0.0; t < MAX_KERNEL_SIZE; t++) {\n    float percent = (t + offset) / MAX_KERNEL_SIZE;\n    float weight = 4.0 * (percent - percent * percent);\n    vec2 p = vTextureCoord + dir * percent;\n    vec4 sample = texture2D(uSampler, p);\n\n    // switch to pre-multiplied alpha to correctly blur transparent images\n    // sample.rgb *= sample.a;\n\n    color += sample * weight;\n    total += weight;\n\n    if (t > countLimit){\n        break;\n    }\n    }\n\n    color /= total;\n    // switch back from pre-multiplied alpha\n    // color.rgb /= color.a + 0.00001;\n\n    gl_FragColor = color;\n}\n",et=function(e){function t(t){if(e.call(this,$e,Je),"object"!=typeof t){var n=arguments[0],r=arguments[1],o=arguments[2],i=arguments[3];t={},void 0!==n&&(t.strength=n),void 0!==r&&(t.center=r),void 0!==o&&(t.innerRadius=o),void 0!==i&&(t.radius=i)}Object.assign(this,{strength:.1,center:[0,0],innerRadius:0,radius:-1},t)}e&&(t.__proto__=e),t.prototype=Object.create(e&&e.prototype),t.prototype.constructor=t;var n={center:{configurable:!0},strength:{configurable:!0},innerRadius:{configurable:!0},radius:{configurable:!0}};return n.center.get=function(){return this.uniforms.uCenter},n.center.set=function(e){this.uniforms.uCenter=e},n.strength.get=function(){return this.uniforms.uStrength},n.strength.set=function(e){this.uniforms.uStrength=e},n.innerRadius.get=function(){return this.uniforms.uInnerRadius},n.innerRadius.set=function(e){this.uniforms.uInnerRadius=e},n.radius.get=function(){return this.uniforms.uRadius},n.radius.set=function(e){(e<0||e===1/0)&&(e=-1),this.uniforms.uRadius=e},Object.defineProperties(t.prototype,n),t}(t.Filter);return e.AdjustmentFilter=c,e.AdvancedBloomFilter=y,e.AsciiFilter=C,e.BevelFilter=z,e.BloomFilter=A,e.BulgePinchFilter=O,e.CRTFilter=Z,e.ColorMapFilter=M,e.ColorOverlayFilter=j,e.ColorReplaceFilter=I,e.ConvolutionFilter=N,e.CrossHatchFilter=W,e.DotFilter=V,e.DropShadowFilter=J,e.EmbossFilter=ne,e.GlitchFilter=ie,e.GlowFilter=ae,e.GodrayFilter=he,e.KawaseBlurFilter=d,e.MotionBlurFilter=me,e.MultiColorReplaceFilter=xe,e.OldFilmFilter=be,e.OutlineFilter=Fe,e.PixelateFilter=we,e.RGBSplitFilter=Ee,e.RadialBlurFilter=De,e.ReflectionFilter=Re,e.ShockwaveFilter=Xe,e.SimpleLightmapFilter=Ge,e.TiltShiftAxisFilter=Ke,e.TiltShiftFilter=Qe,e.TiltShiftXFilter=Ye,e.TiltShiftYFilter=Ze,e.TwistFilter=He,e.ZoomBlurFilter=et,e}({},PIXI,PIXI,PIXI,PIXI.utils,PIXI,PIXI.filters,PIXI.filters);Object.assign(PIXI.filters,__filters);
+    /*# sourceMappingURL=pixi-filters.js.map*/
+    
+}());
