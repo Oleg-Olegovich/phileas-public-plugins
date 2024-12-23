@@ -7,6 +7,7 @@
 // 2024.May.05 Ver1.1.0 Faces and saves
 // 2024.May.05 Ver1.1.1 Prettier faces
 // 2024.May.05 Ver1.1.2 Different HEX formats support
+// 2024.December.23 Ver1.2.0 Added picture sprite backing
 
 /*:
  * @target MZ
@@ -32,6 +33,11 @@
  * @arg color
  * @text Color
  * @default 0xffffff
+ * 
+ * @arg backing
+ * @text Sprite backing
+ * @type boolean
+ * @default true
  * 
  *
  * @command erase
@@ -63,6 +69,12 @@
  * @arg color
  * @text Color
  * @default 0xffffff
+ * 
+ * @arg backing
+ * @text Sprite backing
+ * @type boolean
+ * @default true
+ * 
  * 
  * @command eraseSeveral
  * @text Erase several outlines
@@ -119,6 +131,12 @@
  * - #ffffff
  * - ffffff
  * 
+ * When installing a filter on an picture, you can choose whether to bake its sprite or not.
+ * This feature is enabled by default.
+ * When baking, the picture together in the outline is rendered into a single bitmap, which
+ * replaces the original one.
+ * The difference can be noticed when changing the opacity of the image.
+ * 
  * You can always write to the author if you need other features or even plugins.
  * Boosty: https://boosty.to/phileas
  * RPG Maker Web: https://forums.rpgmakerweb.com/index.php?members/phileas.176075/
@@ -159,6 +177,11 @@
  * @text Цвет
  * @default 0xffffff
  * 
+ * @arg backing
+ * @text Запекание спрайта
+ * @type boolean
+ * @default true
+ * 
  *
  * @command erase
  * @text Удалить обводку картинки
@@ -189,6 +212,12 @@
  * @arg color
  * @text Цвет
  * @default 0xffffff
+ * 
+ * @arg backing
+ * @text Запекание спрайта
+ * @type boolean
+ * @default true
+ * 
  * 
  * @command eraseSeveral
  * @text Удалить несколько обводок
@@ -244,6 +273,12 @@
  * - 0xffffff
  * - #ffffff
  * - ffffff
+ * 
+ * При установке фильтра картинке вы можете выбрать, запекать её спрайт или нет.
+ * Эта функция по умолчанию включена.
+ * При запекании картина вместе в обводкой рендерится в один битмап, который
+ * заменяет изначальный.
+ * Разницу можно заметить при изменении непрозрачности картинки.
  *
  * Вы всегда можете написать автору, если вам нужны другие функции или даже плагины.
  * Boosty: https://boosty.to/phileas
@@ -317,6 +352,8 @@
     }
 
     function loadPictureFiltersData(data) {
+        phileasOutlineFilters = [];
+
         for (let i = 0; i < data.length; ++i) {
             loadPhileasFilterData(data[i]);
         }
@@ -337,7 +374,9 @@
     function createFilter(params) {
         const thickness = Number(params["thickness"]);
         const color = readColor(params["color"]);
-        return new PIXI.filters.OutlineFilter(thickness, color);
+        const outlineFilter = new PIXI.filters.OutlineFilter(thickness, color);
+        outlineFilter.needBacking = params["backing"] == "true" || params["backing"] == undefined;
+        return outlineFilter;
     }
 
     function createPhileasFilter(params, pictureNumbers) {
@@ -442,6 +481,46 @@
         newBitmap.blt(bitmap, sx, sy, sw, sh, 0, 0);
         return addBitmapOutline(newBitmap);
     }
+
+    function applyFilter(sprite, filter) {
+        let arr = sprite.filters || [];
+        arr = arr.filter(item => item.phileasPictureOutline !== true);
+        arr.push(filter);
+        sprite.filters = arr;
+    }
+
+    function bakeSprite(sprite, filter) {
+        if (sprite.isBaked) {
+            return;
+        }
+
+        const w = sprite.width;
+        const h = sprite.height;
+        if (w == 0 || h == 0) {
+            return;
+        }
+
+        const tempContainer = new PIXI.Container();
+        tempContainer.filters = [filter];
+        tempContainer.filterArea = new PIXI.Rectangle(0, 0, w, h);
+        const tempSprite = new PIXI.Sprite(sprite.texture);
+        tempSprite.anchor.set(sprite.anchor.x, sprite.anchor.y);
+        tempSprite.x = w * sprite.anchor.x;
+        tempSprite.y = h * sprite.anchor.y;
+        tempContainer.addChild(tempSprite);
+
+        const rt = PIXI.RenderTexture.create(w, h);
+        Graphics._app.renderer.render(tempContainer, rt);
+        const canvas = Graphics._app.renderer.extract.canvas(rt);
+        tempContainer.destroy({ children: true });
+
+        const newBitmap = new Bitmap(w, h);
+        newBitmap._context.drawImage(canvas, 0, 0);
+        newBitmap.baseTexture.update();
+
+        sprite.bitmap = newBitmap;
+        sprite.isBaked = true;
+    }
     
     Scene_Base.prototype.getTargets = function(targetIds) {
         const targets = [];
@@ -466,16 +545,23 @@
                     continue;
                 }
         
-                let arr = targets[j].filters || [];
-                arr = arr.filter(item => item.phileasPictureOutline !== true);
-                arr.push(phileasOutlineFilters[i]);
-                targets[j].filters = arr;
+                if (phileasOutlineFilters[i].needBacking) {
+                    bakeSprite(targets[j], phileasOutlineFilters[i]);
+                } else {
+                    applyFilter(targets[j], phileasOutlineFilters[i]);
+                }
             }
         }
     };
         
 //-----------------------------------------------------------------------------
 // Changed code
+
+    const Origin_Sprite_Picture_loadBitmap = Sprite_Picture.prototype.loadBitmap;
+    Sprite_Picture.prototype.loadBitmap = function() {
+        Origin_Sprite_Picture_loadBitmap.call(this);
+        this.isBaked = false;
+    };
 
     const Origin_updateMain = Scene_Map.prototype.updateMain;
     Scene_Map.prototype.updateMain = function() {
@@ -550,4 +636,3 @@
     /*# sourceMappingURL=pixi-filters.js.map*/
 
 }());
-    
