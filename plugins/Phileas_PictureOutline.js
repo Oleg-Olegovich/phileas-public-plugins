@@ -8,6 +8,7 @@
 // 2024.May.05 Ver1.1.1 Prettier faces
 // 2024.May.05 Ver1.1.2 Different HEX formats support
 // 2024.December.23 Ver1.2.0 Added picture sprite backing
+// 2024.December.24 Ver1.2.1 Added inner outline
 
 /*:
  * @target MZ
@@ -36,6 +37,11 @@
  * 
  * @arg backing
  * @text Sprite backing
+ * @type boolean
+ * @default false
+ * 
+ * @arg isInner
+ * @text Inner outline
  * @type boolean
  * @default false
  * 
@@ -75,6 +81,11 @@
  * @type boolean
  * @default false
  * 
+ * @arg isInner
+ * @text Inner outline
+ * @type boolean
+ * @default false
+ * 
  * 
  * @command eraseSeveral
  * @text Erase several outlines
@@ -105,6 +116,11 @@
  * @arg color
  * @text Color
  * @default 0xffffff
+ * 
+ * @arg isInner
+ * @text Inner outline
+ * @type boolean
+ * @default false
  * 
  * 
  * @command eraseFace
@@ -182,6 +198,11 @@
  * @type boolean
  * @default false
  * 
+ * @arg isInner
+ * @text Внутренняя обводка
+ * @type boolean
+ * @default false
+ * 
  *
  * @command erase
  * @text Удалить обводку картинки
@@ -218,6 +239,11 @@
  * @type boolean
  * @default false
  * 
+ * @arg isInner
+ * @text Внутренняя обводка
+ * @type boolean
+ * @default false
+ * 
  * 
  * @command eraseSeveral
  * @text Удалить несколько обводок
@@ -248,6 +274,11 @@
  * @arg color
  * @text Цвет
  * @default 0xffffff
+ * 
+ * @arg isInner
+ * @text Внутренняя обводка
+ * @type boolean
+ * @default false
  * 
  * 
  * @command eraseFace
@@ -319,6 +350,7 @@
         let data = {};
         data.thickness = filter.thickness;
         data.color = filter.color;
+        data.isInner = filter.isInner;
         return data;
     }
     
@@ -341,7 +373,21 @@
     function loadFilterData(data) {
         const thickness = data.thickness;
         const color = data.color;
-        return new PIXI.filters.OutlineFilter(thickness, color);
+
+        if (data.isInner) {
+            const glowFilter = new PIXI.filters.GlowFilter({
+                distance: 10,
+                outerStrength: 0,
+                innerStrength: thickness,
+                color: color
+            });
+            glowFilter.isInner = true;
+            return glowFilter;
+        }
+
+        const outlineFilter = new PIXI.filters.OutlineFilter(thickness, color);
+        outlineFilter.isInner = false;
+        return outlineFilter;
     }
     
     function loadPhileasFilterData(data) {
@@ -374,9 +420,23 @@
     }
     
     function createFilter(params) {
+        var isInner = params["isInner"] == "true";
+
+        if (isInner) {
+            const glowFilter = new PIXI.filters.GlowFilter({
+                distance: 10,
+                outerStrength: 0,
+                innerStrength: Number(params["thickness"]),
+                color: readColor(params["color"])
+            });
+            glowFilter.isInner = true;
+            return glowFilter;
+        }
+
         const thickness = Number(params["thickness"]);
         const color = readColor(params["color"]);
         const outlineFilter = new PIXI.filters.OutlineFilter(thickness, color);
+        outlineFilter.isInner = false;
         return outlineFilter;
     }
     
