@@ -5,6 +5,7 @@
 // 2024.November.09 Ver1.0.0 First Release
 // 2024.November.16 Ver1.1.0 Added media localization
 // 2024.November.29 Ver1.2.0 Added language data export/import and language selection menu
+// 2024.December.25 Ver1.2.1 Fixed text code decoding
 
 /*:
  * @target MZ
@@ -792,7 +793,10 @@ var DO_NOT_EXPORT_CODEPAGE=true;var DO_NOT_EXPORT_JSZIP=true;(function(e){if("ob
         }
 
         data = data[id];
-        textCode = textCode.substring(arrayJ + 1);
+        const offset = textCode[arrayJ + 1] == "."
+            ? 2
+            : 1;
+        textCode = textCode.substring(arrayJ + offset);
 
         return getLanguageData(data, textCode);
     }
