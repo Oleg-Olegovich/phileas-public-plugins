@@ -16,6 +16,7 @@
 // 2024.September.23 Ver1.3.6 Cursor data getting fix
 // 2024.September.23 Ver1.3.6 Cursor data getting fix
 // 2024.October.11 Ver1.3.7 Added cursor freezing
+// 2024.October.11 Ver1.3.8 Fixed common events preload
 
 /*:
  * @target MZ
@@ -709,7 +710,7 @@
         this.initialize(...arguments);
     }
 
-    PhileasCursorData.prototype.initialize = function () {
+    PhileasCursorData.prototype.initialize = function() {
         this.CursorPicture = "";
         this.CursorPictureOnClick = "";
         this.CursorFramesNumber = 1;
@@ -720,7 +721,7 @@
 
     PhileasCursorData.prototype.constructor = PhileasCursorData;
 
-    PhileasCursorData.prototype.setFromJson = function (params) {
+    PhileasCursorData.prototype.setFromJson = function(params) {
         if (params == undefined) {
             return;
         }
@@ -733,7 +734,7 @@
         this.CursorClickFramesNumber = Number(params["CursorClickFramesNumber"]);
     }
 
-    PhileasCursorData.prototype.setFromParams = function (params) {
+    PhileasCursorData.prototype.setFromParams = function(params) {
         if (params == "") {
             return;
         }
@@ -742,7 +743,7 @@
         this.setFromJson(params);
     }
 
-    PhileasCursorData.prototype.equals = function (cursorData) {
+    PhileasCursorData.prototype.equals = function(cursorData) {
         if (cursorData instanceof PhileasEventCursorData) {
             return false;
         }
@@ -759,7 +760,7 @@
         this.initialize(...arguments);
     }
 
-    PhileasEventCursorData.prototype.initialize = function () {
+    PhileasEventCursorData.prototype.initialize = function() {
         PhileasCursorData.prototype.initialize.call(this);
         this.CursorStartOnClick = false;
         this.CursorStartOnHover = false;
@@ -768,7 +769,7 @@
     PhileasEventCursorData.prototype = Object.create(PhileasCursorData.prototype);
     PhileasEventCursorData.prototype.constructor = PhileasEventCursorData;
 
-    PhileasEventCursorData.prototype.setFromNote = function (note) {
+    PhileasEventCursorData.prototype.setFromNote = function(note) {
         const meta = getMeta(note);
         if (meta == undefined) {
             return;
@@ -789,7 +790,7 @@
         this.CursorStartOnHover = this.CursorStartOnHover != undefined;
     };
 
-    PhileasEventCursorData.prototype.setFromJson = function (params) {
+    PhileasEventCursorData.prototype.setFromJson = function(params) {
         if (params == undefined) {
             return;
         }
@@ -804,7 +805,7 @@
         this.CursorStartOnHover = params["CursorStartOnHover"] == "true";
     }
 
-    PhileasEventCursorData.prototype.setFromParams = function (params) {
+    PhileasEventCursorData.prototype.setFromParams = function(params) {
         if (params == "") {
             return;
         }
@@ -813,7 +814,7 @@
         this.setFromJson(params);
     }
 
-    PhileasEventCursorData.prototype.equals = function (cursorData) {
+    PhileasEventCursorData.prototype.equals = function(cursorData) {
         if (!(cursorData instanceof PhileasEventCursorData)) {
             return false;
         }
@@ -965,7 +966,7 @@
         let preloadCounter = 1;
 
         const Origin_onDataLoad = DataManager.onLoad;
-        DataManager.onLoad = function (object) {
+        DataManager.onLoad = function(object) {
             Origin_onDataLoad.call(this, object);
             if (object.events) {
                 for (let i = 1; i < object.events.length; ++i) {
@@ -1229,7 +1230,7 @@
     document.addEventListener("mouseup", phileasCursorClickUpHandler);
 
 
-    Scene_Map.prototype.setupPhileasEventCursors = function () {
+    Scene_Map.prototype.setupPhileasEventCursors = function() {
         if (!(SceneManager._scene instanceof Scene_Map)) {
             return;
         }
@@ -1260,7 +1261,7 @@
         }
     };
 
-    Scene_Map.prototype.phileasCheckEventCursors = function (x, y) {
+    Scene_Map.prototype.phileasCheckEventCursors = function(x, y) {
         if (!eventCursorsEnabled || isFrozen) {
             return;
         }
@@ -1297,7 +1298,7 @@
         }
     };
 
-    TouchInput.phileasCheckClickEventCursors = function (x, y) {
+    TouchInput.phileasCheckClickEventCursors = function(x, y) {
         if (!eventCursorsEnabled) {
             return;
         }
@@ -1330,20 +1331,20 @@
 //--------CHANGED CORE:
 
     const Origin_loaded = Scene_Boot.prototype.onDatabaseLoaded;
-    Scene_Boot.prototype.onDatabaseLoaded = function () {
+    Scene_Boot.prototype.onDatabaseLoaded = function() {
         Origin_loaded.call(this);
         preloadCursorImages();
     };
 
     const Origin_setupNewGame = DataManager.setupNewGame;
-    DataManager.setupNewGame = function () {
+    DataManager.setupNewGame = function() {
         Origin_setupNewGame.call(this);
         changeCursorToBasic();
         isFrozen = isFrozenDefault;
     };
 
     const Origin_makeSaveContents = DataManager.makeSaveContents;
-    DataManager.makeSaveContents = function () {
+    DataManager.makeSaveContents = function() {
         let contents = Origin_makeSaveContents.call(this);
         contents.phileasDefaultCursor = defaultCursor;
         contents.phileasBattleCursor = battleCursor;
@@ -1356,7 +1357,7 @@
     };
 
     const Origin_extractSaveContents = DataManager.extractSaveContents;
-    DataManager.extractSaveContents = function (contents) {
+    DataManager.extractSaveContents = function(contents) {
         Origin_extractSaveContents.call(this, contents);
         defaultCursor = new PhileasCursorData();
         defaultCursor.setFromJson(contents.phileasDefaultCursor);
@@ -1392,7 +1393,7 @@
 
     if (gamepadHideKeyNumber != 0) {
         Origin_updateGamepadState = Input._updateGamepadState;
-        Input._updateGamepadState = function (gamepad) {
+        Input._updateGamepadState = function(gamepad) {
             Origin_updateGamepadState.call(this, gamepad);
             const lastState = this._gamepadStates[gamepad.index] || [];
             let state = this._gamepadStates[gamepad.index];
@@ -1405,13 +1406,13 @@
     }
 
     const Origin_onMapLoaded = Scene_Map.prototype.onMapLoaded;
-    Scene_Map.prototype.onMapLoaded = function () {
+    Scene_Map.prototype.onMapLoaded = function() {
         Origin_onMapLoaded.call(this);
         this.setupPhileasEventCursors();
     };
 
     const Origin_onMouseMove = TouchInput._onMouseMove;
-    TouchInput._onMouseMove = function (event) {
+    TouchInput._onMouseMove = function(event) {
         Origin_onMouseMove.call(this, event);
 
         const x = Graphics.pageToCanvasX(event.pageX);
@@ -1429,7 +1430,7 @@
     };
 
     const Origin_onTrigger = TouchInput._onTrigger;
-    TouchInput._onTrigger = function (x, y) {
+    TouchInput._onTrigger = function(x, y) {
         if (this.phileasCheckClickEventCursors(x, y)) {
             $gameTemp.clearDestination();
             return;
@@ -1440,26 +1441,26 @@
 
     if (!commonEventsPreload) {
         const Origin_CommonEventInitialize = Game_CommonEvent.prototype.initialize;
-        Game_CommonEvent.prototype.initialize = function (commonEventId) {
+        Game_CommonEvent.prototype.initialize = function(commonEventId) {
             preloadCursorDataFromCommandList($dataCommonEvents[commonEventId].list);
-            Origin_CommonEventInitialize.call(commonEventId);
+            Origin_CommonEventInitialize.call(this, commonEventId);
         };
     }
 
     const Origin_battleStart = Scene_Battle.prototype.start;
-    Scene_Battle.prototype.start = function () {
+    Scene_Battle.prototype.start = function() {
         Origin_battleStart.call(this);
         changeCursorToBasic();
     };
 
     const Origin_menuStart = Scene_MenuBase.prototype.start;
-    Scene_MenuBase.prototype.start = function () {
+    Scene_MenuBase.prototype.start = function() {
         Origin_menuStart.call(this);
         changeCursorToBasic();
     };
 
     const Origin_mapStart = Scene_Map.prototype.start;
-    Scene_Map.prototype.start = function () {
+    Scene_Map.prototype.start = function() {
         Origin_mapStart.call(this);
         changeCursorToBasic();
     };
