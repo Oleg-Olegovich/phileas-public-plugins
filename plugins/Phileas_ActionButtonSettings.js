@@ -33,7 +33,7 @@
  * https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_SkippingMessages.js
  * If you are using the Phileas's Options Manager plugin,
  * then place Phileas's Action Button Settings above in the plugins menu:
- * https://rpgmakerunion.ru/thread/mz-phileass-options-manager.333
+ * https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_OptionsManager.js
  * 
  * You can always write to the author if you need other features or even plugins.
  * Boosty: https://boosty.to/phileas
@@ -81,7 +81,7 @@
  * https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_SkippingMessages.js
  * Если вы используете плагин Phileas's Options Manager, 
  * то в меню плагинов расположите Phileas's Action Button Settings выше:
- * https://rpgmakerunion.ru/thread/mz-phileass-options-manager.333
+ * https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_OptionsManager.js
  *
  * Вы всегда можете написать автору, если вам нужны другие функции или даже плагины.
  * Boosty: https://boosty.to/phileas
