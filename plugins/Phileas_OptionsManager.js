@@ -13,6 +13,7 @@
 // 2024.May.8 Ver1.3.3 Switch labels
 // 2024.November.10 Ver1.3.4 Added window width, status width and visible options max number parameters
 // 2024.December.09 Ver1.3.5 Fixed switch option arrow keys
+// 2024.December.30 Ver1.4.0 Added always dash custom option
 
 /*:
  * @target MZ
@@ -37,9 +38,10 @@
  * @type struct<MessageSpeed>
  * @default {"AddMessageSpeed":"false","MessageSpeedOptionName":"Message speed","Position":"Top"}
  *
- * @param Show 'Always Dash' option?
- * @type boolean
- * @default true
+ * @param AlwaysDashOption
+ * @text 'Always Dash' option
+ * @type struct<AlwaysDash>
+ * @default {"addAlwaysDash":"true","defaultStatusText":"true","switchOnText":"","switchOffText":""}
  * 
  * @param Show 'Command Remember' option?
  * @type boolean
@@ -149,10 +151,10 @@
  * @type struct<MessageSpeed>
  * @default {"AddMessageSpeed":"false","MessageSpeedOptionName":"Скорость сообщения","Position":"Top"}
  *
- * @param Show 'Always Dash' option?
- * @text Показывать опцию 'Бег всегда'?
- * @type boolean
- * @default true
+ * @param AlwaysDashOption
+ * @text Опция 'Бег по умолчанию'
+ * @type struct<AlwaysDash>
+ * @default {"addAlwaysDash":"true","defaultStatusText":"true","switchOnText":"","switchOffText":""}
  * 
  * @param Show 'Command Remember' option?
  * @text Показывать опцию 'Запоминать команду'?
@@ -537,6 +539,54 @@
  * @desc Если значение равно true, значение параметра будет восстановлено при перезапуске игры.
  */
 
+/*~struct~AlwaysDash:
+ * @param addAlwaysDash
+ * @text Add 'Always Dash' option?
+ * @type boolean
+ * @default true
+ * @desc Adds a option to the Options window.
+ *
+ * @param defaultStatusText
+ * @text Default status text
+ * @type boolean
+ * @default true
+ * @desc Use the default values (ON/OFF)?
+ *
+ * @param switchOnText
+ * @text Switch On Label
+ * @default Dash
+ * @desc Status text.
+ * 
+ * @param switchOffText
+ * @text Switch Off Label
+ * @default Walk
+ * @desc Status text.
+ */
+
+/*~struct~AlwaysDash:ru
+ * @param addAlwaysDash
+ * @text Добавить опцию 'Бег по умолчанию'?
+ * @type boolean
+ * @default true
+ * @desc Добавляет опцию в окно опций.
+ *
+ * @param defaultStatusText
+ * @text Текст состояния по умолчанию
+ * @type boolean
+ * @default true
+ * @desc Использовать надписи по умолчанию (ВКЛ/ВЫКЛ)?
+ *
+ * @param switchOnText
+ * @text Текст ВКЛ
+ * @default Бег
+ * @desc Надпись состояния.
+ * 
+ * @param switchOffText
+ * @text Текст ВЫКЛ
+ * @default Шаг
+ * @desc Надпись состояния.
+ */
+
 (function() {
 
 //--------DATA:
@@ -548,7 +598,7 @@
     var fullscreenOption = getFullsreenOptionArray(JSON.parse(parameters["Fullscreen option"]) || {"AddFullscreen":false,"Fullscreen option name":"Fullscreen","Position":"Top"});
     var windowStateOption = getWindowStateOptionArray(JSON.parse(parameters["WindowStateOption"]) || {"AddWindowState":"false","WindowStateOptionName":"Состояние окна","Position":"Top"});
     var messageSpeedOption = getMessageSpeedOptionArray(JSON.parse(parameters["MessageSpeedOption"]) || {"AddMessageSpeed":false,"MessageSpeedOptionName":"Message speed","Position":"Top","MessageSpeedMax":10,"DefaultSpeed":10, "InstantName":"Instant"});
-    var showAlwaysDash = parameters["Show 'Always Dash' option?"] == "true";
+    var alwaysDashOption = parseAlwaysDashOption(parameters["AlwaysDashOption"] || "{\"addAlwaysDash\":\"true\",\"defaultStatusText\":\"true\",\"switchOnText\":\"\",\"switchOffText\":\"\"}");
     var showCommandRemember = parameters["Show 'Command Remember' option?"] == "true";
     var showTouchUI = parameters["Show 'Touch UI' option?"] == "true";
     var showBGMVolume = parameters["Show 'BGM Volume' option?"] == "true";
@@ -641,6 +691,13 @@
         }
         
         return [dict["AddMessageSpeed"] == "true", dict["MessageSpeedOptionName"], pos, dict["Remember"] == "true", max, def, dict["InstantName"]];
+    }
+
+    function parseAlwaysDashOption(par) {
+        var opt = JSON.parse(par);
+        opt.addAlwaysDash = opt.addAlwaysDash == "true";
+        opt.defaultStatusText = opt.defaultStatusText == "true";
+        return opt;
     }
     
     function setCustomOptionsDictionaries() {
@@ -814,7 +871,7 @@
     };
 
     Window_Options.prototype.addGeneralOptions = function() {
-        if (showAlwaysDash) {
+        if (alwaysDashOption.addAlwaysDash) {
             this.addCommand(TextManager.alwaysDash, "alwaysDash");
         }
         
@@ -895,8 +952,15 @@
         if (symbol == "messageSpeedVolume") {
             return messageSpeedValue == messageSpeedOption[4] ? messageSpeedOption[6] : messageSpeedValue;
         }
-        
+
         const value = this.getConfigValue(symbol);
+
+        if (symbol == "alwaysDash" && !alwaysDashOption.defaultStatusText) {
+            return value
+                ? alwaysDashOption.switchOnText
+                : alwaysDashOption.switchOffText;
+        }
+
         let opt = customOptions[symbol];
 
         if (this.isVolumeSymbol(symbol)) {
