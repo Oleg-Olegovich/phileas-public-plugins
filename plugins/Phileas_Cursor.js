@@ -16,7 +16,7 @@
 // 2024.September.23 Ver1.3.6 Cursor data getting fix
 // 2024.September.23 Ver1.3.6 Cursor data getting fix
 // 2024.October.11 Ver1.3.7 Added cursor freezing
-// 2024.October.11 Ver1.3.8 Fixed common events preload
+// 2024.December.30 Ver1.3.8 Fixed common events preload
 
 /*:
  * @target MZ
