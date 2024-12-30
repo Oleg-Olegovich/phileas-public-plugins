@@ -41,7 +41,7 @@
  * @param AlwaysDashOption
  * @text 'Always Dash' option
  * @type struct<AlwaysDash>
- * @default {"addAlwaysDash":"true","defaultStatusText":"true","switchOnText":"","switchOffText":""}
+ * @default {"addAlwaysDash":"true","defaultStatusText":"true","switchOnText":"Dash","switchOffText":"Walk"}
  * 
  * @param Show 'Command Remember' option?
  * @type boolean
@@ -154,7 +154,7 @@
  * @param AlwaysDashOption
  * @text Опция 'Бег по умолчанию'
  * @type struct<AlwaysDash>
- * @default {"addAlwaysDash":"true","defaultStatusText":"true","switchOnText":"","switchOffText":""}
+ * @default {"addAlwaysDash":"true","defaultStatusText":"true","switchOnText":"Бег","switchOffText":"Шаг"}
  * 
  * @param Show 'Command Remember' option?
  * @text Показывать опцию 'Запоминать команду'?
