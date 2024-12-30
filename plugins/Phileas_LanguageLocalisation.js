@@ -6,6 +6,7 @@
 // 2024.November.16 Ver1.1.0 Added media localization
 // 2024.November.29 Ver1.2.0 Added language data export/import and language selection menu
 // 2024.December.25 Ver1.2.1 Fixed text code decoding
+// 2024.December.30 Ver1.2.2 Fixed name edit setup
 
 /*:
  * @target MZ
@@ -1470,7 +1471,7 @@ var DO_NOT_EXPORT_CODEPAGE=true;var DO_NOT_EXPORT_JSZIP=true;(function(e){if("ob
         }, 100);
     };
 
-    const Origin_Window_NameEdit_setup = Window_Options.prototype.setup;
+    const Origin_Window_NameEdit_setup = Window_NameEdit.prototype.setup;
     Window_NameEdit.prototype.setup = function(actor, maxLength) {
         Origin_Window_NameEdit_setup.call(this, actor, maxLength);
         this._name = getText(this._name).slice(0, this._maxLength);
