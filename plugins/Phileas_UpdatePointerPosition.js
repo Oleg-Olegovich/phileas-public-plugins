@@ -7,7 +7,7 @@
  * @plugindesc 
  * @author Phileas
  *
- * @param isEnabledDeafult
+ * @param isEnabledDefault
  * @text Is enabled by default?
  * @type boolean
  * @default false
@@ -52,7 +52,7 @@
  * @plugindesc 
  * @author Phileas
  *
- * @param isEnabledDeafult
+ * @param isEnabledDefault
  * @text Включён по умолчанию?
  * @type boolean
  * @default false
@@ -94,7 +94,7 @@
 
 (() => {
     var parameters = PluginManager.parameters("Phileas_UpdatePointerPosition");
-    var isEnabled = parameters["isEnabledDeafult"] == "true";
+    var isEnabled = parameters["isEnabledDefault"] == "true";
     var xVariable = Number(parameters["xVariable"] || 0);
     var yVariable = Number(parameters["yVariable"] || 0);
     var updateSwitch = Number(parameters["updateSwitch"] || 0);
@@ -146,4 +146,24 @@
         let y = Graphics.pageToCanvasY(event.pageY);
         updateVariables(x, y);
     }
+
+    const Origin_makeSaveContents = DataManager.makeSaveContents;
+    DataManager.makeSaveContents = function() {
+        let contents = Origin_makeSaveContents.call(this);
+        contents.phileasUpdatePointerPositionIsEnabled = isEnabled;
+        contents.phileasUpdatePointerPositionXVariable = xVariable;
+        contents.phileasUpdatePointerPositionYVariable = yVariable;
+        contents.phileasUpdatePointerPositionUpdateSwitch = updateSwitch;
+
+        return contents;
+    };
+    
+    const Origin_extractSaveContents = DataManager.extractSaveContents;
+    DataManager.extractSaveContents = function(contents) {
+        Origin_extractSaveContents.call(this, contents);
+        isEnabled = contents.phileasUpdatePointerPositionIsEnabled;
+        xVariable = contents.phileasUpdatePointerPositionXVariable;
+        yVariable = contents.phileasUpdatePointerPositionYVariable;
+        updateSwitch = contents.phileasUpdatePointerPositionUpdateSwitch;
+    };
 })();
