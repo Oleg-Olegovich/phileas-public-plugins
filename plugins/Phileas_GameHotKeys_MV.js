@@ -1,5 +1,5 @@
 //=============================================================================
-// Phileas_GameHotKeys.js
+// Phileas_GameHotKeys_MV.js
 //=============================================================================
 // [Update History]
 // 2023.July.17 Ver1.0.0 First Release
@@ -10,7 +10,7 @@
 // 2025.January.01 Ver1.2.0 Removed unused event listeners
 
 /*:
- * @target MZ
+ * @target MV
  * @plugindesc Assigns common events and switches to keyboard, gamepad, and mouse keys
  * @author Phileas
  *
@@ -23,17 +23,14 @@
  * @default []
  *
  *
- * @command setHotKeysState
- * @text Controller
- * @desc Enables or disables hot keys.
- *
- * @arg enableHotKeys
- * @text Enable
- * @type boolean
- * @desc If this option is on, hotkeys are active.
- * @default true
  *
  * @help
+ * Use the plugin command to turn it on or off.
+ * Enabling the plugin:
+ *   Phileas_GameHotKeys_SetHotKeysState true
+ * Disabling the plugin:
+ *   Phileas_GameHotKeys_SetHotKeysState false
+ * 
  * The plugin has 2 parameters: Common Events and Switches. They differ only in one field: in Common Events, the number of the common event is set, and in Switch - the switch. The other fields are shared:
  * - Device type - the device that you want to track clicks on.
  * - Key name - string identifier of the button.
@@ -41,8 +38,6 @@
  *
  * Starting from version 1.1.0, blocking can be enabled in General Events. If it is enabled, then you can retriggered the event only after it completes execution.
  *
- * The plugin provides one command:
- * - Controller - allows to enable and disable hotkeys.
  *
  * First, the plugin searches for the Key name in the standard dictionaries of the engine. If you haven't redefined them, then they look like this:
  * 
@@ -171,17 +166,14 @@
  * @type struct<Switches>[]
  * @default []
  *
- * @command setHotKeysState
- * @text Контроллер
- * @desc Включает и отключает горячие клавиши
- *
- * @arg enableHotKeys
- * @text Включить
- * @type boolean
- * @desc Если параметр включён, горячие клавиши активны.
- * @default true
  *
  * @help
+ * Используйте команду плагина, чтобы включить или выключить его.
+ * Включение плагина:
+ *   Phileas_GameHotKeys_SetHotKeysState true
+ * Выключение плагина:
+ *   Phileas_GameHotKeys_SetHotKeysState false
+ * 
  * Плагин имеет 2 параметра: Общие события и Переключатели. Они отличаются только одним полем: в Common Events задается номер общего события, а в Switch - переключатель. Остальные поля являются общими:
  * - Тип устройства - устройство, на котором вы хотите отслеживать клики.
  * - Имя клавиши - строковый идентификатор кнопки.
@@ -189,8 +181,6 @@
  *
  * Начиная с версии 1.1.0, в Общих событиях можно включить блокировку. Если она включена, то повторно стриггерить событие можно будет только после того, как оно завершит выполнение.
  *
- * Плагин предоставляет одну команду:
- *  - Контроллер - позволяет включить и отключить горячие клавиши.
  *
  * Сначала плагин выполняет поиск названия ключа в стандартных словарях движка. Если вы не переопределили их, то они выглядят следующим образом:
  * 
@@ -322,7 +312,7 @@
         "right": 2
     }
 
-    var parameters = PluginManager.parameters("Phileas_GameHotKeys");
+    var parameters = PluginManager.parameters("Phileas_GameHotKeys_MV");
     var commonEventHotKeys = parsePluginParam(parameters["Common events"]);
     var switchHotKeys = parsePluginParam(parameters["Switches"]);
     var cehkKeyboard = undefined;
@@ -334,8 +324,6 @@
     
     var blockedEvents = new Set();
     var disableHotKeys = false;
-
-    PluginManager.registerCommand("Phileas_GameHotKeys", "setHotKeysState", setHotKeysStateByCommand);
 
 //--------MY CODE:
     function parsePluginParam(data) {
@@ -423,7 +411,7 @@
         if (disableHotKeys == true) {
             return;
         }
-        
+
         triggerPhileasCommonEvent(cehkKeyboard[code]);
         triggerPhileasSwitch(shkKeyboard[code]);
     }
@@ -469,12 +457,17 @@
             document.addEventListener("mousedown", phileasHotKeysMouseDownHandler);
         }
     }
-    
-    function setHotKeysStateByCommand(params) {
-        setHotKeysState(params["enableHotKeys"] != "true");
-    }
 
 //--------CHANGED CORE:
+
+    const Origin_Game_Interpreter_pluginCommand = Game_Interpreter.prototype.pluginCommand;
+    Game_Interpreter.prototype.pluginCommand = function(command, args) {
+        Origin_Game_Interpreter_pluginCommand.call(this, command, args);
+
+        if (command === "Phileas_GameHotKeys_SetHotKeysState") {
+            setHotKeysState(args[0] != "true");
+        }
+    };
     
     const Origin_updateGamepadState = Input._updateGamepadState;
     Input._updateGamepadState = function(gamepad) {
@@ -510,18 +503,22 @@
         
         Origin_terminate.call(this);
     };
-    
-    const Origin_loaded = Scene_Boot.prototype.onDatabaseLoaded;
-    Scene_Boot.prototype.onDatabaseLoaded = function() {
-        Origin_loaded.call(this);
-        
-        setCommonEventHotKeysDictionaries();
-        setSwitchHotKeysDictionaries();
-        
-        document.addEventListener("keydown", phileasHotKeysKeyDownHandler);
-        document.addEventListener("mousedown", phileasHotKeysMouseDownHandler);
-    };
 
+    const Origin_isDatabaseLoaded = DataManager.isDatabaseLoaded;
+    DataManager.isDatabaseLoaded = function() {
+        const result = Origin_isDatabaseLoaded.call(this);
+
+        if (result) {
+            setCommonEventHotKeysDictionaries();
+            setSwitchHotKeysDictionaries();
+
+            document.addEventListener("keydown", phileasHotKeysKeyDownHandler);
+            document.addEventListener("mousedown", phileasHotKeysMouseDownHandler);
+        }
+
+        return result;
+    };
+    
     const Origin_makeSaveContents = DataManager.makeSaveContents;
     DataManager.makeSaveContents = function() {
         let contents = Origin_makeSaveContents.call(this);
