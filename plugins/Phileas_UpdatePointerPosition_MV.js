@@ -100,14 +100,18 @@
         document.addEventListener("mouseover", handleMouseUpdateEvent);
     }
     
-    function switchPlugin() {
+    function switchPlugin(newValue) {
+        if (newValue == isEnabled) {
+            return;
+        }
+        
         isEnabled = !isEnabled;
         if (isEnabled) {
             document.addEventListener("mousemove", handleMouseUpdateEvent);
             document.addEventListener("mouseover", handleMouseUpdateEvent);
             return;
         }
-            
+        
         document.removeEventListener("mousemove", handleMouseUpdateEvent);
         document.addEventListener("mouseover", handleMouseUpdateEvent);
     }
@@ -117,11 +121,7 @@
         Origin_Game_Interpreter_pluginCommand.call(this, command, args);
 
         if (command === "Phileas_UpdatePointerPosition_SwitchPlugin") {
-            if ((args[0] == "true") == isEnabled) {
-                return;
-            }
-
-            switchPlugin();
+            switchPlugin(args[0] == "true");
         }
     };
 
@@ -153,23 +153,13 @@
     const Origin_makeSaveContents = DataManager.makeSaveContents;
     DataManager.makeSaveContents = function() {
         let contents = Origin_makeSaveContents.call(this);
-        contents.phileasUpdatePointerPositionXVariable = xVariable;
-        contents.phileasUpdatePointerPositionYVariable = yVariable;
-        contents.phileasUpdatePointerPositionUpdateSwitch = updateSwitch;
-        
-        if (contents.phileasUpdatePointerPositionIsEnabled != isEnabled) {
-            switchPlugin();
-        }
-
+        contents.phileasUpdatePointerPositionIsEnabled = isEnabled;
         return contents;
     };
     
     const Origin_extractSaveContents = DataManager.extractSaveContents;
     DataManager.extractSaveContents = function(contents) {
         Origin_extractSaveContents.call(this, contents);
-        isEnabled = contents.phileasUpdatePointerPositionIsEnabled;
-        xVariable = contents.phileasUpdatePointerPositionXVariable;
-        yVariable = contents.phileasUpdatePointerPositionYVariable;
-        updateSwitch = contents.phileasUpdatePointerPositionUpdateSwitch;
+        switchPlugin(contents.phileasUpdatePointerPositionIsEnabled || (parameters["isEnabledDefault"] == "true"));
     };
 })();

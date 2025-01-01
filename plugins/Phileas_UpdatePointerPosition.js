@@ -99,15 +99,15 @@
     var yVariable = Number(parameters["yVariable"] || 0);
     var updateSwitch = Number(parameters["updateSwitch"] || 0);
     
-    PluginManager.registerCommand("Phileas_UpdatePointerPosition", "switchPlugin", switchPlugin);
+    PluginManager.registerCommand("Phileas_UpdatePointerPosition", "switchPlugin", switchPluginByCommand);
     
     if (isEnabled) {
         document.addEventListener("mousemove", handleMouseUpdateEvent);
         document.addEventListener("mouseover", handleMouseUpdateEvent);
     }
     
-    function switchPlugin(params) {
-        if ((params["isEnabled"] == "true") == isEnabled) {
+    function switchPlugin(newValue) {
+        if (newValue == isEnabled) {
             return;
         }
         
@@ -120,6 +120,10 @@
         
         document.removeEventListener("mousemove", handleMouseUpdateEvent);
         document.addEventListener("mouseover", handleMouseUpdateEvent);
+    }
+
+    function switchPluginByCommand(params) {
+        switchPlugin(params["isEnabled"] == "true");
     }
     
     function updateVariables(x, y) {
@@ -151,19 +155,12 @@
     DataManager.makeSaveContents = function() {
         let contents = Origin_makeSaveContents.call(this);
         contents.phileasUpdatePointerPositionIsEnabled = isEnabled;
-        contents.phileasUpdatePointerPositionXVariable = xVariable;
-        contents.phileasUpdatePointerPositionYVariable = yVariable;
-        contents.phileasUpdatePointerPositionUpdateSwitch = updateSwitch;
-
         return contents;
     };
     
     const Origin_extractSaveContents = DataManager.extractSaveContents;
     DataManager.extractSaveContents = function(contents) {
         Origin_extractSaveContents.call(this, contents);
-        isEnabled = contents.phileasUpdatePointerPositionIsEnabled;
-        xVariable = contents.phileasUpdatePointerPositionXVariable;
-        yVariable = contents.phileasUpdatePointerPositionYVariable;
-        updateSwitch = contents.phileasUpdatePointerPositionUpdateSwitch;
+        switchPlugin(contents.phileasUpdatePointerPositionIsEnabled || (parameters["isEnabledDefault"] == "true"));
     };
 })();
