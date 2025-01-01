@@ -388,7 +388,7 @@
         if (id == undefined || $dataCommonEvents[id] == undefined) {
             return;
         }
-        
+
         if ($dataCommonEvents[id].list.phileasGameHotKeysBlock === true) {
             if (blockedEvents.has(id)) {
                 return;
@@ -396,7 +396,7 @@
             
             blockedEvents.add(id);
         }
-        
+
         $gameTemp.reserveCommonEvent(id);
     }
     
@@ -504,6 +504,12 @@
         Origin_terminate.call(this);
     };
 
+    const Origin_setupNewGame = DataManager.setupNewGame;
+    DataManager.setupNewGame = function() {
+        Origin_setupNewGame.call(this);
+        blockedEvents.clear();
+    };
+
     const Origin_isDatabaseLoaded = DataManager.isDatabaseLoaded;
     DataManager.isDatabaseLoaded = function() {
         const result = Origin_isDatabaseLoaded.call(this);
@@ -530,6 +536,7 @@
     DataManager.extractSaveContents = function(contents) {
         Origin_extractSaveContents.call(this, contents);
         setHotKeysState(contents.phileasDisableHotKeys || false);
+        blockedEvents.clear();
     };
     
 }());

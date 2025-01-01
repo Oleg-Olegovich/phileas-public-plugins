@@ -8,6 +8,7 @@
 // 2024.January.21 Ver1.1.1 Added the disable command
 // 2024.January.29 Ver1.1.2 Common events are set via the common events menu
 // 2025.January.01 Ver1.2.0 Removed unused event listeners
+// 2025.January.01 Ver1.2.1 Added cache cleanup when starting a new game
 
 /*:
  * @target MZ
@@ -522,6 +523,12 @@
         document.addEventListener("mousedown", phileasHotKeysMouseDownHandler);
     };
 
+    const Origin_setupNewGame = DataManager.setupNewGame;
+    DataManager.setupNewGame = function() {
+        Origin_setupNewGame.call(this);
+        blockedEvents.clear();
+    };
+
     const Origin_makeSaveContents = DataManager.makeSaveContents;
     DataManager.makeSaveContents = function() {
         let contents = Origin_makeSaveContents.call(this);
@@ -533,6 +540,7 @@
     DataManager.extractSaveContents = function(contents) {
         Origin_extractSaveContents.call(this, contents);
         setHotKeysState(contents.phileasDisableHotKeys || false);
+        blockedEvents.clear();
     };
     
 }());
