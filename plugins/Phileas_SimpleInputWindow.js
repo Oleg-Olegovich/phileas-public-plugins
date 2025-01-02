@@ -10,6 +10,7 @@
 // 2024.September.23 Ver1.2.0 Improved Japanese display
 // 2024.October.3 Ver1.2.1 If keyboard input is disabled, you can input the letter with the Z key and delete it with the X key
 // 2024.October.13 Ver1.2.2 Fixed the type of the "message" argument
+// 2025.January.02 Ver1.3.0 Added additional keys
 
 /*:
  * @target MZ
@@ -30,15 +31,30 @@
  * @default true
  *
  * @arg keyMap
- * @text Keys
+ * @text Main keys
  * @type select
  * @option Uppercase
  * @value uppercase
  * @option Lowercase
- * @value lowercase 
+ * @value lowercase
  * @option Digits
  * @value digits
+ * @option Punctuation marks
+ * @value marks
  * @default uppercase
+ * 
+ * @arg additionalKeyMaps
+ * @text Additional keys
+ * @type select[]
+ * @option Uppercase
+ * @value uppercase
+ * @option Lowercase
+ * @value lowercase
+ * @option Digits
+ * @value digits
+ * @option Punctuation marks
+ * @value marks
+ * @default []
  *
  * @arg minLength
  * @text Minimum input length
@@ -81,7 +97,7 @@
  * @desc Erases the current value before entering
  *
  * @arg language
- * @text Language
+ * @text Main language
  * @type select
  * @option English
  * @value en
@@ -116,10 +132,23 @@
  * @option Uppercase
  * @value uppercase
  * @option Lowercase
- * @value lowercase 
+ * @value lowercase
  * @option Digits
  * @value digits
  * @default uppercase
+ * 
+ * @arg additionalKeyMaps
+ * @text Additional keys
+ * @type select[]
+ * @option Uppercase
+ * @value uppercase
+ * @option Lowercase
+ * @value lowercase
+ * @option Digits
+ * @value digits
+ * @option Punctuation marks
+ * @value marks
+ * @default []
  *
  * @arg minLength
  * @text Minimum input length
@@ -234,10 +263,23 @@
  * @option Заглавные буквы
  * @value uppercase
  * @option Строчные буквы
- * @value lowercase 
+ * @value lowercase
  * @option Цифры
  * @value digits
  * @default uppercase
+ * 
+ * @arg additionalKeyMaps
+ * @text Дополнительные кнопки
+ * @type select[]
+ * @option Uppercase
+ * @value uppercase
+ * @option Lowercase
+ * @value lowercase
+ * @option Digits
+ * @value digits
+ * @option Punctuation marks
+ * @value marks
+ * @default []
  *
  * @arg minLength
  * @text Минимальная длина ввода
@@ -315,10 +357,23 @@
  * @option Заглавные буквы
  * @value uppercase
  * @option Строчные буквы
- * @value lowercase 
+ * @value lowercase
  * @option Цифры
  * @value digits
  * @default uppercase
+ * 
+ * @arg additionalKeyMaps
+ * @text Дополнительные кнопки
+ * @type select[]
+ * @option Uppercase
+ * @value uppercase
+ * @option Lowercase
+ * @value lowercase
+ * @option Digits
+ * @value digits
+ * @option Punctuation marks
+ * @value marks
+ * @default []
  *
  * @arg minLength
  * @text Минимальная длина ввода
@@ -413,6 +468,7 @@
 const SPACE_CHAR = " ";
 const BACKSPACE_CHAR = "←";
 const CONFIRM_CHAR = "✓";
+const KEYBOARD_SWITCH_CHAR = "⇆";
 
 const PHILEAS_KEYBOARD_ENGLISH_UPPERCASE =
     ["A", "B", "C", "D", "E",
@@ -420,7 +476,8 @@ const PHILEAS_KEYBOARD_ENGLISH_UPPERCASE =
      "K", "L", "M", "N", "O",
      "P", "Q", "R", "S", "T",
      "U", "V", "W", "X", "Y",
-     "Z", SPACE_CHAR, BACKSPACE_CHAR, CONFIRM_CHAR];
+     "Z", SPACE_CHAR, BACKSPACE_CHAR,
+     KEYBOARD_SWITCH_CHAR, CONFIRM_CHAR];
 
 const PHILEAS_KEYBOARD_ENGLISH_LOWERCASE =
     ["a", "b", "c", "d", "e",
@@ -428,7 +485,8 @@ const PHILEAS_KEYBOARD_ENGLISH_LOWERCASE =
      "k", "l", "m", "n", "o",
      "p", "q", "r", "s", "t",
      "u", "v", "w", "x", "y",
-     "z", SPACE_CHAR, BACKSPACE_CHAR, CONFIRM_CHAR];
+     "z", SPACE_CHAR,BACKSPACE_CHAR,
+     KEYBOARD_SWITCH_CHAR, CONFIRM_CHAR];
 
 const PHILEAS_KEYBOARD_RUSSIAN_UPPERCASE =
     ["А", "Б", "В", "Г", "Д",
@@ -437,7 +495,8 @@ const PHILEAS_KEYBOARD_RUSSIAN_UPPERCASE =
      "П", "Р", "С", "Т", "У",
      "Ф","Х", "Ц", "Ч", "Ш",
      "Щ", "Ъ", "Ы", "Ь", "Э",
-     "Ю", "Я", SPACE_CHAR, "Ё", BACKSPACE_CHAR, CONFIRM_CHAR];
+     "Ю", "Я", SPACE_CHAR, "Ё",
+     BACKSPACE_CHAR, KEYBOARD_SWITCH_CHAR, CONFIRM_CHAR];
 
 const PHILEAS_KEYBOARD_RUSSIAN_LOWERCASE =
     ["а", "б", "в", "г", "д",
@@ -446,7 +505,8 @@ const PHILEAS_KEYBOARD_RUSSIAN_LOWERCASE =
      "п", "р", "с", "т", "у",
      "ф", "х", "ц", "ч", "ш",
      "щ", "ъ", "ы", "ь", "э",
-     "ю", "я", SPACE_CHAR, "ё", BACKSPACE_CHAR, CONFIRM_CHAR];
+     "ю", "я", SPACE_CHAR, "ё",
+     BACKSPACE_CHAR, KEYBOARD_SWITCH_CHAR, CONFIRM_CHAR];
 
 const PHILEAS_KEYBOARD_JAPANESE =
     ["あ", "い", "う", "え", "お", "が", "ぎ", "ぐ", "げ", "ご",
@@ -457,12 +517,20 @@ const PHILEAS_KEYBOARD_JAPANESE =
         "は", "ひ", "ふ", "へ", "ほ", "ぁ", "ぃ", "ぅ", "ぇ", "ぉ",
         "ま", "み", "む", "め", "も", "っ", "ゃ", "ゅ", "ょ", "ゎ",
         "や", "ゆ", "よ", "わ", "ん", "ー", "～", "・", "＝", "☆",
-        "ら", "り", "る", "れ", "ろ", "ゔ", "を", SPACE_CHAR, BACKSPACE_CHAR, CONFIRM_CHAR];
+        "ら", "り", "る", "れ", "ろ", "ゔ", "を",
+        SPACE_CHAR, BACKSPACE_CHAR, KEYBOARD_SWITCH_CHAR, CONFIRM_CHAR];
 
 const PHILEAS_KEYBOARD_DIGITS =
     ["0", "1", "2", "3",
         "4", "5", "6", "7",
-        "8", "9", SPACE_CHAR, BACKSPACE_CHAR, CONFIRM_CHAR];
+        "8", "9", SPACE_CHAR,
+        BACKSPACE_CHAR, KEYBOARD_SWITCH_CHAR, CONFIRM_CHAR];
+
+const PHILEAS_KEYBOARD_MARKS =
+    [".", ",", "?", "!", ":", ";", "-", "—", "_", "’", "~", "`", "'",
+        "\"", "«", "»", "(", ")", "[", "]", "{", "}", "/", "\\", "|",
+        "@", "#", "№", "%", "^", "&", "*", "+", "=",
+        SPACE_CHAR, BACKSPACE_CHAR, KEYBOARD_SWITCH_CHAR, CONFIRM_CHAR];
 
 const PHILEAS_FACE_PADDING = 20;
 
@@ -484,6 +552,7 @@ const PHILEAD_EN_RU_MAP = {
     function handleInputCommand(actorId, showFace, variableId, params) {
         const language = params["language"];
         const keyMap = params["keyMap"];
+        const additionalKeyMaps = JSON.parse(params["additionalKeyMaps"]);
         const minLength = Number(params["minLength"]);
         const maxLength = Number(params["maxLength"]);
         const allowCancel = params["allowCancel"] == "true";
@@ -496,7 +565,7 @@ const PHILEAD_EN_RU_MAP = {
 
         SceneManager.push(Scene_PhileasInput);
         SceneManager.prepareNextScene(actorId, showFace, variableId, language,
-            keyMap, minLength, maxLength, allowCancel, allowSpace,
+            keyMap, additionalKeyMaps, minLength, maxLength, allowCancel, allowSpace,
             keyboardInput, firstIsUpper, clear, message, widthPadding);
     }
 
@@ -529,14 +598,13 @@ Scene_PhileasInput.prototype.initialize = function() {
 };
 
 Scene_PhileasInput.prototype.prepare = function(actorId, showFace,
-    variableId, language, keyMap, minLength, maxLength, allowCancel,
+    variableId, language, keyMap, additionalKeyMaps, minLength, maxLength, allowCancel,
     allowSpace, keyboardInput, firstIsUpper, clear, message, widthPadding) {
 
     this._actorId = actorId;
     this._showFace = showFace;
     this._variableId = variableId;
     this._language = language;
-    this._keyMap = keyMap;
     this._minLength = minLength;
     this._maxLength = maxLength;
     this._allowCancel = allowCancel;
@@ -547,9 +615,10 @@ Scene_PhileasInput.prototype.prepare = function(actorId, showFace,
     this._message = message == "" ? "" : JSON.parse(message);
     this._widthPadding = widthPadding;
 
-    const table = Window_PhileasInput.table(language, keyMap);
-    const columnsNumber = Math.ceil(Math.sqrt(table.length));
-    this._inputRowsNumber = Math.ceil(table.length / columnsNumber);
+    this._keyMaps = [keyMap];
+    this._keyMaps = this._keyMaps.concat(additionalKeyMaps);
+    this._keyMaps = this._keyMaps.filter((item, index) => this._keyMaps.indexOf(item) === index);
+    this._keyMapId = 0;
 };
 
 Scene_PhileasInput.prototype.create = function() {
@@ -557,14 +626,34 @@ Scene_PhileasInput.prototype.create = function() {
     this._actor = this._actorId == undefined
         ? undefined
         : $gameActors.actor(this._actorId);
-    this.createEditWindow();
-    this.createInputWindow();
-    this.createMessageWindow();
+    this.createWindows();
 };
 
-Scene_PhileasInput.prototype.start = function() {
-    Scene_MenuBase.prototype.start.call(this);
-    this._editWindow.refresh();
+Scene_PhileasInput.prototype.createWindows = function() {
+    this._windows = new Array(this._keyMaps.length);
+
+    for (let i = 0; i < this._keyMaps.length; ++i) {
+        this._windows[i] = {};
+
+        const inputRowsNumber = this.getInputRowsNumber(this._keyMaps[i]);
+        this.createEditWindow(this._windows[i], inputRowsNumber);
+        this.createInputWindow(this._windows[i], this._keyMaps[i], inputRowsNumber);
+        this.createMessageWindow(this._windows[i]);
+
+        this.addWindow(this._windows[i].editWindow);
+        this.addWindow(this._windows[i].inputWindow);
+        this.addWindow(this._windows[i].messageWindow);
+
+        this.hideWindows(i);
+    }
+
+    this.showWindows(0);
+};
+
+Scene_PhileasInput.prototype.getInputRowsNumber = function(keyMap) {
+    const table = Window_PhileasInput.table(this._language, keyMap);
+    const columnsNumber = Math.ceil(Math.sqrt(table.length));
+    return Math.ceil(table.length / columnsNumber);
 };
 
 Scene_PhileasInput.prototype.getMinWindowWidth = function(calcWindow) {
@@ -585,7 +674,13 @@ Scene_PhileasInput.prototype.getMinWindowWidth = function(calcWindow) {
     return width + 20;
 }
 
-Scene_PhileasInput.prototype.editWindowRect = function() {
+Scene_PhileasInput.prototype.createEditWindow = function(windows, inputRowsNumber) {
+    const rect = this.editWindowRect(inputRowsNumber);
+    windows.editWindow = new Window_PhileasEdit(rect, this._showFace, this._language);
+    windows.editWindow.setup(this._actor, this._variableId, this._maxLength, this._clear);
+};
+
+Scene_PhileasInput.prototype.editWindowRect = function(inputRowsNumber) {
     const calcWindow = new Window_PhileasEdit(new Rectangle(0, 0, 0, 0), this._language);
 
     const padding = $gameSystem.windowPadding();
@@ -597,65 +692,92 @@ Scene_PhileasInput.prototype.editWindowRect = function() {
 
     const wh = ImageManager.faceHeight + padding * 2;
     const wx = (Graphics.boxWidth - ww) / 2;
-    const inputWindowHeight = this.calcWindowHeight(this._inputRowsNumber, true);
+    const inputWindowHeight = this.calcWindowHeight(inputRowsNumber, true);
     const msgHeight = this._message == "" ? 0 : this.calcWindowHeight(2, false) + 8;
     const wy = (Graphics.boxHeight - (wh + inputWindowHeight + 8) - msgHeight) / 2;
 
     return new Rectangle(wx, wy, ww, wh);
 };
 
-Scene_PhileasInput.prototype.createEditWindow = function() {
-    const rect = this.editWindowRect();
-    this._editWindow = new Window_PhileasEdit(rect, this._showFace, this._language);
-    this._editWindow.setup(this._actor, this._variableId, this._maxLength, this._clear);
-    this.addWindow(this._editWindow);
-};
-
-Scene_PhileasInput.prototype.inputWindowRect = function() {
-    const wx = this._editWindow.x;
-    const wy = this._editWindow.y + this._editWindow.height + 8;
-    const ww = this._editWindow.width;
-    const wh = this.calcWindowHeight(this._inputRowsNumber, true);
-    return new Rectangle(wx, wy, ww, wh);
-};
-
-Scene_PhileasInput.prototype.createInputWindow = function() {
-    const rect = this.inputWindowRect();
-    this._inputWindow
-        = new Window_PhileasInput(rect, this._language, this._keyMap,
+Scene_PhileasInput.prototype.createInputWindow = function(windows, keymap, inputRowsNumber) {
+    const rect = this.inputWindowRect(windows.editWindow, inputRowsNumber);
+    windows.inputWindow
+        = new Window_PhileasInput(this, rect, this._language, keymap,
             this._keyboardInput, this._allowCancel, this._allowSpace, this._minLength);
-    this._inputWindow.setEditWindow(this._editWindow);
-    this._inputWindow.setHandler("ok", this.onInputOk.bind(this));
-    this._inputWindow.setHandler("cancel", this.onInputCancel.bind(this));
-    this.addWindow(this._inputWindow);
+    windows.inputWindow.setEditWindow(windows.editWindow);
+    windows.inputWindow.setHandler("ok", this.onInputOk.bind(this));
+    windows.inputWindow.setHandler("cancel", this.onInputCancel.bind(this));
 };
 
-Scene_PhileasInput.prototype.messageWindowRect = function() {
-    const wx = this._inputWindow.x;
-    const wy = this._inputWindow.y + this._inputWindow.height + 8;
-    const ww = this._inputWindow.width;
-    const wh = this.calcWindowHeight(2, false) + 8;
+Scene_PhileasInput.prototype.inputWindowRect = function(editWindow, inputRowsNumber) {
+    const wx = editWindow.x;
+    const wy = editWindow.y + editWindow.height + 8;
+    const ww = editWindow.width;
+    const wh = this.calcWindowHeight(inputRowsNumber, true);
     return new Rectangle(wx, wy, ww, wh);
 };
 
-Scene_PhileasInput.prototype.createMessageWindow = function() {
+Scene_PhileasInput.prototype.createMessageWindow = function(windows) {
     if (this._message == "") {
         return;
     }
 
-    const rect = this.messageWindowRect();
-    this._messageWindow = new Window_PhileasMessage(rect, this._message);
-    this.addWindow(this._messageWindow);
+    const rect = this.messageWindowRect(windows.inputWindow);
+    windows.messageWindow = new Window_PhileasMessage(rect, this._message);
+};
+
+Scene_PhileasInput.prototype.messageWindowRect = function(inputWindow) {
+    const wx = inputWindow.x;
+    const wy = inputWindow.y + inputWindow.height + 8;
+    const ww = inputWindow.width;
+    const wh = this.calcWindowHeight(2, false) + 8;
+    return new Rectangle(wx, wy, ww, wh);
+};
+
+Scene_PhileasInput.prototype.start = function() {
+    Scene_MenuBase.prototype.start.call(this);
+    this._windows[0].editWindow.refresh();
+};
+
+Scene_PhileasInput.prototype.hideWindows = function(id) {
+    this._windows[id].inputWindow.phileasExit();
+    this._windows[id].editWindow.hide();
+    this._windows[id].inputWindow.hide();
+    this._windows[id].messageWindow.hide();
+};
+
+Scene_PhileasInput.prototype.showWindows = function(id) {
+    this._windows[id].editWindow.show();
+    this._windows[id].inputWindow.show();
+    this._windows[id].inputWindow.activate();
+    this._windows[id].messageWindow.show();
+};
+
+Scene_PhileasInput.prototype.switchWindows = function() {
+    if (this._keyMaps.length == 1) {
+        SoundManager.playBuzzer();
+        return;
+    }
+
+    const oldId = this._keyMapId;
+    this._keyMapId = (this._keyMapId + 1) % this._keyMaps.length;
+
+    this._windows[this._keyMapId].editWindow._name = this._windows[oldId].editWindow._name;
+    this._windows[this._keyMapId].editWindow._index = this._windows[oldId].editWindow._index;
+    this._windows[this._keyMapId].editWindow.refresh();
+
+    this.hideWindows(oldId);
+    this.showWindows(this._keyMapId);
 };
 
 Scene_PhileasInput.prototype.onInputOk = function() {
-    let value = this._editWindow.name();
+    let value = this._windows[this._keyMapId].editWindow.name();
     if (this._firstIsUpper) {
         value = value.charAt(0).toUpperCase() + value.slice(1);
     }
 
     if (this._actor == undefined) {
-        if (this._keyMap == "digits") {
+        if (!isNaN(Number(value))) {
             value = Number(value);
         }
 
@@ -664,16 +786,17 @@ Scene_PhileasInput.prototype.onInputOk = function() {
         this._actor.setName(value);
     }
 
-    this._inputWindow.deactivate();
-    this._inputWindow.phileasExit();
-    this.popScene();
+    this.processExit();
 };
 
 Scene_PhileasInput.prototype.onInputCancel = function() {
-    this._inputWindow.deactivate();
-    this._inputWindow.phileasExit();
-    this.popScene();
+    this.processExit();
 };
+
+Scene_PhileasInput.prototype.processExit = function() {
+    this._windows[this._keyMapId].inputWindow.phileasExit();
+    this.popScene();
+}
 
 //-----------------------------------------------------------------------------
 // Window_PhileasInput
@@ -686,8 +809,10 @@ Window_PhileasInput.prototype = Object.create(Window_Selectable.prototype);
 Window_PhileasInput.prototype.constructor = Window_PhileasInput;
 
 Window_PhileasInput.prototype.initialize
-    = function(rect, language, keyMap, keyboardInput,
+    = function(scene, rect, language, keyMap, keyboardInput,
         allowCancel, allowSpace, minLength) {
+
+        this._scene = scene;
 
         this.upArrowVisible = false;
         this._keyboardInput = keyboardInput;
@@ -728,13 +853,14 @@ Window_PhileasInput.prototype.phileasExit = function() {
         Input.keyMapper[88] = this.saveX;
         Input.keyMapper[90] = this.saveZ;
     }
+
+    this.deactivate();
 };
 
 Window_PhileasInput.prototype.setEditWindow = function(editWindow) {
     this._editWindow = editWindow;
     this.refresh();
     this.updateCursor();
-    this.activate();
 };
 
 Window_PhileasInput.table = function(language, keyMap) {
@@ -754,8 +880,10 @@ Window_PhileasInput.table = function(language, keyMap) {
         } else {
             return PHILEAS_KEYBOARD_RUSSIAN_LOWERCASE;
         }
-    } else {
+    } else if (keyMap == "digits") {
         return PHILEAS_KEYBOARD_DIGITS;
+    } else {
+        return PHILEAS_KEYBOARD_MARKS;
     }
 };
 
@@ -772,12 +900,12 @@ Window_PhileasInput.prototype.itemWidth = function() {
 };
 
 Window_PhileasInput.prototype.character = function() {
-    if (!this._allowSpace && this._index + 3 == this._table.length) {
+    if (!this._allowSpace && this.isSpace()) {
         this.playBuzzerSound();
         return;
     }
 
-    return this._index + 2 < this._table.length ? this._table[this._index] : "";
+    return this._index + 3 < this._table.length ? this._table[this._index] : "";
 };
 
 Window_PhileasInput.prototype.itemRect = function(index) {
@@ -878,6 +1006,11 @@ Window_PhileasInput.prototype.keyDownHandler = function(event) {
         return;
     }
 
+    if (event.key == "Tab") {
+        this.processSwitch();
+        return;
+    }
+
     if (this.isDeletePressed(event)) {
         this.processBack();
         return;
@@ -947,22 +1080,35 @@ Window_PhileasInput.prototype.processBack = function() {
     }
 };
 
+Window_PhileasInput.prototype.processSwitch = function() {
+    this._scene.switchWindows();
+};
+
 Window_PhileasInput.prototype.isOk = function() {
     return this._index + 1 === this._table.length;
 };
 
-Window_PhileasInput.prototype.isBackspace = function() {
+Window_PhileasInput.prototype.isSwitch = function() {
     return this._index + 2 === this._table.length;
 };
 
+Window_PhileasInput.prototype.isBackspace = function() {
+    return this._index + 3 === this._table.length;
+};
+
+Window_PhileasInput.prototype.isSpace = function() {
+    return this._index + 4 == this._table.length;
+}
+
 Window_PhileasInput.prototype.processOk = function() {
-    this.playOkSound();
     if (this.character()) {
         this.onNameAdd();
     } else if (this.isOk()) {
         this.onNameOk();
     } else if (this.isBackspace()) {
         this.processBack();
+    } else if (this.isSwitch()) {
+        this.processSwitch();
     }
 };
 
