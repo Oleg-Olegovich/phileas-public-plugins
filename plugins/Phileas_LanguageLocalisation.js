@@ -1387,8 +1387,6 @@ var DO_NOT_EXPORT_CODEPAGE=true;var DO_NOT_EXPORT_JSZIP=true;(function(e){if("ob
         Origin_Scene_Boot_start.call(this);
 
         if (!DataManager.isBattleTest() && !DataManager.isEventTest()) {
-            
-
             if (ConfigManager.phileasLanguageIndex == undefined) {
                 if (openLanuageSelectionMenu) {
                     const nextScene = SceneManager._nextScene.constructor;
