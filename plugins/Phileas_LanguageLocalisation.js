@@ -7,7 +7,7 @@
 // 2024.November.29 Ver1.2.0 Added language data export/import and language selection menu
 // 2024.December.25 Ver1.2.1 Fixed text code decoding
 // 2024.December.30 Ver1.2.2 Fixed name edit setup
-// 2025.January.04 Ver1.2.3 Fixed language selection menu
+// 2025.January.04 Ver1.2.3 Language selection menu customization
 
 /*:
  * @target MZ
@@ -32,7 +32,18 @@
  * @type string[]
  * @default []
  * 
+ * @param languageSelectionMenuParent
+ * @text Language selection menu
+ * 
+ * @param openLanuageSelectionMenu
+ * @parent languageSelectionMenuParent
+ * @text Open menu
+ * @desc If ON, the language selection will open when the game is started for the first time. If OFF, the first language from the "Languages" parameter will be set
+ * @type boolean
+ * @default true
+ * 
  * @param languageSelectionWindowMargin
+ * @parent languageSelectionMenuParent
  * @text Language selection window margin
  * @desc The value is added to the margin items vertically
  * @type number
@@ -325,7 +336,18 @@
  * @type string[]
  * @default []
  * 
+ * @param languageSelectionMenuParent
+ * @text Меню выбора языка
+ * 
+ * @param openLanuageSelectionMenu
+ * @parent languageSelectionMenuParent
+ * @text Открывать меню
+ * @desc Если ON, при первом запуске игры будет открываться выбор языка. Если OFF, установится первый язык из параметра "Языки"
+ * @type boolean
+ * @default true
+ * 
  * @param languageSelectionWindowMargin
+ * @parent languageSelectionMenuParent
  * @text Отступ окна выбора языка
  * @desc Значение прибавляется к отступу пунктов по вертикали
  * @type number
@@ -639,6 +661,7 @@ var DO_NOT_EXPORT_CODEPAGE=true;var DO_NOT_EXPORT_JSZIP=true;(function(e){if("ob
     var option = parameters["option"];
     var languages = loadLanguages();
     var files = loadFiles();
+    var openLanuageSelectionMenu = parameters["openLanuageSelectionMenu"] == "true";
     var languageSelectionWindowMargin = Number(parameters["languageSelectionWindowMargin"]);
 
     var languageData = {};
@@ -1364,10 +1387,18 @@ var DO_NOT_EXPORT_CODEPAGE=true;var DO_NOT_EXPORT_JSZIP=true;(function(e){if("ob
         Origin_Scene_Boot_start.call(this);
 
         if (!DataManager.isBattleTest() && !DataManager.isEventTest()) {
+            
+
             if (ConfigManager.phileasLanguageIndex == undefined) {
-                const nextScene = SceneManager._nextScene.constructor;
-                SceneManager.goto(Scene_LanguageSelection);
-                SceneManager.prepareNextScene(nextScene);
+                if (openLanuageSelectionMenu) {
+                    const nextScene = SceneManager._nextScene.constructor;
+                    SceneManager.goto(Scene_LanguageSelection);
+                    SceneManager.prepareNextScene(nextScene);
+                } else {
+                    setLanguage(0, () => {
+                        updateGameTitle();
+                    });
+                }
             } else {
                 loadLanguageData(() => {
                     updateGameTitle();
