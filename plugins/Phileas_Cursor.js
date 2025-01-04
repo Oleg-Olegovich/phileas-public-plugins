@@ -17,6 +17,7 @@
 // 2024.September.23 Ver1.3.6 Cursor data getting fix
 // 2024.October.11 Ver1.3.7 Added cursor freezing
 // 2024.December.30 Ver1.3.8 Fixed common events preload
+// 2025.January.04 Ver1.3.9 Title screen cursor
 
 /*:
  * @target MZ
@@ -42,7 +43,13 @@
  * @parent basicCursors
  * @text Menu cursor
  * @type struct<CursorDataStruct>
- * @desc Used in menu. If not set, the "Default cursor" will be used
+ * @desc Used in the game menu. If not set, the "Default cursor" will be used
+ *
+ * @param titleCursor
+ * @parent basicCursors
+ * @text Title screen cursor
+ * @type struct<CursorDataStruct>
+ * @desc Used on the title screen. If not set, the "Default cursor" will be used
  *
  * @param cursorDisplay
  * @text Cursor display
@@ -129,6 +136,12 @@
  *
  * @command setMenuCursor
  * @text Change the menu cursor
+ * @arg cursorData
+ * @text Configuration
+ * @type struct<CursorDataStruct>
+ *
+ * @command setTitleCursor
+ * @text Change the title screen cursor
  * @arg cursorData
  * @text Configuration
  * @type struct<CursorDataStruct>
@@ -374,6 +387,12 @@
  * @type struct<CursorDataStruct>
  * @desc Используется в меню. Если не установлен, будет использоваться "Курсор по умолчанию"
  *
+ * @param titleCursor
+ * @parent basicCursors
+ * @text Курсор титульного экрана
+ * @type struct<CursorDataStruct>
+ * @desc Используется на титульном экране. Если не установлен, будет использоваться "Курсор по умолчанию"
+ *
  * @param cursorDisplay
  * @text Отображение курсора
  *
@@ -461,6 +480,12 @@
  * @text Изменить курсор меню
  * @arg cursorData
  * @text Настройки
+ * @type struct<CursorDataStruct>
+ *
+ * @command setTitleCursor
+ * @text Изменить курсор титульного экрана
+ * @arg cursorData
+ * @text Configuration
  * @type struct<CursorDataStruct>
  *
  * @command hide
@@ -735,7 +760,7 @@
     }
 
     PhileasCursorData.prototype.setFromParams = function(params) {
-        if (params == "") {
+        if (params == "" || params == undefined) {
             return;
         }
 
@@ -806,7 +831,7 @@
     }
 
     PhileasEventCursorData.prototype.setFromParams = function(params) {
-        if (params == "") {
+        if (params == "" || params == undefined) {
             return;
         }
 
@@ -861,6 +886,8 @@
     battleCursor.setFromParams(parameters["battleCursor"]);
     var menuCursor = new PhileasCursorData();
     menuCursor.setFromParams(parameters["menuCursor"]);
+    var titleCursor = new PhileasCursorData();
+    titleCursor.setFromParams(parameters["titleCursor"]);
     var eventCursorsEnabled = true;
     var currentHidden = false;
     var currentClick = false;
@@ -879,6 +906,7 @@
     PluginManager.registerCommand("Phileas_Cursor", "setDefaultCursor", setDefaultCursor);
     PluginManager.registerCommand("Phileas_Cursor", "setBattleCursor", setBattleCursor);
     PluginManager.registerCommand("Phileas_Cursor", "setMenuCursor", setMenuCursor);
+    PluginManager.registerCommand("Phileas_Cursor", "setTitleCursor", setTitleCursor);
     PluginManager.registerCommand("Phileas_Cursor", "hide", hide);
     PluginManager.registerCommand("Phileas_Cursor", "show", show);
     PluginManager.registerCommand("Phileas_Cursor", "setEventCursorData", setEventCursorData);
@@ -935,6 +963,7 @@
                 case "setDefaultCursor":
                 case "setBattleCursor":
                 case "setMenuCursor":
+                case "setTitleCursor":
                     cursorCommandData.setFromParams(list[i].parameters[3].cursorData);
                     break;
                 case "setEventCursorData":
@@ -999,6 +1028,7 @@
         preloadCursorData(defaultCursor);
         preloadCursorData(battleCursor);
         preloadCursorData(menuCursor);
+        preloadCursorData(titleCursor);
 
         if (commonEventsPreload) {
             preloadCursorDataFromCommonEvents();
@@ -1085,20 +1115,22 @@
         menuCursor.setFromParams(params["cursorData"]);
     }
 
+    function setTitleCursor(params) {
+        titleCursor.setFromParams(params["cursorData"]);
+    }
+
     function changeCursorToBasic() {
         let scene = SceneManager._scene;
 
         if (battleCursor.CursorPicture != "" && scene instanceof Scene_Battle) {
             setCurrentCursor(battleCursor);
-            return;
-        }
-
-        if (menuCursor.CursorPicture != "" && scene instanceof Scene_MenuBase) {
+        } else if (menuCursor.CursorPicture != "" && scene instanceof Scene_MenuBase) {
             setCurrentCursor(menuCursor);
-            return;
+        } else if (setTitleCursor.CursorPicture != "" && scene instanceof Scene_Title) {
+            setCurrentCursor(titleCursor);
+        } else {
+            setCurrentCursor(defaultCursor);
         }
-
-        setCurrentCursor(defaultCursor);
 
         if (isFrozen) {
             requestAnimationFrame(updatePhileasCursor);
@@ -1336,6 +1368,13 @@
         preloadCursorImages();
     };
 
+    const Origin_Scene_Title_create = Scene_Title.prototype.create;
+    Scene_Title.prototype.create = function() {
+        Origin_Scene_Title_create.call(this);
+        changeCursorToBasic();
+        isFrozen = isFrozenDefault;
+    };
+
     const Origin_setupNewGame = DataManager.setupNewGame;
     DataManager.setupNewGame = function() {
         Origin_setupNewGame.call(this);
@@ -1349,6 +1388,7 @@
         contents.phileasDefaultCursor = defaultCursor;
         contents.phileasBattleCursor = battleCursor;
         contents.phileasMenuCursor = menuCursor;
+        contents.phileasTitleCursor = titleCursor;
         contents.phileasCursorHidden = currentHidden;
         contents.eventCursorsEnabled = eventCursorsEnabled;
         contents.phileasGlobalEventCursorData = phileasGlobalEventCursorData;
@@ -1365,6 +1405,8 @@
         battleCursor.setFromJson(contents.phileasBattleCursor);
         menuCursor = new PhileasCursorData();
         menuCursor.setFromJson(contents.phileasMenuCursor);
+        titleCursor = new PhileasCursorData();
+        titleCursor.setFromJson(contents.phileasTitleCursor);
         isFrozen = contents.phileasCursorIsFrozen;
         phileasGlobalEventCursorData = {};
         const data = contents.phileasGlobalEventCursorData || {};
