@@ -18,6 +18,7 @@
 // 2024.October.11 Ver1.3.7 Added cursor freezing
 // 2024.December.30 Ver1.3.8 Fixed common events preload
 // 2025.January.04 Ver1.3.9 Title screen cursor
+// 2025.January.06 Ver1.3.10 Fixed cursor hiding
 
 /*:
  * @target MZ
@@ -1073,6 +1074,10 @@
     }
 
     function updatePhileasCursor() {
+        if (currentHidden) {
+            return;
+        }
+
         const now = Date.now();
         const passedTime = now - lastFrameIncrementTime;
         if (currentClick) {
@@ -1095,7 +1100,7 @@
     requestAnimationFrame(updatePhileasCursor);
 
     function setCurrentCursor(cursorData) {
-        if (currentCursor.equals(cursorData)) {
+        if (currentHidden || currentCursor.equals(cursorData)) {
             return;
         }
 
@@ -1120,6 +1125,10 @@
     }
 
     function changeCursorToBasic() {
+        if (currentHidden) {
+            return;
+        }
+
         let scene = SceneManager._scene;
 
         if (battleCursor.CursorPicture != "" && scene instanceof Scene_Battle) {
@@ -1140,11 +1149,13 @@
     function hide() {
         currentHidden = true;
         document.body.style.cursor = "none";
+        currentCursorSet.file = null;
     }
 
     function show() {
         currentHidden = false;
         changeCursorToBasic();
+        updatePhileasCursor();
     }
 
     function refreshEventCursor(eventId, cursorData) {
