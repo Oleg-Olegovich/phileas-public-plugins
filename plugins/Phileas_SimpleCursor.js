@@ -1,5 +1,5 @@
 //=============================================================================
-// Phileas_CursorMini.js
+// Phileas_SimpleCursor.js
 //=============================================================================
 // [Update History]
 // 2025.January.04 Ver1.0.0 First Release
@@ -451,7 +451,7 @@
         "right": 2
     }
 
-    var parameters = PluginManager.parameters("Phileas_CursorMini");
+    var parameters = PluginManager.parameters("Phileas_SimpleCursor");
     var hideAtStartup = parameters["hideAtStartup"] == "true";
     var keyboardHideKey = parameters["keyboardHideKey"] || "";
     var keyboardHideKeyNumber = Number(parameters["keyboardHideKeyNumber"] || 0);
@@ -476,12 +476,12 @@
 
     setCurrentCursor(defaultCursor);
 
-    PluginManager.registerCommand("Phileas_CursorMini", "setDefaultCursor", setDefaultCursor);
-    PluginManager.registerCommand("Phileas_CursorMini", "setBattleCursor", setBattleCursor);
-    PluginManager.registerCommand("Phileas_CursorMini", "setMenuCursor", setMenuCursor);
-    PluginManager.registerCommand("Phileas_CursorMini", "setTitleCursor", setTitleCursor);
-    PluginManager.registerCommand("Phileas_CursorMini", "hide", hide);
-    PluginManager.registerCommand("Phileas_CursorMini", "show", show);
+    PluginManager.registerCommand("Phileas_SimpleCursor", "setDefaultCursor", setDefaultCursor);
+    PluginManager.registerCommand("Phileas_SimpleCursor", "setBattleCursor", setBattleCursor);
+    PluginManager.registerCommand("Phileas_SimpleCursor", "setMenuCursor", setMenuCursor);
+    PluginManager.registerCommand("Phileas_SimpleCursor", "setTitleCursor", setTitleCursor);
+    PluginManager.registerCommand("Phileas_SimpleCursor", "hide", hide);
+    PluginManager.registerCommand("Phileas_SimpleCursor", "show", show);
 
 
 //-----------------------------------------------------------------------------
@@ -514,7 +514,7 @@
     function preloadCursorDataFromCommandList(list) {
         let cursorCommandData = new PhileasCursorData();
         for (let i = 0; i < list.length; ++i) {
-            if (list[i].code != 357 || list[i].parameters[0] != "Phileas_CursorMini") {
+            if (list[i].code != 357 || list[i].parameters[0] != "Phileas_SimpleCursor") {
                 continue;
             }
 
