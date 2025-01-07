@@ -11,6 +11,7 @@
 // 2024.October.3 Ver1.2.1 If keyboard input is disabled, you can input the letter with the Z key and delete it with the X key
 // 2024.October.13 Ver1.2.2 Fixed the type of the "message" argument
 // 2025.January.02 Ver1.3.0 Added additional keys
+// 2025.January.06 Ver1.3.1 Fixed window without help message 
 
 /*:
  * @target MZ
@@ -642,7 +643,10 @@ Scene_PhileasInput.prototype.createWindows = function() {
 
         this.addWindow(this._windows[i].editWindow);
         this.addWindow(this._windows[i].inputWindow);
-        this.addWindow(this._windows[i].messageWindow);
+
+        if (this._windows[i].messageWindow != null) {
+            this.addWindow(this._windows[i].messageWindow);
+        }
 
         this.hideWindows(i);
     }
@@ -719,6 +723,7 @@ Scene_PhileasInput.prototype.inputWindowRect = function(editWindow, inputRowsNum
 
 Scene_PhileasInput.prototype.createMessageWindow = function(windows) {
     if (this._message == "") {
+        windows.messageWindow = null;
         return;
     }
 
@@ -743,14 +748,20 @@ Scene_PhileasInput.prototype.hideWindows = function(id) {
     this._windows[id].inputWindow.phileasExit();
     this._windows[id].editWindow.hide();
     this._windows[id].inputWindow.hide();
-    this._windows[id].messageWindow.hide();
+
+    if (this._windows[id].messageWindow != null) {
+        this._windows[id].messageWindow.hide();
+    }
 };
 
 Scene_PhileasInput.prototype.showWindows = function(id) {
     this._windows[id].editWindow.show();
     this._windows[id].inputWindow.show();
     this._windows[id].inputWindow.activate();
-    this._windows[id].messageWindow.show();
+
+    if (this._windows[id].messageWindow != null) {
+        this._windows[id].messageWindow.show();
+    }
 };
 
 Scene_PhileasInput.prototype.switchWindows = function() {
