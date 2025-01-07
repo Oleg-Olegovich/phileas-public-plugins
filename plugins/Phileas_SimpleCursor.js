@@ -128,6 +128,10 @@
  *
  * 
  * @help
+ * This is a simplified version of the Phileas's Cursor plugin for those
+ * who do not need animated cursors and cursor changes when hovering over an event:
+ * https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_Cursor.js
+ * 
  * Changes the cursor image to any of the img/system.
  * Animated cursors are supported, details below.
  * Use png format!
@@ -322,6 +326,10 @@
  *
  * 
  * @help
+ * Это упрощённая версия плагина Phileas's Cursor для тех,
+ * кому не нужны анимированные курсоры и смена курсора при наведении на событие:
+ * https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_Cursor.js
+ * 
  * Изменяет картинку курсора на любую из img/system.
  * Поддерживаются анимированные курсоры, подробности ниже.
  * Используйте формат png!
