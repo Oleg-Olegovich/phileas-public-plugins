@@ -12,6 +12,7 @@
 // 2024.April.20 Ver1.2.4 Custom line spacing
 // 2024.May.19 Ver1.2.5 Displaying labels on hover
 // 2025.January.07 Ver1.3.0 Alternative commands with parameters
+// 2025.January.08 Ver1.3.1 Fixed center picture rendering
 
 /*:
  * @target MZ
@@ -803,9 +804,9 @@
         this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x - bitmap.width, 0);
     }
 
-    Window_PhileasEventLabel.prototype.drawPhileasLabelPictureCenter = function(x) {
+    Window_PhileasEventLabel.prototype.drawPhileasLabelPictureCenter = function() {
         const bitmap = this.phileasLabelBitmap;
-        this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x - bitmap.width / 2, 0);
+        this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, (this.contents.width - bitmap.width) / 2, 0);
     }
 
     Window_PhileasEventLabel.prototype.drawPhileasLabelPictureRight = function(x, offset) {
@@ -833,11 +834,11 @@
 
         this.height = this.fittingHeight(1) + 10 + this.imageHeight;
         this.createContents();
-        let wx = (this.contents.width - textWidth) / 2 + this.itemPadding();
+        const wx = (this.contents.width - textWidth) / 2 + this.itemPadding();
 
         if (this.phileasLabelBitmap != undefined) {
             if (this.phileasEventLabelData.LabelImagePosition == "center") {
-                this.drawPhileasLabelPictureCenter(wx);
+                this.drawPhileasLabelPictureCenter();
             } else if (this.phileasEventLabelData.LabelImagePosition == "left") {
                 this.drawPhileasLabelPictureLeft(wx);
             } else {
