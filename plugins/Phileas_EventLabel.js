@@ -11,6 +11,7 @@
 // 2024.April.20 Ver1.2.3 Added saving settings from commands
 // 2024.April.20 Ver1.2.4 Custom line spacing
 // 2024.May.19 Ver1.2.5 Displaying labels on hover
+// 2025.January.07 Ver1.3.0 Alternative commands with parameters
 
 /*:
  * @target MZ
@@ -74,11 +75,15 @@
  * @default false
  * @desc The label will be displayed only when the cursor hovers over the event (the default value of the option).
  *
- * @param Default picture position is on the left
- * @type boolean
- * @default true
- * @desc If the label has a picture set and the parameter is true, then the picture is displayed to the left of the label text, otherwise - to the right.
- *
+ * @param defaultPicturePosition
+ * @text Default picture position
+ * @type combo
+ * @option left
+ * @option center
+ * @option right
+ * @default left
+ * @desc The position of the picture relative to the text.
+ * 
  * @command showAllLabels
  * @text Show all labels
  * @desc Displays all labels on the map. If the labels of invisible events are hidden, then you will not see the labels.
@@ -92,7 +97,7 @@
  * @desc Redraws the contents of the label windows without deleting the windows themselves.
  *
  * @command setLabelText
- * @text Set the label text by id
+ * @text Set the label tags by id
  * @desc Changes the text of the event label to an arbitrary one.
  * @arg eventId
  * @text Event ID
@@ -100,19 +105,128 @@
  * @desc Input a event ID (it is a positive number).
  * @default 1
  * @arg text
- * @text Text
+ * @text Tags
  * @type string
- * @desc Input text. If you input an empty line, the label will not be displayed. It can be used to hide a label.
+ * @desc Input tags. If you input an empty line, the label will not be displayed. It can be used to hide a label.
  * @default <LabelText:text>
  *
  * @command setPlayerLabelText
- * @text Set the player label text
+ * @text Set the player label tags
  * @desc Changes the text of the player character label to an arbitrary one.
  * @arg text
+ * @text Tags
+ * @type string
+ * @desc Input tags. If you input an empty line, the label will not be displayed. It can be used to hide a label.
+ * @default <LabelText:text>
+ * 
+ *
+ * @command setLabelTextParams
+ * @text Set the label text by id
+ * @desc Changes the text of the event label to an arbitrary one.
+ * @arg eventId
+ * @text Event ID
+ * @type number
+ * @desc Input a event ID (it is a positive number).
+ * @default 1
+ * 
+ * @arg LabelText
  * @text Text
  * @type string
- * @desc Input text. If you input an empty line, the label will not be displayed. It can be used to hide a label.
- * @default <LabelText:text>
+ * 
+ * @arg LabelFontSize
+ * @text Font size
+ * @type number
+ * 
+ * @arg LabelLineSpacing
+ * @text Line spacing
+ * @type number
+ * 
+ * @arg LabelXOffset
+ * @text X offset
+ * @type number
+ * 
+ * @arg LabelYOffset
+ * @text Y offset
+ * @type number
+ * 
+ * @arg LabelDistance
+ * @text Distance
+ * @type number
+ * 
+ * @arg LabelCheckDirection
+ * @text Check direction
+ * @type boolean
+ * 
+ * @arg LabelHideInvisible
+ * @text Hide invisible
+ * @type boolean
+ * 
+ * @arg LabelImage
+ * @text Image
+ * @type file
+ * @dir dir img/pictures
+ * 
+ * @arg LabelImagePosition
+ * @text Image position
+ * @type combo
+ * @option left
+ * @option center
+ * @option right
+ * @default left
+ * @desc The position of the image relative to the text.
+ * 
+ * @arg LabelOnlyOnHover
+ * @text Only on hover
+ * @type boolean
+ * 
+ * 
+ *
+ * @command setPlayerLabelTextParams
+ * @text Set the player label text
+ * @desc Changes the text of the player character label to an arbitrary one.
+ * 
+ * @arg LabelText
+ * @text Text
+ * @type string
+ * 
+ * @arg LabelFontSize
+ * @text Font size
+ * @type number
+ * 
+ * @arg LabelLineSpacing
+ * @text Line spacing
+ * @type number
+ * 
+ * @arg LabelXOffset
+ * @text X offset
+ * @type number
+ * 
+ * @arg LabelYOffset
+ * @text Y offset
+ * @type number
+ * 
+ * @arg LabelHideInvisible
+ * @text Hide invisible
+ * @type boolean
+ * 
+ * @arg LabelImage
+ * @text Image
+ * @type file
+ * @dir dir img/pictures
+ * 
+ * @arg LabelImagePosition
+ * @text Image position
+ * @type combo
+ * @option left
+ * @option center
+ * @option right
+ * @default left
+ * @desc The position of the image relative to the text.
+ * 
+ * @arg LabelOnlyOnHover
+ * @text Only on hover
+ * @type boolean
+ * 
  *
  * @command showPlayerLabel
  * @text Show the player label
@@ -134,7 +248,7 @@
  * <LabelFontSize:26> - sets the font size for a specific label.
  * <LabelLineSpacing:-10> - reduces or increases the line spacing.
  * <LabelImage:Actor1> - displays the picture "Actor1.png".
- * <LabelImagePositionLeft:yes> - if "yes", the image will be displayed to the left of the label text.
+ * <LabelImagePosition:left> - "left", "center" or "right". The position of the image relative to the text.
  * <LabelXOffset:0> - sets the horizontal offset for a specific label.
  * <LabelYOffset:25> - sets the vertical offset for a specific label.
  * <LabelDistance:50> - the distance beyond which the label is hidden.
@@ -152,10 +266,12 @@
  * 0) Show all labels - displays all labels on the map; if the labels of invisible events are hidden, then you will not see their labels.
  * 1) Hide all labels - hides all labels on the map.
  * 2) Redraw all labels - redraws the contents of the label windows without deleting the windows themselves.
- * 3) Set the label text by id - changes the text of the event label to an arbitrary one.
- * 4) Set the player label text - changes the text of the player character label to an arbitrary one.
- * 5) Show the player label - displays the player label; if the invisible player label is hidden and the player is invisible, then you will not see the label.
- * 6) Hide the player label - hides the player label.
+ * 3) Set the label tags by id - changes the tags of the event label to an arbitrary one.
+ * 4) Set the player label tags - changes the tags of the player character label to an arbitrary one.
+ * 5) Set the label text by id - changes the text of the event label to an arbitrary one.
+ * 6) Set the player label text - changes the text of the player character label to an arbitrary one.
+ * 7) Show the player label - displays the player label; if the invisible player label is hidden and the player is invisible, then you will not see the label.
+ * 8) Hide the player label - hides the player label.
  *
  * [License]
  * This plugin is released under MIT license.
@@ -237,11 +353,14 @@
  * @default false
  * @desc Надпись будет показываться только при наведении курсора на событие (значение опции по умолчанию).
  *
- * @param Default picture position is on the left
- * @text По умолчанию изображение расположено слева
- * @type boolean
- * @default true
- * @desc Если в надписи установлена картинка и параметр равен true, то картинка отображается слева от текста надписи, в противном случае - справа.
+ * @param defaultPicturePosition
+ * @text Положение картинки по умолчанию
+ * @type combo
+ * @option left
+ * @option center
+ * @option right
+ * @default left
+ * @desc Положение картинки относительно текста.
  *
  * @command showAllLabels
  * @text Показать все надписи
@@ -256,7 +375,7 @@
  * @desc Перерисовывает содержимое окон с надписями, не удаляя сами окна.
  *
  * @command setLabelText
- * @text Установить надпись по id
+ * @text Установить теги по id
  * @desc Изменяет текст надписи события на произвольный.
  * @arg eventId
  * @text ID события
@@ -264,19 +383,137 @@
  * @desc Ввести ID события (это положительное число).
  * @default 1
  * @arg text
- * @text Текст
+ * @text Теги
  * @type string
  * @desc Введите текст. Если вы введете пустую строку, надпись отображаться не будет. Это можно использовать для скрытия надписи.
  * @default <LabelText:text>
  *
  * @command setPlayerLabelText
- * @text Установить надпись игрока
+ * @text Установить теги игрока
  * @desc Изменяет текст надписи игрока.
  * @arg text
- * @text Текст
+ * @text Теги
  * @type string
  * @desc Введите текст. Если вы введете пустую строку, надпись отображаться не будет. Это можно использовать для скрытия надписи.
  * @default <LabelText:text>
+ * 
+ *
+ * @command setLabelTextParams
+ * @text Установить надпись по id
+ * @desc Изменяет текст надписи события на произвольный.
+ * @arg eventId
+ * @text Event ID
+ * @type number
+ * @desc Ввести ID события (это положительное число).
+ * @default 1
+ * 
+ * @arg LabelText
+ * @text Текст
+ * @type string
+ * 
+ * @arg LabelFontSize
+ * @text Размер шрифта
+ * @type number
+ * 
+ * @arg LabelLineSpacing
+ * @text Межстрочный интервал
+ * @type number
+ * 
+ * @arg LabelXOffset
+ * @text Смещение по X
+ * @type number
+ * 
+ * @arg LabelYOffset
+ * @text Смещение по Y
+ * @type number
+ * 
+ * @arg LabelDistance
+ * @text Расстояние
+ * @type number
+ * 
+ * @arg LabelCheckDirection
+ * @text Проверять направление
+ * @type boolean
+ * 
+ * @arg LabelHideInvisible
+ * @text Скрывать невидимое
+ * @type boolean
+ * 
+ * @arg LabelImage
+ * @text Картинка
+ * @type file
+ * @dir dir img/pictures
+ * 
+ * @arg LabelImagePosition
+ * @text Позиция картинки
+ * @type combo
+ * @option left
+ * @option center
+ * @option right
+ * @default left
+ * @desc Положение картинки относительно текста.
+ * 
+ * @arg LabelOnlyOnHover
+ * @text Только при наведении
+ * @type boolean
+ * 
+ * 
+ *
+ * @command setPlayerLabelTextParams
+ * @text Установить надпись игрока
+ * @desc Изменяет текст надписи игрока.
+ * 
+ * @arg LabelText
+ * @text Текст
+ * @type string
+ * 
+ * @arg LabelFontSize
+ * @text Размер шрифта
+ * @type number
+ * 
+ * @arg LabelLineSpacing
+ * @text Межстрочный интервал
+ * @type number
+ * 
+ * @arg LabelXOffset
+ * @text Смещение по X
+ * @type number
+ * 
+ * @arg LabelYOffset
+ * @text Смещение по Y
+ * @type number
+ * 
+ * @arg LabelHideInvisible
+ * @text Скрывать невидимое
+ * @type boolean
+ * 
+ * @arg LabelImage
+ * @text Картинка
+ * @type file
+ * @dir dir img/pictures
+ * 
+ * @arg LabelImagePosition
+ * @text Позиция картинки
+ * @type combo
+ * @option left
+ * @option center
+ * @option right
+ * @default left
+ * @desc Положение картинки относительно текста.
+ * 
+ * @arg LabelOnlyOnHover
+ * @text Только при наведении
+ * @type boolean
+ * 
+ *
+ * @command showPlayerLabel
+ * @text Show the player label
+ * @desc Displays the player label. If the invisible player label is hidden, then you will not see the label.
+ *
+ * @command hidePlayerLabel
+ * @text Hide the player label
+ * @desc Hides the player label.
+ * 
  *
  * @command showPlayerLabel
  * @text Показать надпись игрока
@@ -298,7 +535,7 @@
  * <LabelFontSize:26> - устанавливает размер шрифта для конкретной надписи.
  * <LabelLineSpacing:-10> - уменьшает или увеличивает междустрочный интервал.
  * <LabelImage:Actor1> - показывает картинку "Actor1.png".
- * <LabelImagePositionLeft:yes> - если "yes", картинка будет показана слева от текста надписи.
+ * <LabelImagePosition:left> - "left", "center" или "right". Положение картинки относительно текста.
  * <LabelXOffset:0> - указывает горизонтальное смещение для конкретной надписи.
  * <LabelYOffset:25> - указывает вертикальное смещение для конкретной надписи.
  * <LabelDistance:50> - расстояние, за которым надпись скрывается.
@@ -316,10 +553,12 @@
  * 0) Показать все надписи
  * 1) Скрыть все надписи
  * 2) Перерисовать все надписи
- * 3) Установить надпись по id
- * 4) Установить надпись игрока
- * 5) Показать надпись игрока
- * 6) Скрыть надпись игрока
+ * 3) Установить теги по id
+ * 4) Установить теги игрока
+ * 5) Установить надпись по id
+ * 6) Установить надпись игрока
+ * 7) Показать надпись игрока
+ * 8) Скрыть надпись игрока
  *
  * [License]
  * Этот плагин распространяется по лицензии MIT.
@@ -329,7 +568,7 @@
  * Но обязательно укажите меня в титрах!
  */
 
-(function () {
+(function() {
 
 //--------MY CODE:  
     PluginManager.registerCommand("Phileas_EventLabel", "showAllLabels", showPhileasEventLabels);
@@ -337,6 +576,8 @@
     PluginManager.registerCommand("Phileas_EventLabel", "redrawAllLabels", redrawPhileasEventLabels);
     PluginManager.registerCommand("Phileas_EventLabel", "setLabelText", setPhileasEventLabelText);
     PluginManager.registerCommand("Phileas_EventLabel", "setPlayerLabelText", setPhileasPlayerLabelText);
+    PluginManager.registerCommand("Phileas_EventLabel", "setLabelTextParams", setPhileasLabelTextParams);
+    PluginManager.registerCommand("Phileas_EventLabel", "setPlayerLabelTextParams", setPhileasPlayerLabelTextParams);
     PluginManager.registerCommand("Phileas_EventLabel", "showPlayerLabel", showPhileasPlayerLabel);
     PluginManager.registerCommand("Phileas_EventLabel", "hidePlayerLabel", hidePhileasPlayerLabel);
 
@@ -354,8 +595,8 @@
     PhileasEventLabelSettings.defaultPlayerLabel = parameters["Default player label"] || "";
     PhileasEventLabelSettings.hideInvisibleCharacterLabel = (parameters["Hide the invisible character label"] || "true") == "true";
     PhileasEventLabelSettings.defaultOnlyOnHover = parameters["defaultOnlyOnHover"] == "true";
-    PhileasEventLabelSettings.defaultPicturePositionIsLeft = (parameters["Default picture position is on the left"] || "true") == "true";
-    PhileasEventLabelSettings.tags = ["LabelText", "LabelFontSize", "LabelLineSpacing", "LabelXOffset", "LabelYOffset", "LabelDistance", "LabelCheckDirection", "LabelHideInvisible", "LabelImage", "LabelImagePositionLeft", "LabelOnlyOnHover"];
+    PhileasEventLabelSettings.defaultPicturePosition = parameters["defaultPicturePosition"];
+    PhileasEventLabelSettings.tags = ["LabelText", "LabelFontSize", "LabelLineSpacing", "LabelXOffset", "LabelYOffset", "LabelDistance", "LabelCheckDirection", "LabelHideInvisible", "LabelImage", "LabelImagePosition", "LabelOnlyOnHover"];
 
     var playerLabelWindow = null;
 
@@ -377,7 +618,7 @@
         this.LabelHideInvisible = PhileasEventLabelSettings.defaultHideInvisibleCharacterLabel;
         this.LabelOnlyOnHover = PhileasEventLabelSettings.defaultOnlyOnHover;
         this.LabelImage = "";
-        this.LabelImagePositionLeft = PhileasEventLabelSettings.defaultPicturePositionIsLeft;
+        this.LabelImagePosition = PhileasEventLabelSettings.defaultPicturePosition;
     }
     PhileasEventLabelData.prototype.constructor = PhileasEventLabelData;
 
@@ -389,8 +630,9 @@
     Window_PhileasEventLabel.prototype = Object.create(Window_Base.prototype);
     Window_PhileasEventLabel.prototype.constructor = Window_PhileasEventLabel;
 
-    Window_PhileasEventLabel.prototype.initialize = function (eventObject, isVisible, isEventVisible) {
+    Window_PhileasEventLabel.prototype.initialize = function(eventObject, isVisible, isEventVisible) {
         this.eventObject = eventObject;
+        this.isPlayer = this.eventObject instanceof Game_Player;
         this.isVisible = isVisible;
         this.isEventVisible = isEventVisible;
         this.phileasEventLabelData = new PhileasEventLabelData();
@@ -403,7 +645,7 @@
         SceneManager._scene._spriteset.addChild(this);
     };
 
-    Window_PhileasEventLabel.prototype.lineHeight = function () {
+    Window_PhileasEventLabel.prototype.lineHeight = function() {
         return Window_Base.prototype.lineHeight.call(this) + this.phileasEventLabelData.LabelLineSpacing;
     };
 
@@ -426,7 +668,7 @@
         return meta;
     };
 
-    Window_PhileasEventLabel.prototype.setPhileasLabelData = function (data) {
+    Window_PhileasEventLabel.prototype.setPhileasLabelData = function(data) {
         let meta = getMeta(data);
         if (meta == undefined) {
             return;
@@ -439,6 +681,8 @@
             }
         }
 
+        this.phileasEventLabelData.LabelText = this.phileasEventLabelData.LabelText || "";
+        this.phileasEventLabelData.LabelImage = this.phileasEventLabelData.LabelImage || "";
         this.phileasEventLabelData.LabelFontSize = Number(this.phileasEventLabelData.LabelFontSize);
         this.phileasEventLabelData.LabelLineSpacing = Number(this.phileasEventLabelData.LabelLineSpacing);
         this.phileasEventLabelData.LabelXOffset = Number(this.phileasEventLabelData.LabelXOffset);
@@ -447,7 +691,6 @@
         this.phileasEventLabelData.LabelCheckDirection = this.phileasEventLabelData.LabelCheckDirection == true || this.phileasEventLabelData.LabelCheckDirection == "yes";
         this.phileasEventLabelData.LabelHideInvisible = this.phileasEventLabelData.LabelHideInvisible == true || this.phileasEventLabelData.LabelHideInvisible == "yes";
         this.phileasEventLabelData.LabelOnlyOnHover = this.phileasEventLabelData.LabelOnlyOnHover == true || this.phileasEventLabelData.LabelOnlyOnHover == "yes";
-        this.phileasEventLabelData.LabelImagePositionLeft = this.phileasEventLabelData.LabelImagePositionLeft == true || this.phileasEventLabelData.LabelImagePositionLeft == "yes";
     }
 
     function isRightDirection(pX, pY, eX, eY) {
@@ -491,8 +734,15 @@
         return false;
     };
 
-    Window_PhileasEventLabel.prototype.isPhileasEventLabelVisible = function () {
-        if (this.phileasEventLabelData.LabelText == "" || !this.isVisible
+    Window_PhileasEventLabel.prototype.playerIsOnHover = function() {
+        const mapX = $gameMap.canvasToMapX(currentCursorX);
+        const mapY = $gameMap.canvasToMapY(currentCursorY);
+        return mapX == $gamePlayer.x && mapY == $gamePlayer.y;
+    };
+
+    Window_PhileasEventLabel.prototype.isPhileasEventLabelVisible = function() {
+        if (this.phileasEventLabelData.LabelText == "" && this.phileasEventLabelData.LabelImage == ""
+            || !this.isVisible
             || this.phileasEventLabelData.LabelHideInvisible && !this.isEventVisible) {
             return false;
         }
@@ -507,13 +757,15 @@
         }
 
         if (this.phileasEventLabelData.LabelOnlyOnHover) {
-            return this.isOnHover();
+            return this.isPlayer
+                ? this.playerIsOnHover()
+                : this.isOnHover();
         }
 
         return true;
     };
 
-    Window_PhileasEventLabel.prototype.show = function () {
+    Window_PhileasEventLabel.prototype.show = function() {
         if (this.contentsOpacity >= 255) {
             return;
         }
@@ -522,7 +774,7 @@
         this.visible = true;
     };
 
-    Window_PhileasEventLabel.prototype.hide = function () {
+    Window_PhileasEventLabel.prototype.hide = function() {
         if (this.contentsOpacity <= 0) {
             if (this.visible) {
                 this.visible = false;
@@ -532,7 +784,7 @@
         this.contentsOpacity -= 20;
     };
 
-    Window_PhileasEventLabel.prototype.tryShow = function () {
+    Window_PhileasEventLabel.prototype.tryShow = function() {
         if (this.isPhileasEventLabelVisible()) {
             this.show();
             return;
@@ -541,47 +793,56 @@
         this.hide();
     };
 
-    Window_PhileasEventLabel.prototype.resetFontSettings = function () {
+    Window_PhileasEventLabel.prototype.resetFontSettings = function() {
         Window_Base.prototype.resetFontSettings.call(this);
         this.contents.fontSize = this.phileasEventLabelData.LabelFontSize;
     };
 
-    Window_PhileasEventLabel.prototype.drawPhileasLabelPicture = function (x, offset = 0) {
+    Window_PhileasEventLabel.prototype.drawPhileasLabelPictureLeft = function(x) {
         const bitmap = this.phileasLabelBitmap;
-        if (offset == 0) {
-            this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x - bitmap.width, 0);
-        }
-        else {
-            this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x + offset, 0);
-        }
+        this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x - bitmap.width, 0);
     }
 
-    Window_PhileasEventLabel.prototype.drawPhileasLabel2 = function () {
+    Window_PhileasEventLabel.prototype.drawPhileasLabelPictureCenter = function(x) {
+        const bitmap = this.phileasLabelBitmap;
+        this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x - bitmap.width / 2, 0);
+    }
+
+    Window_PhileasEventLabel.prototype.drawPhileasLabelPictureRight = function(x, offset) {
+        const bitmap = this.phileasLabelBitmap;
+        this.contents.blt(bitmap, 0, 0, bitmap.width, bitmap.height, x + offset, 0);
+    }
+
+    Window_PhileasEventLabel.prototype.drawPhileasLabel2 = function() {
         this.contents.clear();
         let textWidth = this.textSizeEx(this.phileasEventLabelData.LabelText).width;
         if (textWidth > 0) {
             textWidth += this.itemPadding() * 2;
         }
 
-        this.width = Math.max(textWidth, PhileasEventLabelSettings.minWidth) + this.imageWidth + this.padding * 2;
-        if (this.imageWidth > 0) {
-            this.width += textWidth * 2;
+        if (this.phileasEventLabelData.LabelImagePosition == "center") {
+            this.width = Math.max(this.imageWidth, Math.max(textWidth, PhileasEventLabelSettings.minWidth)) + this.padding * 2;
+        } else {
+            this.width = Math.max(textWidth, PhileasEventLabelSettings.minWidth) + this.imageWidth + this.padding * 2;
+
+            if (this.imageWidth > 0) {
+                this.width += textWidth * 2;
+            }
         }
+        
 
         this.height = this.fittingHeight(1) + 10 + this.imageHeight;
         this.createContents();
         let wx = (this.contents.width - textWidth) / 2 + this.itemPadding();
-        if (this.phileasLabelBitmap != undefined) {
-            if (this.phileasEventLabelData.LabelImagePositionLeft) {
-                this.drawPhileasLabelPicture(wx);
-            }
-            else {
-                this.drawPhileasLabelPicture(wx, textWidth);
-            }
-        }
 
-        if (this.phileasEventLabelData.LabelText == "") {
-            this.phileasEventLabelData.LabelText = " ";
+        if (this.phileasLabelBitmap != undefined) {
+            if (this.phileasEventLabelData.LabelImagePosition == "center") {
+                this.drawPhileasLabelPictureCenter(wx);
+            } else if (this.phileasEventLabelData.LabelImagePosition == "left") {
+                this.drawPhileasLabelPictureLeft(wx);
+            } else {
+                this.drawPhileasLabelPictureRight(wx, textWidth);
+            }
         }
 
         this.drawTextEx(this.phileasEventLabelData.LabelText, wx, 0, textWidth);
@@ -591,7 +852,7 @@
         }
     }
 
-    Window_PhileasEventLabel.prototype.setPhileasLabelPictureSizes = function () {
+    Window_PhileasEventLabel.prototype.setPhileasLabelPictureSizes = function() {
         this.phileasLabelBitmap = undefined;
         if (this.phileasEventLabelData.LabelImage == "") {
             this.imageWidth = 0;
@@ -609,11 +870,11 @@
         });
     }
 
-    Window_PhileasEventLabel.prototype.drawPhileasLabel = function () {
+    Window_PhileasEventLabel.prototype.drawPhileasLabel = function() {
         this.setPhileasLabelPictureSizes();
     }
 
-    Scene_Map.prototype.drawPhileasEventLabels = function () {
+    Scene_Map.prototype.drawPhileasEventLabels = function() {
         if (!(SceneManager._scene instanceof Scene_Map)) {
             return;
         }
@@ -651,7 +912,7 @@
         }
     };
 
-    Sprite_Character.prototype.setPhileasEventLabelPosition = function () {
+    Sprite_Character.prototype.setPhileasEventLabelPosition = function() {
         let scale = SceneManager._scene._spriteset.scale;
         let scaleX = 1 / scale.x;
         let scaleY = 1 / scale.y;
@@ -697,14 +958,12 @@
         iteratePhileasEventLabels(redrawPhileasEventLabel);
     };
 
-    function setPhileasEventLabelText(params) {
-        let scene = SceneManager._scene;
-        let eventId = Number(params["eventId"]);
+    function setPhileasEventLabelTextCommon(eventId, text) {
+        const scene = SceneManager._scene;
         if (!(scene instanceof Scene_Map) || eventId < 1) {
             return;
         }
 
-        let text = params["text"];
         if (text == undefined) {
             text = "";
         }
@@ -735,8 +994,7 @@
         label.drawPhileasLabel();
     }
 
-    function setPhileasPlayerLabelText(params) {
-        let text = params["text"];
+    function setPhileasPlayerLabelTextCommon(text) {
         if (text == undefined) {
             text = "";
         }
@@ -744,6 +1002,57 @@
         playerLabelText = text;
         playerLabelWindow.setPhileasLabelData(text);
         playerLabelWindow.drawPhileasLabel();
+    }
+
+    function setPhileasEventLabelText(params) {
+        const eventId = Number(params["eventId"]);
+        const text = params["text"];
+        setPhileasEventLabelTextCommon(eventId, text);
+    }
+
+    function setPhileasPlayerLabelText(params) {
+        const text = params["text"];
+        setPhileasPlayerLabelTextCommon(text);
+    }
+
+    function getPhileasLabelTextTags(params) {
+        const text = [];
+
+        for (let i in PhileasEventLabelSettings.tags) {
+            const tag = PhileasEventLabelSettings.tags[i];
+            const value = params[tag];
+            if (value != undefined && value != "") {
+                if (value == "true") {
+                    text.push(`<${tag}:yes>`);
+                    continue;
+                }
+
+                if (value == "false") {
+                    text.push(`<${tag}:no>`);
+                    continue;
+                }
+
+                text.push(`<${tag}:${value}>`);
+            }
+        }
+
+        return text.join("");
+    }
+
+    function setPhileasLabelTextParams(params) {
+        const scene = SceneManager._scene;
+        const eventId = Number(params["eventId"]);
+        if (!(scene instanceof Scene_Map) || eventId < 1) {
+            return;
+        }
+
+        const text = getPhileasLabelTextTags(params);
+        setPhileasEventLabelTextCommon(eventId, text);
+    }
+
+    function setPhileasPlayerLabelTextParams(params) {
+        const text = getPhileasLabelTextTags(params);
+        setPhileasPlayerLabelTextCommon(text);
     }
 
     function showPhileasPlayerLabel() {
@@ -757,13 +1066,13 @@
 //--------CHANGED CORE:
 
     const Origin_onMapLoaded = Scene_Map.prototype.onMapLoaded;
-    Scene_Map.prototype.onMapLoaded = function () {
+    Scene_Map.prototype.onMapLoaded = function() {
         Origin_onMapLoaded.call(this);
         this.drawPhileasEventLabels();
     };
 
     const Origin_eventUpdate = Sprite_Character.prototype.update;
-    Sprite_Character.prototype.update = function () {
+    Sprite_Character.prototype.update = function() {
         Origin_eventUpdate.call(this);
         if (this.phileasEventLabelWindow != undefined) {
             this.phileasEventLabelWindow.isEventVisible = this.visible;
@@ -773,14 +1082,14 @@
     };
 
     const Origin_setupNewGame = DataManager.setupNewGame;
-    DataManager.setupNewGame = function () {
+    DataManager.setupNewGame = function() {
         Origin_setupNewGame.call(this);
         playerLabelText = null;
         commandEventLabels = {};
     };
 
     const Origin_makeSaveContents = DataManager.makeSaveContents;
-    DataManager.makeSaveContents = function () {
+    DataManager.makeSaveContents = function() {
         let contents = Origin_makeSaveContents.call(this);
         contents.phileasPlayerLabelText = playerLabelText;
         contents.phileasCommandEventLabels = commandEventLabels;
@@ -788,14 +1097,14 @@
     };
 
     const Origin_extractSaveContents = DataManager.extractSaveContents;
-    DataManager.extractSaveContents = function (contents) {
+    DataManager.extractSaveContents = function(contents) {
         Origin_extractSaveContents.call(this, contents);
         playerLabelText = contents.phileasPlayerLabelText || null;
         commandEventLabels = contents.phileasCommandEventLabels || {};
     };
 
     const Origin_onMouseMove = TouchInput._onMouseMove;
-    TouchInput._onMouseMove = function (event) {
+    TouchInput._onMouseMove = function(event) {
         Origin_onMouseMove.call(this, event);
 
         const x = Graphics.pageToCanvasX(event.pageX);
