@@ -1514,14 +1514,13 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
     };
 
     Window_Options.prototype.phileasRefreshLanguage = function() {
-        loadLanguageData();
-        this.resetFontSettings();
-        setTimeout(() => {
+        loadLanguageData(() => {
+            this.resetFontSettings();
             updateGameTitle();
             if (SceneManager._scene._optionsWindow) {
                 SceneManager._scene._optionsWindow.refresh();
             }
-        }, 100);
+        });
     };
 
     const Origin_Window_NameEdit_setup = Window_NameEdit.prototype.setup;
