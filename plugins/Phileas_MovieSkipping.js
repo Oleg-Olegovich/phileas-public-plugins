@@ -76,13 +76,13 @@
  * 
  * @help
  * 
- * The plugin provides an improved version of the "Play Video" event command,
+ * The plugin provides an improved version of the "Play Movie" event command,
  * adding the ability to skip the video when pressing a key.
  * 
  * The plugin has 2 commands:
- * - "Play video (skip with any key)" - the player just needs to press
+ * - "Play Movie (any key to skip)" - the player just needs to press
  *   any keyon the keyboard, mouse and gamepad to skip the video.
- * - "Play video (specific skip key)" - allows you to assign specific
+ * - "Play Movie (specific skip key)" - allows you to assign specific
  *   skip keys to the keyboard, mouse and gamepad.
  * 
  * If you enable the "Exclude unused files" option when you deploy the game,
