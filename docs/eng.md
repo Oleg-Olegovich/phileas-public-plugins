@@ -41,6 +41,7 @@ Some of the plugins for MZ can work on MV. But I haven't tested it. Write to [me
 | Name | Description | Code | Forum |
 | --- | --- | --- | --- |
 | **Phileas's Custom Fonts** | Assigns custom fonts to custom font families | [MV](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_CustomFonts_MV.js) [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_CustomFonts.js) | [Thread](https://forums.rpgmakerweb.com/index.php?threads/mz-phileass-custom-fonts.167944/) |
+| **Phileas's Movie Skipping** | Movie playback with skip function | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_MovieSkipping.js) | [Thread](https://forums.rpgmakerweb.com/index.php?threads/mz-phileass-movie-skipping.174645/) |
 | **Phileas's Pictures Collision** | Determining the collision (intersection) of images | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_PicturesCollision.js) | [Thread](https://forums.rpgmakerweb.com/index.php?threads/phileass-pictures-collision.166705/) |
 | **Phileas's Picture Outline** | Clear picture outlines | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_PictureOutline.js) | [Thread](https://forums.rpgmakerweb.com/index.php?threads/mz-phileass-picture-outline-clear-picture-outlines.168355/) |
 
