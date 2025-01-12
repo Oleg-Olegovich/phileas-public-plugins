@@ -64,7 +64,7 @@
  *
  * @arg gamepadNumbers
  * @text Gamepad key numbers
- * @type number
+ * @type number[]
  * @default ["0"]
  *
  * @arg gamepadNames
@@ -166,7 +166,7 @@
  *
  * @arg gamepadNumbers
  * @text Номера клавиш геймпада
- * @type number
+ * @type number[]
  * @default ["0"]
  *
  * @arg gamepadNames
