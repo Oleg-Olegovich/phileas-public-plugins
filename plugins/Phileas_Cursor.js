@@ -1238,7 +1238,7 @@
         }
     }
 
-    if (hideAtStartup) {
+    if (!DataManager.isBattleTest() && hideAtStartup) {
         hide();
     }
     if (keyboardHideKeyNumber == 0) {
