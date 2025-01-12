@@ -108,6 +108,58 @@
         this.processAllText(textState);
         return textState.outputWidth;
     };
+
+    Window_Base.prototype.getWrappedText = function(text, maxWidth) {
+        let wrapWindow = new Window_Base(new Rectangle(this.x, this.y, maxWidth, this.height));
+        wrapWindow.contents.fontFace = this.contents.fontFace;
+        wrapWindow.contents.fontSize = this.contents.fontSize;
+        rect = wrapWindow.baseTextRect();
+        let result = "";
+        let word = "";
+        let line = "";
+        let lastIndex = 0;
+        let currentColor = "";
+        let nFlag = false;
+        if (text[text.length - 1] != " ") {
+            text += " ";
+        }
+        
+        for (let i = 0; i < text.length; ++i) {
+            if (text[i] == "\\" && i + 1 < text.length && text[i] == "n") {
+                nFlag = true;
+            }
+            else if (text[i] != " ") {
+                continue;
+            }
+            
+            word = text.substring(lastIndex, i + 1);
+            let newColor = getColor(word);
+            if (newColor != "") {
+                currentColor = newColor;
+            }
+            
+            line += word;
+            let currentWidth = wrapWindow.phileasGetTextWidth(line, rect.x, rect.y, rect.width);
+            //console.log('parsed: ', [line, currentWidth]);
+            if (currentWidth > maxWidth) {
+                result += "\n";
+                currentWidth = wrapWindow.textWidth(wrapWindow.convertEscapeCharacters(word));
+                line = word = currentColor + word;
+            }
+            
+            result += word;
+            lastIndex = i + 1;
+            if (nFlag) {
+                result += "\n";
+                line = word = currentColor;
+                ++lastIndex;
+                ++i;
+                nFlag = false;
+            }
+        }
+        
+        return result;
+    };
     
     function getWrappedText(text, maxWidth, mainWindow) {
         let wrapWindow = new Window_Base(new Rectangle(mainWindow.x, mainWindow.y, maxWidth, mainWindow.height));
