@@ -30,7 +30,7 @@
  *
  * @arg movie
  * @text Movie
- * @desc A file with the ".webm" extension in the movies directory
+ * @desc A file with the ".webm" or ".mp4" extension in the movies directory
  * @default movie
  *
  * @arg ext
@@ -116,7 +116,7 @@
  *
  * @arg movie
  * @text Видео
- * @desc Файл с расширением ".webm" в директории movies
+ * @desc Файл с расширением ".webm" или ".mp4" в директории movies
  * @default movie
  *
  * @arg ext
@@ -132,7 +132,7 @@
  *
  * @arg movie
  * @text Видео
- * @desc Файл с расширением ".webm" в директории movies
+ * @desc Файл с расширением ".webm" или ".mp4" в директории movies
  * @default movie
  *
  * @arg ext
