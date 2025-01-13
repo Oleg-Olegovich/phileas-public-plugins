@@ -3,6 +3,7 @@
 //=============================================================================
 // [Update History]
 // 2024.April.14 Ver1.0.0 First Release
+// 2025.January.13 Ver1.0.1 Fixed invisible type
 
 /*:
  * @target MZ
@@ -327,6 +328,10 @@
 //--------CHANGED CORE:
 
     Sprite_Destination.prototype.createBitmap = function () {
+        if (type == "invisible") {
+            return;
+        }
+
         this.bitmap = drawDestSprite($gameMap.tileWidth(), $gameMap.tileHeight());
         this.anchor.x = 0.5;
         this.anchor.y = 0.5;
