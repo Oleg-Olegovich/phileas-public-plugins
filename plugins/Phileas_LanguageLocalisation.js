@@ -9,6 +9,7 @@
 // 2024.December.30 Ver1.2.2 Fixed name edit setup
 // 2025.January.04 Ver1.2.3 Language selection menu customization
 // 2025.January.12 Ver1.2.4 Added API method
+// 2025.January.13 Ver1.2.5 Battle test setup
 
 /*:
  * @target MZ
@@ -1583,6 +1584,14 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
     AudioManager.createBuffer = function(folder, name) {
         folder = getLocalizationAudioFolder(folder, name + AudioManager.audioFileExt());
         return Origin_AudioManager_createBuffer.call(this, folder, name);
+    };
+
+    const Origin_DataManager_setupBattleTest = DataManager.setupBattleTest;
+    DataManager.setupBattleTest = function() {
+        Origin_DataManager_setupBattleTest.call(this);
+        setLanguage(0, () => {
+            updateGameTitle();
+        });
     };
 
 }());
