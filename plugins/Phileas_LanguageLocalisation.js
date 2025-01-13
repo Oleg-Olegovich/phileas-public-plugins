@@ -8,8 +8,7 @@
 // 2024.December.25 Ver1.2.1 Fixed text code decoding
 // 2024.December.30 Ver1.2.2 Fixed name edit setup
 // 2025.January.04 Ver1.2.3 Language selection menu customization
-// 2025.January.12 Ver1.2.4 Added API method
-// 2025.January.13 Ver1.2.5 Battle test setup
+// 2025.January.12 Ver1.2.4 Added API method, battle test setup
 
 /*:
  * @target MZ
