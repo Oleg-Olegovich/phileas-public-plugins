@@ -4,6 +4,7 @@
 // [Update History]
 // 2025.January.12 Ver1.0.0 First Release
 // 2025.January.16 Ver1.0.1 Added command with blacklist
+// 2025.January.19 Ver1.0.2 Fixed command with blacklist
 
 /*:
  * @target MZ
@@ -540,18 +541,9 @@
 
     Video.phileasLoadMovieExceptSkip = function() {
         Origin_Video_onLoad.call(this);
-
-        if (exceptKeyboardKeyCodes.size > 0) {
-            addEventListener("keydown", skipMovieByKeydownExcept);
-        }
-
-        if (exceptMouseKeyCodes.size > 0) {
-            addEventListener("mousedown", skipMovieByMousedownExcept);
-        }
-
-        if (exceptGamepadKeyCodes.size > 0) {
-            Input._updateGamepadState = Input.phileasSkipMovieExceptKey;
-        }
+        addEventListener("keydown", skipMovieByKeydownExcept);
+        addEventListener("mousedown", skipMovieByMousedownExcept);
+        Input._updateGamepadState = Input.phileasSkipMovieExceptKey;
     };
 
     Input.phileasSkipMovie = function(gamepad) {
