@@ -9,6 +9,7 @@
 // 2024.December.30 Ver1.2.2 Fixed name edit setup
 // 2025.January.04 Ver1.2.3 Language selection menu customization
 // 2025.January.12 Ver1.2.4 Added API method, battle test setup
+// 2025.January.19 Ver1.2.5 Refactoring
 
 /*:
  * @target MZ
@@ -674,22 +675,22 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
 //-----------------------------------------------------------------------------
 // Data
 
-    var parameters = PluginManager.parameters("Phileas_LanguageLocalisation");
-    var option = parameters["option"];
-    var languages = loadLanguages();
-    var files = loadFiles();
-    var openLanuageSelectionMenu = parameters["openLanuageSelectionMenu"] == "true";
-    var languageSelectionWindowMargin = Number(parameters["languageSelectionWindowMargin"]);
+    var $parameters = PluginManager.parameters("Phileas_LanguageLocalisation");
+    var $option = $parameters["option"];
+    var $languages = loadLanguages();
+    var $files = loadFiles();
+    var $openLanuageSelectionMenu = $parameters["openLanuageSelectionMenu"] == "true";
+    var $languageSelectionWindowMargin = Number($parameters["languageSelectionWindowMargin"]);
 
-    var languageData = {};
-    var filesLoaded = 0;
+    var $languageData = {};
+    var $filesLoaded = 0;
 
 
 //-----------------------------------------------------------------------------
 // Main
 
     function loadLanguages() {
-        let langs = JSON.parse(parameters["languages"]);
+        let langs = JSON.parse($parameters["languages"]);
 
         for (var i = 0; i < langs.length; ++i) {
             langs[i] = JSON.parse(langs[i]);
@@ -700,7 +701,7 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
     }
 
     function loadFiles() {
-        var filesList = JSON.parse(parameters["files"]);
+        var filesList = JSON.parse($parameters["files"]);
         return [MAIN_FILE].concat(filesList);
     }
 
@@ -711,12 +712,12 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
     }
 
     function loadLanguageData(nextFunction = () => {}, ...args) {
-        languageData = {};
+        $languageData = {};
         const index = getCurrentLanguageIndex();
         const language = getCurrentLanguage();
-        filesLoaded = 0;
+        $filesLoaded = 0;
 
-        for (const file of files) {
+        for (const file of $files) {
             const url = `${FOLDER}/${language.code}/${file}.json`;
             loadLanguageFile(index, url, file, nextFunction, ...args);
         }
@@ -738,12 +739,12 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
         }
     
         try {
-            ++filesLoaded;
+            ++$filesLoaded;
 
             if (file == MAIN_FILE) {
-                languageData = xhr.response;
+                $languageData = xhr.response;
 
-                if (filesLoaded == files.length) {
+                if ($filesLoaded == $files.length) {
                     nextFunction(...args);
                 }
 
@@ -751,7 +752,7 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
             }
 
             const path = file.split("/");
-            let lastDict = languageData;
+            let lastDict = $languageData;
 
             for (let i = 0; i + 1 < path.length; ++i) {
                 if (lastDict[path[i]] == undefined) {
@@ -763,10 +764,11 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
 
             lastDict[path[path.length - 1]] = xhr.response;
 
-            if (filesLoaded == files.length) {
+            if ($filesLoaded == $files.length) {
                 nextFunction(...args);
             }
         } catch (e) {
+            --$filesLoaded;
             onLanguageFileError(id, url, e);
         }
     };
@@ -782,7 +784,7 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
         let newText = originalText;
 
         while ((regexParts = regex.exec(originalText)) != null) {
-            const langData = getLanguageData(languageData, regexParts[1]);
+            const langData = getLanguageData($languageData, regexParts[1]);
             newText = newText.replace(regexParts[0], langData);
         }
 
@@ -854,20 +856,20 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
     }
 
     function getPreviousLanguageIndex() {
-        return (ConfigManager.phileasLanguageIndex + languages.length - 1) % languages.length;
+        return (ConfigManager.phileasLanguageIndex + $languages.length - 1) % $languages.length;
     }
 
     function getNextLanguageIndex() {
-        return (ConfigManager.phileasLanguageIndex + 1) % languages.length;
+        return (ConfigManager.phileasLanguageIndex + 1) % $languages.length;
     }
 
     function getCurrentLanguage() {
         const index = getCurrentLanguageIndex();
-        return languages[index];
+        return $languages[index];
     }
 
     function getLabel(index) {
-        return languages[index].label;
+        return $languages[index].label;
     }
 
     function getCurrentFontName() {
@@ -1028,12 +1030,12 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
     }
 
     function makeLanguageDataTableProcess(data, index) {
-        const lang = languages[index].code;
+        const lang = $languages[index].code;
         ++index;
 
-        for (let i = 1; i < files.length; ++i) {
+        for (let i = 1; i < $files.length; ++i) {
             data[i][0][index] = lang;
-            const fileData = getFileData(languageData, files[i]);
+            const fileData = getFileData($languageData, $files[i]);
             const flatFileData = flattenObject(fileData);
             let row = 1;
 
@@ -1049,7 +1051,7 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
         }
 
         // main file.
-        const flatLanguageData = flattenObject(languageData);
+        const flatLanguageData = flattenObject($languageData);
         let row = 1;
         data[0][0][index] = lang;
 
@@ -1063,7 +1065,7 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
             ++row;
         }
 
-        if (index == languages.length) {
+        if (index == $languages.length) {
             saveLanguageDataToXlsx(data);
             console.log("The export of language data to XLSX is complete!");
             ConfigManager.phileasLanguageIndex = landIdBackUp;
@@ -1078,9 +1080,9 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
         //const XLSX = require("xlsx");
         const workbook = XLSX.utils.book_new();
 
-        for (let i = 0; i < files.length; ++i) {
+        for (let i = 0; i < $files.length; ++i) {
             const worksheet = XLSX.utils.aoa_to_sheet(data[i]);
-            const sheetName = files[i].replace("/", "|");
+            const sheetName = $files[i].replace("/", "|");
             XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
         }
 
@@ -1093,7 +1095,7 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
 
         const data = [];
 
-        for (let i = 0; i < files.length; ++i) {
+        for (let i = 0; i < $files.length; ++i) {
             data[i] = [
                 ["Text code"] // Headers
             ];
@@ -1102,7 +1104,7 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
         makeLanguageDataTableStart(data, 0);
     }
 
-    function writeToLanguageData(languageData, textCode, value) {
+    function writeToLanguageData($languageData, textCode, value) {
         const path = textCode.split(".");
 
         for (let i = 0; i < path.length; ++i) {
@@ -1111,19 +1113,19 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
             }
 
             if (i + 1 == path.length) {
-                languageData[path[i]] = value;
+                $languageData[path[i]] = value;
                 return;
             }
 
-            if (languageData[path[i]] == undefined) {
+            if ($languageData[path[i]] == undefined) {
                 if (path[i + 1][0] == "[") {
-                    languageData[path[i]] = [];
+                    $languageData[path[i]] = [];
                 } else {
-                    languageData[path[i]] = {};
+                    $languageData[path[i]] = {};
                 }
             }
 
-            languageData = languageData[path[i]]; 
+            $languageData = $languageData[path[i]]; 
         }
     }
 
@@ -1140,8 +1142,8 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
         //const XLSX = require("xlsx");
         const workbook = XLSX.readFile(EXPORT_FILE);
         const languageDatas = {};
-        for (let i = 0; i < languages.length; ++i) {
-            languageDatas[languages[i].code] = {};
+        for (let i = 0; i < $languages.length; ++i) {
+            languageDatas[$languages[i].code] = {};
         }
 
         for (let i = 0; i < workbook.SheetNames.length; ++i) {
@@ -1157,8 +1159,8 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
                 const textCode = textCodePrefix
                     + jsonData[j]["Text code"][0]
                     + jsonData[j]["Text code"].slice(1).replace("[", ".[");
-                for (let z = 0; z < languages.length; ++z) {
-                    const lang = languages[z].code;
+                for (let z = 0; z < $languages.length; ++z) {
+                    const lang = $languages[z].code;
                     writeToLanguageData(languageDatas[lang], textCode, jsonData[j][lang]);
                 }
             }
@@ -1167,18 +1169,18 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
         checkDir(FOLDER);
         const fs = require("fs");
 
-        for (let i = 0; i < languages.length; ++i) {
-            const lang = languages[i].code;
+        for (let i = 0; i < $languages.length; ++i) {
+            const lang = $languages[i].code;
             const langData = languageDatas[lang];
 
-            for (let j = 1; j < files.length; ++j) {
-                const fileName = `${FOLDER}/${lang}/${files[j]}.json`;
+            for (let j = 1; j < $files.length; ++j) {
+                const fileName = `${FOLDER}/${lang}/${$files[j]}.json`;
                 checkDir(fileName);
-                const fileData = getFileData(langData, files[j]);
+                const fileData = getFileData(langData, $files[j]);
                 const jsonString = JSON.stringify(fileData, null, 4);
                 fs.writeFileSync(fileName, jsonString, (err) => {
                     if (err) {
-                      console.error(`Error writing to the language file ${files[j]}.json:`, err);
+                      console.error(`Error writing to the language file ${$files[j]}.json:`, err);
                     }
                 });
             }
@@ -1250,7 +1252,7 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
         const rect = this.commandWindowRect();
         this._commandWindow = new Window_LanguageCommand(rect);
 
-        for (let i = 0; i < languages.length; ++i) {
+        for (let i = 0; i < $languages.length; ++i) {
             this._commandWindow.setHandler(i, () => {
                 setLanguage(i, () => {
                     updateGameTitle();
@@ -1265,7 +1267,7 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
 
     Scene_LanguageSelection.prototype.commandWindowRect = function() {
         const ww = this.maxLabelWidth();
-        const wh = languages.length * (36 + languageSelectionWindowMargin) + $gameSystem.windowPadding() * 2;
+        const wh = $languages.length * (36 + $languageSelectionWindowMargin) + $gameSystem.windowPadding() * 2;
         const wx = (Graphics.boxWidth - ww) / 2;
         const wy = (Graphics.boxHeight - wh) / 2;
         return new Rectangle(wx, wy, ww, wh);
@@ -1275,7 +1277,7 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
         const calcWindow = new Window_Base(new Rectangle(0, 0, Graphics.boxWidth, Graphics.boxHeight));
         let maxWidth = 96;
 
-        for (const language of languages) {
+        for (const language of $languages) {
             const textWidth = calcWindow.textSizeEx(language.label).width;
             const choiceWidth = Math.ceil(textWidth) + 16;
 
@@ -1317,8 +1319,8 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
     };
     
     Window_LanguageCommand.prototype.makeCommandList = function() {
-        for (let i = 0; i < languages.length; ++i) {
-            this.addCommand(languages[i].label, i);
+        for (let i = 0; i < $languages.length; ++i) {
+            this.addCommand($languages[i].label, i);
         }
     };
 
@@ -1332,7 +1334,7 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
     };
     
     Window_LanguageCommand.prototype.itemHeight = function() {
-        return Window_Scrollable.prototype.itemHeight.call(this) + languageSelectionWindowMargin;
+        return Window_Scrollable.prototype.itemHeight.call(this) + $languageSelectionWindowMargin;
     };
 
 
@@ -1406,7 +1408,7 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
 
         if (!DataManager.isBattleTest() && !DataManager.isEventTest()) {
             if (ConfigManager.phileasLanguageIndex == undefined) {
-                if (openLanuageSelectionMenu) {
+                if ($openLanuageSelectionMenu) {
                     const nextScene = SceneManager._nextScene.constructor;
                     SceneManager.goto(Scene_LanguageSelection);
                     SceneManager.prepareNextScene(nextScene);
@@ -1462,7 +1464,7 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
     const Origin_Window_Options_makeCommandList = Window_Options.prototype.makeCommandList;
     Window_Options.prototype.makeCommandList = function() {
         Origin_Window_Options_makeCommandList.call(this);
-        this.addCommand(getText(option), "phileasLanguageIndex");
+        this.addCommand(getText($option), "phileasLanguageIndex");
     };
     
     const Origin_Window_Options_statusText = Window_Options.prototype.statusText;
