@@ -10,6 +10,7 @@
 // 2025.January.04 Ver1.2.3 Language selection menu customization
 // 2025.January.12 Ver1.2.4 Added API method, battle test setup
 // 2025.January.19 Ver1.2.5 Refactoring
+// 2025.January.20 Ver1.2.6 Compatibility with TAA_BookMenu
 
 /*:
  * @target MZ
@@ -240,6 +241,21 @@
  * 7. You can use subfolders. Then the relative paths must match. Example:
  *    "img/pictures/sub_folder/b.png"
  *    "img/pictures/ru/sub_folder/b.png"
+ * 
+ *-----------------------------------------------------------------------------
+ * COMPATIBILITY WITH OTHER PLUGINS
+ * The plugin is compatible with "Phileas's Text Wrap".
+ * Place this plugin under "Phileas's Text Wrap" in the Plugin Manager.
+ * 
+ * The plugin is compatible with "TAA_BookMenu".
+ * Place this plugin under "TAA_BookMenu" in the Plugin Manager.
+ * 
+ * If you are using "Phileas's Language Localization",
+ * "Phileas's Text Wrap" and "TAA_BookMenu" at the same time,
+ * arrange them exactly in this order in the Plugin Manager:
+ * 1. TAA_BookMenu
+ * 2. Phileas_TextWrap
+ * 3. Phileas_LanguageLocalisation
  * 
  *-----------------------------------------------------------------------------
  * DEMO PROJECT
@@ -546,6 +562,21 @@
  *    пути должны совпадать. Пример:
  *    "img/pictures/sub_folder/b.png"
  *    "img/pictures/ru/sub_folder/b.png"
+ * 
+ *-----------------------------------------------------------------------------
+ * СОВМЕСТИМОСТЬ С ДРУГИМИ ПЛАГИНАМИ
+ * Плагин совместим с "Phileas's Text Wrap". Располагайте этот плагин под
+ * "Phileas's Text Wrap" в меню плагинов.
+ * 
+ * Плагин совместим с "TAA_BookMenu". Располагайте этот плагин под
+ * "TAA_BookMenu" в меню плагинов.
+ * 
+ * Если вы одновременно используете "Phileas's Language Localisation",
+ * "Phileas's Text Wrap" и "TAA_BookMenu", располагайте их точно в
+ * таком порядке в меню плагинов:
+ * 1. TAA_BookMenu
+ * 2. Phileas_TextWrap
+ * 3. Phileas_LanguageLocalisation
  * 
  *-----------------------------------------------------------------------------
  * ДЕМО ПРОЕКТ
@@ -1594,5 +1625,12 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
             updateGameTitle();
         });
     };
+
+    if (typeof Window_BookText != "undefined") {
+        const Origin_TaaPreparePrintableObjects = Window_BookText.prototype.preparePrintableObjects;
+        Window_BookText.prototype.preparePrintableObjects = function(text) {
+            Origin_TaaPreparePrintableObjects.call(this, getText(text));
+        }
+    }
 
 }());
