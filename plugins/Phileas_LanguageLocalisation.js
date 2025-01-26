@@ -11,6 +11,7 @@
 // 2025.January.12 Ver1.2.4 Added API method, battle test setup
 // 2025.January.19 Ver1.2.5 Refactoring
 // 2025.January.20 Ver1.2.6 Compatibility with TAA_BookMenu
+// 2025.January.26 Ver1.2.7 Fixed data loading
 
 /*:
  * @target MZ
@@ -714,11 +715,10 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
     var $languageSelectionWindowMargin = Number($parameters["languageSelectionWindowMargin"]);
 
     var $languageData = {};
-    var $filesLoaded = 0;
 
 
 //-----------------------------------------------------------------------------
-// Main
+// Data loading
 
     function loadLanguages() {
         let langs = JSON.parse($parameters["languages"]);
@@ -744,70 +744,56 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
 
     function loadLanguageData(nextFunction = () => {}, ...args) {
         $languageData = {};
-        const index = getCurrentLanguageIndex();
-        const language = getCurrentLanguage();
-        $filesLoaded = 0;
+        loadLanguageFiles(nextFunction, ...args);
+    }
 
-        for (const file of $files) {
-            const url = `${FOLDER}/${language.code}/${file}.json`;
-            loadLanguageFile(index, url, file, nextFunction, ...args);
+    function loadLanguageFile(url) {
+        return new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open("GET", url, true);
+            xhr.onload = () => {
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    resolve({ response: xhr.response });
+                } else {
+                    reject(`Error loading file: ${url}, Status: ${xhr.status}`);
+                }
+            };
+            xhr.onerror = () => reject(`Network error loading file: ${url}`);
+            xhr.send();
+        });
+    }
+    
+    async function loadLanguageFiles(nextFunction, ...args) {
+        try {
+            const language = getCurrentLanguage();
+            const results = await Promise.all($files.map(file =>
+                loadLanguageFile(`${FOLDER}/${language.code}/${file}.json`)));
+            $languageData = JSON.parse(results[0].response);
+
+            for (let i = 1; i < results.length; ++i) {
+                const path = $files[i].split("/");
+                let lastDict = $languageData;
+    
+                for (let i = 0; i + 1 < path.length; ++i) {
+                    if (!lastDict[path[i]]) {
+                        lastDict[path[i]] = {};
+                    }
+                    lastDict = lastDict[path[i]];
+                }
+    
+                const value = JSON.parse(results[i].response);
+                lastDict[path[path.length - 1]] = value;
+            }
+    
+            nextFunction(...args);
+        } catch (error) {
+            console.error(error);
+            throw new Error("Failed to load language file");
         }
     }
 
-    function loadLanguageFile(id, url, file, nextFunction, ...args) {
-        const xhr = new XMLHttpRequest();
-        xhr.open("GET", url);
-        xhr.responseType = "json";
-        xhr.onload = () => onLanguageFileLoad(xhr, id, url, file, nextFunction, ...args);
-        xhr.onerror = () => onLanguageFileError(id, url, "File not found.");
-        xhr.send();
-    };
-    
-    function onLanguageFileLoad(xhr, id, url, file, nextFunction, ...args) {
-        if (xhr.status >= 400) {
-            onLanguageFileError(id, url, "Xhr status " + xhr.status);
-            return;
-        }
-    
-        try {
-            ++$filesLoaded;
-
-            if (file == MAIN_FILE) {
-                $languageData = xhr.response;
-
-                if ($filesLoaded == $files.length) {
-                    nextFunction(...args);
-                }
-
-                return;
-            }
-
-            const path = file.split("/");
-            let lastDict = $languageData;
-
-            for (let i = 0; i + 1 < path.length; ++i) {
-                if (lastDict[path[i]] == undefined) {
-                    lastDict[path[i]] = {};
-                }
-
-                lastDict = lastDict[path[i]];
-            }
-
-            lastDict[path[path.length - 1]] = xhr.response;
-
-            if ($filesLoaded == $files.length) {
-                nextFunction(...args);
-            }
-        } catch (e) {
-            --$filesLoaded;
-            onLanguageFileError(id, url, e);
-        }
-    };
-    
-    function onLanguageFileError(id, url, e) {
-        console.error({id, url, e});
-        throw new Error("Failed to load language file");
-    };
+//-----------------------------------------------------------------------------
+// Main (getters)
 
     function getText(originalText) {
         const regex = /\${([\w|\.\[\]0-9]+)}/gm;
