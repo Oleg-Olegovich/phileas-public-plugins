@@ -744,7 +744,8 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
 
     function loadLanguageData(nextFunction = () => {}, ...args) {
         $languageData = {};
-        loadLanguageFiles(nextFunction, ...args);
+        const result = loadLanguageFiles();
+        result.then(_ => nextFunction(...args));
     }
 
     function loadLanguageFile(url) {
@@ -763,7 +764,7 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
         });
     }
     
-    async function loadLanguageFiles(nextFunction, ...args) {
+    async function loadLanguageFiles() {
         try {
             const language = getCurrentLanguage();
             const results = await Promise.all($files.map(file =>
@@ -784,8 +785,6 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
                 const value = JSON.parse(results[i].response);
                 lastDict[path[path.length - 1]] = value;
             }
-    
-            nextFunction(...args);
         } catch (error) {
             console.error(error);
             throw new Error("Failed to load language file");
