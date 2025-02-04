@@ -9,161 +9,53 @@
  * @plugindesc Triggering of the switch/variable/common event when the pointer acts with the picture
  * @author Phileas
  *
- * @command assign
- * @text Assign
- * @desc Binds a switch, a variable, and a common event to a single action.
- *
- * @arg pictureId
- * @text Picture ID
- * @type number
- * @default 1
- *
- * @arg switch
- * @text Switch
- * @type struct<SwitchDataStruct>
- * 
- * @arg selfSwitch
- * @text Self Switch
- * @type struct<SelfSwitchDataStruct>
- *
- * @arg variable
- * @text Variable
- * @type struct<VariableDataStruct>
- * 
- * @arg pictureVariableId
- * @text Picture number variable
- * @type variable
- * @default 0
- * @desc The number of the picture will be written to this variable when the action is performed.
- *
- * @arg commonEventId
- * @text Common event ID
- * @type common_event
- * @default 0
- * 
- * @arg runScript
- * @text Script
- * @type text
- * @desc An arbitrary JS script that will be executed at the trigger.
- * 
- * @arg ignoreTransparentPixels
- * @text Ignore transparent pixels
- * @type boolean
- * @default true
- *
- * @arg action
- * @text Action
- * @type combo
- * @option Enter
- * @option Exit
- * @option Press
- * @option Click
- * @default Enter
- *
- * @command eraseAction
- * @text Erase action
- * @desc Remove the binding to a single picture action.
- * @arg pictureId
- * @text Picture ID
- * @type number
- * @default 1
- * @arg action
- * @text Action
- * @type combo
- * @option Enter
- * @option Exit
- * @option Press
- * @option Click
- * @default Enter
- *
- * @command eraseAllAction
- * @text Erase all actions
- * @desc Removes bindings to all actions of the picture.
- * @arg pictureId
- * @text Picture ID
- * @type number
- * @default 1
- *
- * @command assignGlobal
- * @text Assign global action
- * @desc Binds a switch, a variable, and a common event to a single action.
- *
- * @arg switch
- * @text Switch
- * @type struct<SwitchDataStruct>
- *
- * @arg selfSwitch
- * @text Self Switch
- * @type struct<SelfSwitchDataStruct>
- *
- * @arg variable
- * @text Variable
- * @type struct<VariableDataStruct>
- * 
- * @arg pictureVariableId
- * @text Picture number variable
- * @type variable
- * @default 0
- * @desc The number of the picture will be written to this variable when the action is performed.
- *
- * @arg commonEventId
- * @text Common event ID
- * @type common_event
- * @default 0
- * 
- * @arg runScript
- * @text Script
- * @type text
- * @desc An arbitrary JS script that will be executed at the trigger.
- * 
- * @arg ignoreTransparentPixels
- * @text Ignore transparent pixels
- * @type boolean
- * @default true
- *
- * @arg action
- * @text Action
- * @type combo
- * @option Enter
- * @option Exit
- * @option Press
- * @option Click
- * @default Enter
- *
- * @command eraseGlobal
- * @text Erase global action
- * @desc Remove the binding to a single global action.
- * @arg action
- * @text Action
- * @type combo
- * @option Enter
- * @option Exit
- * @option Press
- * @option Click
- * @default Enter
- *
- * @command eraseAllGlobal
- * @text Erase all global actions
- * @desc Removes bindings to all global actions.
- * 
- * @command disablePlugin
- * @text Disable the plugin
- * @desc Triggers stop working, but data about them is not deleted
- * 
- * @command enablePlugin
- * @text Enable the plugin
- *
  * @help
  * Triggering of a switch or a common event when the pointer with the picture acts:
  * enter, exit, press, click.
+ * 
+ * To invoke the plugin commands, use the "Script" command in the event.
  *
  * The plugin provides commands: 
- * 0) Assign - assigns a handler to one type of action with an picture.
- * 1) Erase action - removes the handler of a single action with an picture.
- * 2) Erase all actions - removes all picture handlers.
+ * 0) Phileas_PointerPictureTrigger.assignAction(params) - assigns a handler to one type of action with an picture.
+ * 1) Phileas_PointerPictureTrigger.eraseAction(params) - removes the handler of a single action with an picture.
+ * 2) Phileas_PointerPictureTrigger.eraseAllAction(params) - removes all picture handlers.
+ * 3) Phileas_PointerPictureTrigger.assignGlobal(params) - assigns a handler for all pictures.
+ * 4) Phileas_PointerPictureTrigger.eraseGlobal(params) - deletes the handler for all pictures.
+ * 5) Phileas_PointerPictureTrigger.eraseAllGlobal() - deletes all global handlers.
+ * 6) Phileas_PointerPictureTrigger.disablePlugin() - disables plugin.
+ * 7) Phileas_PointerPictureTrigger.enablePlugin() - enables plugin.
  * 
- * Similar global commands are also provided, allowing to set triggers for all pictures.
- *
+ * params is a JS object. General view:
+ * 
+ * {
+ *     "pictureId": 1,
+ *     "switch": {"switchId":2,"switchState":true},
+ *     "selfSwitch": {"mapId":0,"eventId":0,"selfSwitchId":"A","switchState":true},
+ *     "variable": {"variableId":0,"variableDelta":0,"variableExactValue":0},
+ *     "pictureVariableId": 0,
+ *     "commonEventId": 0,
+ *     "ignoreTransparentPixels": true,
+ *     "runScript": "",
+ *     "action": "Enter"
+ * }
+ * 
+ * Field Descriptions:
+ * pictureId - Picture ID
+ * switch - the switch that will trigger when the action is performed
+ *     (switchId - Switch ID, switchState - the value that will be written to the switch)
+ * selfSwitch - the self switch that will trigger when the action is performed
+ *     (mapId - Map ID, eventId - Event ID, selfSwitchId - Self Switch ID,
+ *      switchState -  The value that will be written to the switch)
+ * variable - the variable that will change when the action is performed
+ *     (variableId - Variable ID, variableDelta - the value that will be added to the variable,
+ *      variableExactValue - the value that will be assigned to the variable
+ *      if the "Variable delta" is 0)
+ * pictureVariableId - the number of the picture will be written to this variable when the action is performed.
+ * commonEventId - ID of the common event that will be triggered when the action is performed.
+ * runScript - an arbitrary JS script that will be executed at the trigger.
+ * ignoreTransparentPixels - ignore transparent pixels (true or false).
+ * action - type of action: Enter, Exit, Press or Click.
+ * 
  * You can assign your own handler for each type of action, they will work independently.
  * For example, you can assign two switches to one picture: to Enter and to Click.
  * 
@@ -184,227 +76,59 @@
  * But be sure to include me in the credits!
  */
 
-/*~struct~SwitchDataStruct:
- * @param switchId
- * @text Switch ID
- * @type switch
- * @default 0
- *
- * @param switchState
- * @text Switch state
- * @type boolean
- * @desc The value that will be written to the switch when the action is performed.
- * @default true
- */
-
-/*~struct~SelfSwitchDataStruct:
- * @param mapId
- * @text Map ID
- * @type number
- * @default 0
- * 
- * @param eventId
- * @text Event ID
- * @type number
- * @default 0
- * 
- * @param selfSwitchId
- * @text Self Switch ID
- * @type combo
- * @option A
- * @option B
- * @option C
- * @option D
- * @default A
- *
- * @param switchState
- * @text Switch state
- * @type boolean
- * @desc The value that will be written to the switch when the action is performed.
- * @default true
- */
-
-/*~struct~VariableDataStruct:
- * @param variableId
- * @text Variable ID
- * @type variable
- * @default 0
- *
- * @param variableDelta
- * @text Variable delta
- * @type number
- * @min -9999999
- * @desc The value that will be added to the variable when the action is performed.
- * @default 0
- * 
- * @param variableExactValue
- * @text Variable exact value
- * @type number
- * @min -9999999
- * @desc The value that will be assigned to the variable when the action is performed if the "Variable delta" is 0.
- * @default 0
- */
- 
 /*:ru
  * @target MV
  * @plugindesc Срабатывание переключателя/переменной/общего события при действии указателя с картинкой
  * @author Phileas
- *
- * @command assign
- * @text Назначить
- * @desc Привязывает переключатель, переменную и общее событие к одному действию.
- *
- * @arg pictureId
- * @text ID картинки
- * @type number
- * @default 1
- *
- * @arg switch
- * @text Переключатель
- * @type struct<SwitchDataStruct>
- * 
- * @arg selfSwitch
- * @text Локальный переключатель
- * @type struct<SelfSwitchDataStruct>
- *
- * @arg variable
- * @text Переменная
- * @type struct<VariableDataStruct>
- * 
- * @arg pictureVariableId
- * @text Переменная номера картинки
- * @type variable
- * @default 0
- * @desc В эту переменную будет записываться номер картинки при совершении действия.
- *
- * @arg commonEventId
- * @text ID общего события
- * @type common_event
- * @default 0
- * 
- * @arg runScript
- * @text Скрипт
- * @type text
- * @desc Произвольный JS-скрипт, который будет исполнен при срабатывании триггера.
- * 
- * @arg ignoreTransparentPixels
- * @text Игнорировать прозрачные пиксели
- * @type boolean
- * @default true
- *
- * @arg action
- * @text Действие
- * @type combo
- * @option Enter
- * @option Exit
- * @option Press
- * @option Click
- * @default Enter
- *
- * @command eraseAction
- * @text Удалить действие
- * @desc Удалить привязку к одному действию картинки.
- * @arg pictureId
- * @text ID картинки
- * @type number
- * @default 1
- * @arg action
- * @text Действие
- * @type combo
- * @option Enter
- * @option Exit
- * @option Press
- * @option Click
- * @default Enter
- *
- * @command eraseAllAction
- * @text Удалить все действия
- * @desc Удаляет привязки ко всем действиям картинки.
- * @arg pictureId
- * @text ID картинки
- * @type number
- * @default 1
- * 
- * @command assignGlobal
- * @text Назначить глобально
- * @desc Привязывает переключатель, переменную и общее событие к одному действию для всех картинок.
- *
- * @arg switch
- * @text Переключатель
- * @type struct<SwitchDataStruct>
- * 
- * @arg selfSwitch
- * @text Локальный переключатель
- * @type struct<SelfSwitchDataStruct>
- *
- * @arg variable
- * @text Переменная
- * @type struct<VariableDataStruct>
- * 
- * @arg pictureVariableId
- * @text Переменная номера картинки
- * @type variable
- * @default 0
- * @desc В эту переменную будет записываться номер картинки при совершении действия.
- *
- * @arg commonEventId
- * @text ID общего события
- * @type common_event
- * @default 0
- * 
- * @arg runScript
- * @text Скрипт
- * @type text
- * @desc Произвольный JS-скрипт, который будет исполнен при срабатывании триггера.
- * 
- * @arg ignoreTransparentPixels
- * @text Игнорировать прозрачные пиксели
- * @type boolean
- * @default true
- *
- * @arg action
- * @text Действие
- * @type combo
- * @option Enter
- * @option Exit
- * @option Press
- * @option Click
- * @default Enter
- *
- * @command eraseGlobal
- * @text Удалить глобальное действие
- * @desc Удалить привязку к одному глобальному действию.
- * @arg action
- * @text Действие
- * @type combo
- * @option Enter
- * @option Exit
- * @option Press
- * @option Click
- * @default Enter
- *
- * @command eraseAllAction
- * @text Удалить все глобальные действия
- * @desc Удаляет привязки ко всем глобальным действиям.
- * 
- * @command disablePlugin
- * @text Отключить плагин
- * @desc Триггеры перестают работать, но данные о них не удаляются
- * 
- * @command enablePlugin
- * @text Включить плагин
  * 
  * @help
  * Срабатывание переключателя, переменной или общего события при действиях указателя с картинкой:
  * наведение, уведение, клик, нажатие.
+ * 
+ * Для вызова команд плагина используйте команду "Скрипт" в событии.
  *
  * Плагин предоставляет команды: 
- * 0) Назначить - назначает обработчик на один тип действия с картинкой.
- * 1) Удалить действие - удаляет обработчик одного действия с картинкой.
- * 2) Удалить все действия - удаляет все обработчики картинки.
+ * 0) Phileas_PointerPictureTrigger.assignAction(params) - назначает обработчик на один тип действия с картинкой.
+ * 1) Phileas_PointerPictureTrigger.eraseAction(params) - удаляет обработчик одного действия с картинкой.
+ * 2) Phileas_PointerPictureTrigger.eraseAllAction(params) - удаляет все обработчики картинки.
+ * 3) Phileas_PointerPictureTrigger.assignGlobal(params) - назначает обработчик для всех картинок.
+ * 4) Phileas_PointerPictureTrigger.eraseGlobal(params) - удаляет обработчик для всех картинок.
+ * 5) Phileas_PointerPictureTrigger.eraseAllGlobal() - удаляет все глобальные обработчики.
+ * 6) Phileas_PointerPictureTrigger.disablePlugin() - отключает плагин.
+ * 7) Phileas_PointerPictureTrigger.enablePlugin() - включает плагин.
  * 
- * Также предоставляются аналогичные глобальные команды, позволяющие задать триггеры для всех картинок.
- *
+ * params - это JS-объект. Общий вид:
+ * 
+ * {
+ *     "pictureId": 1,
+ *     "switch": {"switchId":2,"switchState":true},
+ *     "selfSwitch": {"mapId":0,"eventId":0,"selfSwitchId":"A","switchState":true},
+ *     "variable": {"variableId":0,"variableDelta":0,"variableExactValue":0},
+ *     "pictureVariableId": 0,
+ *     "commonEventId": 0,
+ *     "ignoreTransparentPixels": true,
+ *     "runScript": "",
+ *     "action": "Enter"
+ * }
+ * 
+ * Описания полей:
+ * pictureId - ID картинки
+ * switch - переключатель, который сработает при совершении действия
+ *     (switchId - ID переключателя, switchState - значение, которое будет записано в переключатель)
+ * selfSwitch - локальный переключатель, который сработает при совершении действия
+ *     (mapId - ID карты, eventId - ID события, selfSwitchId - ID локального переключателя,
+ *      switchState -  значение, которое будет записано в переключатель)
+ * variable - переменная, которая изменится при совершении действия
+ *     (variableId - ID переменной, variableDelta - значение, которое будет прибавлено к переменной,
+ *      variableExactValue - значение, которое будет присвоено в переменную, 
+ *      если variableDelta равна 0)
+ * pictureVariableId - в эту переменную будет записываться номер картинки при совершении действия.
+ * commonEventId - ID общего события, которое сработает при совершении действия
+ * runScript - произвольный JS-скрипт, который будет исполнен при срабатывании триггера.
+ * ignoreTransparentPixels - игнорировать прозрачные пиксели (true или false)
+ * action - тип действия: Enter, Exit, Press или Click
+ * 
+ * 
  * На каждый тип действия можно назначить свой обработчик, они будут работать независимо. 
  * Например, можно на одну картинку назначить два переключателя: на Enter и на Click.
  *
@@ -423,66 +147,6 @@
  *
  * Это означает, что вы можете свободно использовать плагин в некоммерческих и коммерческих играх и даже редактировать его.
  * Но обязательно укажите меня в титрах!
- */
-
-/*~struct~SwitchDataStruct:ru
- * @param switchId
- * @text ID переключателя
- * @type switch
- * @default 0
- *
- * @param switchState
- * @text Состояние переключателя
- * @type boolean
- * @desc Значение, которое будет записано в переключатель при совершении действия.
- * @default true
- */
-
-/*~struct~SelfSwitchDataStruct:ru
- * @param mapId
- * @text ID карты
- * @type number
- * @default 0
- * 
- * @param eventId
- * @text ID события
- * @type number
- * @default 0
- * 
- * @param selfSwitchId
- * @text ID локального переключателя
- * @type combo
- * @option A
- * @option B
- * @option C
- * @option D
- * @default A
- *
- * @param switchState
- * @text Состояние переключателя
- * @type boolean
- * @desc Значение, которое будет записано в переключатель при совершении действия.
- * @default true
- */
-
-/*~struct~VariableDataStruct:ru
- * @param variableId
- * @text ID переменной
- * @type variable
- * @default 0
- *
- * @param variableDelta
- * @text Дельта переменной
- * @type number
- * @min -9999999
- * @desc Значение, которое будет прибавлено к переменной при совершении действия.
- * @default 0
- * 
- * @param variableExactValue
- * @text Точное значение пременной
- * @type number
- * @desc Значение, которое будет присвоено в переменную при совершении действия, если "Дельта перменной" равна 0.
- * @default 0
  */
 
 "use strict";
