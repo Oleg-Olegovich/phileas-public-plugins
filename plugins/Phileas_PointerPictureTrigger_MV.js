@@ -533,7 +533,7 @@ Sprite_Picture.prototype.processTouch = function() {
 };
 
 Spriteset_Base.prototype.phileasIsAnyPicturePressed = function() {
-    if (!Phileas_PointerPictureTrigger.isPluginEnabled) {
+    if (!Phileas_PointerPictureTrigger.isPluginEnabled || !this._pictureContainer) {
         return false;
     }
 
