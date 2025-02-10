@@ -7,6 +7,7 @@
 // 2023.May.9 Ver1.1.1 Fixed the compatibility issue of HIME_HiddenChoiceConditions by changing the logic of the plugin command
 // 2024.January.28 Ver1.2.0 Added commands for runtime customization
 // 2024.February.25 Ver1.2.1 Updating the message window after the plugin command
+// 2025.February.10 Ver1.3.0 Added dimmer window settings
 
 /*:
  * @target MZ
@@ -28,6 +29,23 @@
  * @type number
  * @min -1001
  * @default 0
+ *
+ * @param dimColors
+ * @text Dimmer window colors
+ *
+ * @param dimColor1
+ * @parent dimColors
+ * @text Background color
+ * @type struct<ColorStruct>
+ * @desc Input an empty line to use the default value
+ * @default 
+ *
+ * @param dimColor2
+ * @parent dimColors
+ * @text Border color
+ * @type struct<ColorStruct>
+ * @desc Input an empty line to use the default value
+ * @default 
  *
  * @command nextMessageWindowSettings
  * @text Change the message window
@@ -82,6 +100,26 @@
  * @text Default choice list
  * @desc Set the default choice list window settings
  *
+ *
+ * @command setDimColors
+ * @text Set dimmer window colors
+ *
+ * @arg dimColor1
+ * @text Background color
+ * @type struct<ColorStruct>
+ * @desc Input an empty line to use the default value
+ * @default 
+ *
+ * @arg dimColor2
+ * @text Border color
+ * @type struct<ColorStruct>
+ * @desc Input an empty line to use the default value
+ * @default 
+ *
+ *
+ * @command defaultDimColors
+ * @text Default dimmer window colors
+ *
  * 
  * @help
  * [Summary]
@@ -131,6 +169,23 @@
  * @text Горизонтальное смещение окна сообщения по умолчанию
  * @type number
  * @default 0
+ *
+ * @param dimColors
+ * @text Цвета затемнённого окна
+ *
+ * @param dimColor1
+ * @parent dimColors
+ * @text Цвет фона
+ * @type struct<ColorStruct>
+ * @desc Введите пустую строку, чтобы использовать значение по умолчанию
+ * @default 
+ *
+ * @param dimColor2
+ * @parent dimColors
+ * @text Цвет границы
+ * @type struct<ColorStruct>
+ * @desc Введите пустую строку, чтобы использовать значение по умолчанию
+ * @default 
  *
  * @command nextMessageWindowSettings
  * @text Изменить окно сообщения
@@ -185,6 +240,26 @@
  * @text Список выбора по умолчанию
  * @desc Устанавливает стандартные настройки окна списка выбора
  *
+ *
+ * @command setDimColors
+ * @text Изменить цвета затемнённого фона
+ *
+ * @arg dimColor1
+ * @text Цвет фона
+ * @type struct<ColorStruct>
+ * @desc Введите пустую строку, чтобы использовать значение по умолчанию
+ * @default 
+ *
+ * @arg dimColor2
+ * @text Цвет границы
+ * @type struct<ColorStruct>
+ * @desc Введите пустую строку, чтобы использовать значение по умолчанию
+ * @default 
+ *
+ *
+ * @command defaultDimColors
+ * @text Цвета затемнённого фона по умолчанию
+ *
  * 
  * @help
  * [Резюме]
@@ -215,7 +290,53 @@
  * Но обязательно укажите меня в титрах!
  */
 
+/*~struct~ColorStruct
+ * @param red
+ * @text Red
+ * @type number
+ * @default 0
+ *
+ * @param green
+ * @text Green
+ * @type number
+ * @default 0
+ * 
+ * @param blue
+ * @text Blue
+ * @type number
+ * @default 0
+ * 
+ * @param opacity
+ * @text Opacity (%)
+ * @type number
+ * @default 60
+ */
+
+/*~struct~ColorStruct:ru
+ * @param red
+ * @text Красный
+ * @type number
+ * @default 0
+ *
+ * @param green
+ * @text Зелёный
+ * @type number
+ * @default 0
+ * 
+ * @param blue
+ * @text Голубой
+ * @type number
+ * @default 0
+ * 
+ * @param opacity
+ * @text Непрозрачность (%)
+ * @type number
+ * @default 60
+ */
+
 (function() {
+
+    "use strict";
 
 //--------DATA:
     var parameters = PluginManager.parameters("Phileas_MessageWindowRectSettings");
@@ -228,6 +349,8 @@
     var nextMessageWindowY = -1;
     var nextChoiceListX = -1;
     var nextChoiceListY = -1;
+    var dimColor1 = setDimColor(parameters["dimColor1"]);
+    var dimColor2 = setDimColor(parameters["dimColor2"]);
 
 //--------CHANGED CORE:
 
@@ -235,6 +358,8 @@
     PluginManager.registerCommand("Phileas_MessageWindowRectSettings", "defaultMessageWindowSettings", setDefaultMessageWindowSettings);
     PluginManager.registerCommand("Phileas_MessageWindowRectSettings", "nextChoiceListPosition", setNextChoceListPosition);
     PluginManager.registerCommand("Phileas_MessageWindowRectSettings", "defaultChoiceListWindowSettings", setDefaultChoiceListWindowSettings);
+    PluginManager.registerCommand("Phileas_MessageWindowRectSettings", "setDimColors", setDimColors);
+    PluginManager.registerCommand("Phileas_MessageWindowRectSettings", "defaultDimColors", defaultDimColors);
     
     function updateScenesStack() {
         for (let i = 0; i < SceneManager._stack.length; ++i) {
@@ -279,7 +404,7 @@
         nextChoiceListY = Number(params["Y"]);
     }
     
-    function setDefaultChoiceListWindowSettings(params) {
+    function setDefaultChoiceListWindowSettings() {
         nextChoiceListX = -1;
         nextChoiceListY = -1;
     }
@@ -296,7 +421,27 @@
         return defaultValue;
     }
 
-    Origin_messageWindowRect = Scene_Message.prototype.messageWindowRect;
+    function setDimColor(param) {
+        if (param == undefined || param == "") {
+            return "";
+        }
+
+        const obj = JSON.parse(param);
+        const opacity = Number(obj["opacity"]) / 100;
+        return `rgba(${obj["red"]}, ${obj["green"]}, ${obj["blue"]}, ${opacity})`;
+    }
+
+    function setDimColors(params) {
+        dimColor1 = setDimColor(params["dimColor1"]);
+        dimColor2 = setDimColor(params["dimColor2"]);
+    }
+
+    function defaultDimColors() {
+        dimColor1 = "";
+        dimColor2 = "";
+    }
+
+    const Origin_messageWindowRect = Scene_Message.prototype.messageWindowRect;
     Scene_Message.prototype.messageWindowRect = function() {
         var rect = Origin_messageWindowRect.call(this);
         rect.width = calculateSize(rect.width, messageWindowWidth, nextMessageWindowWidth);
@@ -308,7 +453,7 @@
         return rect;
     };
     
-    Origin_messageUpdatePlacement = Window_Message.prototype.updatePlacement;
+    const Origin_messageUpdatePlacement = Window_Message.prototype.updatePlacement;
     Window_Message.prototype.updatePlacement = function() {
         Origin_messageUpdatePlacement.call(this);
         
@@ -321,8 +466,34 @@
             }
         }
     };
+
+    const Origin_Window_Base_messageUpdatePlacement = Window_Base.prototype.refreshDimmerBitmap;
+    Window_Message.prototype.refreshDimmerBitmap = function() {
+        if (dimColor1 == "" && dimColor2 == "") {
+            Origin_Window_Base_messageUpdatePlacement.call(this);
+            return;
+        }
+
+        if (this._dimmerSprite) {
+            const bitmap = this._dimmerSprite.bitmap;
+            const w = this.width > 0 ? this.width + 8 : 0;
+            const h = this.height;
+            const m = this.padding;
+            const c1 = dimColor1 == "" 
+                ? ColorManager.dimColor1()
+                : dimColor1;
+            const c2 = dimColor2 == ""
+                ? ColorManager.dimColor2()
+                : dimColor2;
+            bitmap.resize(w, h);
+            bitmap.gradientFillRect(0, 0, w, m, c2, c1, true);
+            bitmap.fillRect(0, m, w, h - m * 2, c1);
+            bitmap.gradientFillRect(0, h - m, w, m, c1, c2, true);
+            this._dimmerSprite.setFrame(0, 0, w, h);
+        }
+    };
     
-    Origin_updatePlacement = Window_ChoiceList.prototype.updatePlacement;
+    const Origin_updatePlacement = Window_ChoiceList.prototype.updatePlacement;
     Window_ChoiceList.prototype.updatePlacement = function() {
         Origin_updatePlacement.call(this);
         
@@ -342,6 +513,56 @@
         
         if (nextChoiceListY > -1) {
             this.y = nextChoiceListY;
+        }
+    };
+
+    Window_ChoiceList.prototype.refreshDimmerBitmap = function() {
+        if (dimColor1 == "" && dimColor2 == "") {
+            Origin_Window_Base_messageUpdatePlacement.call(this);
+            return;
+        }
+
+        if (this._dimmerSprite) {
+            const bitmap = this._dimmerSprite.bitmap;
+            const w = this.width > 0 ? this.width + 8 : 0;
+            const h = this.height;
+            const m = this.padding;
+            const c1 = dimColor1 == "" 
+                ? ColorManager.dimColor1()
+                : dimColor1;
+            const c2 = dimColor2 == ""
+                ? ColorManager.dimColor2()
+                : dimColor2;
+            bitmap.resize(w, h);
+            bitmap.gradientFillRect(0, 0, w, m, c2, c1, true);
+            bitmap.fillRect(0, m, w, h - m * 2, c1);
+            bitmap.gradientFillRect(0, h - m, w, m, c1, c2, true);
+            this._dimmerSprite.setFrame(0, 0, w, h);
+        }
+    };
+
+    Window_NameBox.prototype.refreshDimmerBitmap = function() {
+        if (dimColor1 == "" && dimColor2 == "") {
+            Origin_Window_Base_messageUpdatePlacement.call(this);
+            return;
+        }
+
+        if (this._dimmerSprite) {
+            const bitmap = this._dimmerSprite.bitmap;
+            const w = this.width > 0 ? this.width + 8 : 0;
+            const h = this.height;
+            const m = this.padding;
+            const c1 = dimColor1 == "" 
+                ? ColorManager.dimColor1()
+                : dimColor1;
+            const c2 = dimColor2 == ""
+                ? ColorManager.dimColor2()
+                : dimColor2;
+            bitmap.resize(w, h);
+            bitmap.gradientFillRect(0, 0, w, m, c2, c1, true);
+            bitmap.fillRect(0, m, w, h - m * 2, c1);
+            bitmap.gradientFillRect(0, h - m, w, m, c1, c2, true);
+            this._dimmerSprite.setFrame(0, 0, w, h);
         }
     };
 }());
