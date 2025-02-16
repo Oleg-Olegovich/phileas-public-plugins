@@ -32,7 +32,7 @@
 #### Сообщения
 | Название | Описание | Код | Форум |
 | --- | --- | --- | --- |
-| **Phileas's Language Localisation** | Языковые локализации текста в игре | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_LanguageLocalisation.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-language-localisation.1150) |
+| **Phileas's Language Localisation** | Языковые локализации текста в игре | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_LanguageLocalisation.js) [XLSX](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/xlsx.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-language-localisation.1150) |
 | **Phileas's Message Window Rect Settings** | Настройка окна сообщения | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_MessageWindowRectSettings.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-message-window-rect-settings.295) |
 | **Phileas's Skipping Messages** | Быстрая промотка (пропуск) сообщений | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_SkippingMessages.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-skipping-messages.294) |
 | **Phileas's Text Wrap** | Автоматический перенос слов | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_TextWrap.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-text-wrap.311) |
@@ -41,6 +41,7 @@
 | Название | Описание | Код | Форум |
 | --- | --- | --- | --- |
 | **Phileas's Custom Fonts** | Назначение кастомных шрифтов кастомным семействам шрифтов | [MV](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_CustomFonts_MV.js) [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_CustomFonts.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-custom-fonts.746) |
+| **Phileas's File Manager** | Кроссплатформенный менеджер файлов | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_FileManager.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-file-manager.1426) |
 | **Phileas's Movie Skipping** | Воспроизведение видео с опцией пропуска | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_MovieSkipping.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-movie-skipping.1349) |
 | **Phileas's Pictures Collision** | Определение коллизии (пересечения) картинок | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_PicturesCollision.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-pictures-collision.683) |
 | **Phileas's Picture Outline** | Чёткие обводки картинок | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_PictureOutline.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-picture-outline.767) |
