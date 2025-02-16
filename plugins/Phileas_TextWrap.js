@@ -5,6 +5,7 @@
 // 2023.July.02 Ver1.0.0 First Release
 // 2023.July.03 Ver1.0.1 Fixed TAA bug
 // 2023.July.03 Ver1.0.2 TAA_BookMenu standard padding
+// 2025.February.16 Ver1.1.0 Fixed the display of messages
 
 /*:
  * @target MZ
@@ -74,6 +75,8 @@
  * http://opensource.org/licenses/mit-license.php
  */
 
+"use strict";
+
 (function() {
 
 //--------MY CODE:    
@@ -110,10 +113,10 @@
     };
 
     Window_Base.prototype.getWrappedText = function(text, maxWidth) {
-        let wrapWindow = new Window_Base(new Rectangle(this.x, this.y, maxWidth, this.height));
+        const wrapWindow = new Window_Base(new Rectangle(this.x, this.y, maxWidth, this.height));
         wrapWindow.contents.fontFace = this.contents.fontFace;
         wrapWindow.contents.fontSize = this.contents.fontSize;
-        rect = wrapWindow.baseTextRect();
+        const rect = wrapWindow.baseTextRect();
         let result = "";
         let word = "";
         let line = "";
@@ -162,10 +165,10 @@
     };
     
     function getWrappedText(text, maxWidth, mainWindow) {
-        let wrapWindow = new Window_Base(new Rectangle(mainWindow.x, mainWindow.y, maxWidth, mainWindow.height));
+        const wrapWindow = new Window_Base(new Rectangle(mainWindow.x, mainWindow.y, maxWidth, mainWindow.height));
         wrapWindow.contents.fontFace = mainWindow.contents.fontFace;
         wrapWindow.contents.fontSize = mainWindow.contents.fontSize;
-        rect = wrapWindow.baseTextRect();
+        const rect = wrapWindow.baseTextRect();
         let result = "";
         let word = "";
         let line = "";
@@ -211,7 +214,7 @@
         }
         
         return result;
-    }
+    };
     
     function getWrappedTextByCommand(params) {
         let text = params['text'];
@@ -230,31 +233,50 @@
         wrapWindow.contents.fontSize = fontSize;
         let wrappedText = getWrappedText(text, maxWidth, wrapWindow);
         $gameVariables.setValue(variableId, wrappedText);
-    }
+    };
     
     Window_Message.prototype.phileasGetWindowMessageMargin = function() {
         const faceExists = $gameMessage.faceName() !== "";
         const spacing = 30;
         return faceExists ? ImageManager.faceWidth + spacing : 4;
-    }
+    };
 
 //--------CHANGED CORE:
     
-    Origin_startMessage = Window_Message.prototype.startMessage;
+    const Origin_startMessage = Window_Message.prototype.startMessage;
     Window_Message.prototype.startMessage = function() {
-        let text = $gameMessage.allText();
-        let maxWidth = this.width - this.phileasGetWindowMessageMargin();
-        let wrappedText = getWrappedText(text, maxWidth, this);
+        const text = $gameMessage.allText();
+        const maxWidth = this.width - this.phileasGetWindowMessageMargin();
+        const wrappedText = getWrappedText(text, maxWidth, this).split("\n");
         $gameMessage._texts.length = 0;
-        $gameMessage._texts = [wrappedText];
+        $gameMessage._texts = wrappedText.slice(0, 4);
+        $gameMessage._nextTexts = wrappedText.slice(4);
         Origin_startMessage.call(this);
     };
     
     if (typeof Window_BookText != "undefined") {
-        Origin_TaaPreparePrintableObjects = Window_BookText.prototype.preparePrintableObjects;
+        const Origin_TaaPreparePrintableObjects = Window_BookText.prototype.preparePrintableObjects;
         Window_BookText.prototype.preparePrintableObjects = function(text) {
             let wrappedText = getWrappedText(text, this.windowWidth() - this.standardPadding(), this);
             Origin_TaaPreparePrintableObjects.call(this, wrappedText);
-        }
+        };
     }
+
+    const Origin_Game_Message_initialize = Game_Message.prototype.initialize;
+    Game_Message.prototype.initialize = function() {
+        this._nextTexts = [];
+        Origin_Game_Message_initialize.call(this);
+    };
+
+    const Origin_Game_Message_clear = Game_Message.prototype.clear;
+    Game_Message.prototype.clear = function() {
+        if (this._nextTexts.length == 0) {
+            Origin_Game_Message_clear.call(this);
+            return;
+        }
+
+        this._texts = this._nextTexts.slice(0, 4);
+        this._nextTexts = this._nextTexts.slice(4);
+    };
+
 }());
