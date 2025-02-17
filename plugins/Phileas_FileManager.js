@@ -3,6 +3,7 @@
 //=============================================================================
 // [Update History]
 // 2025.February.16 Ver1.0.0 First Release
+// 2025.February.17 Ver1.0.1 Added read/write file methods
 
 /*:
  * @target MZ
@@ -23,8 +24,17 @@
  * The plugin provides the following methods that can be used in other
  * plugins or scripts:
  * - Phileas_FileManager.fileExistsSync - synchronously checks for file availability
- * - Phileas_FileManager.getFilesInDirectory - returns a list of files
- * in the specified directory, including nested directories of any level
+ *   (it is necessary to input the file path relative to the root of the game)
+ * - Phileas_FileManager.getFilesInDirectory - synchronously returns a list of files
+ *   in the specified directory, including nested directories of any level
+ * - Phileas_FileManager.readFile(path) - asynchronously returns the contents of the file
+ *   (it is necessary to input the file path relative to the root of the game)
+ * - Phileas_FileManager.writeFile(path, data) - asynchronously saves the specified
+ *   data to a file (it is necessary to input the file path relative to the root of the game)
+ * - Phileas_FileManager.downloadFile(path) - downloads a file from the local storage.
+ *   This method only works in a web environment and on mobile platforms.
+ *   The method must be called after saving the file using Phileas_FileManager.writeFile
+ *   (it is necessary to input the file path relative to the root of the game)
  * 
  * Contact the author of the plugin if you need other methods or commands of the plugin.
  *
@@ -71,9 +81,19 @@
  * 
  * Плагин предоставляет следующие методы, которые можно использовать в других
  * плагинах или в скриптах:
- * - Phileas_FileManager.fileExistsSync - синхронно проверяет наличие файла
- * - Phileas_FileManager.getFilesInDirectory - возвращает список файлов
+ * - Phileas_FileManager.fileExistsSync(path) - синхронно проверяет наличие файла
+ *   (необходимо передать путь к файлу относительно корня игры)
+ * - Phileas_FileManager.getFilesInDirectory(path) - синхронно возвращает список файлов
  *   в указанной директории, включая вложенные директории любого уровня
+ *   (необходимо передать путь к директории относительно корня игры)
+ * - Phileas_FileManager.readFile(path) - асинхронно возвращает содержимое файла
+ *   (необходимо передать путь к файлу относительно корня игры)
+ * - Phileas_FileManager.writeFile(path, data) - асинхронно сохраняет указанные
+ *   данные в файл файл (необходимо передать путь к файлу относительно корня игры)
+ * - Phileas_FileManager.downloadFile(path) - скачивает файл из локального хранилища.
+ *   Этот метод работает только в веб-среде и на мобильных платформах. Метод нужно
+ *   вызывать после сохранения файла с помощью Phileas_FileManager.writeFile.
+ *   (необходимо передать путь к файлу относительно корня игры)
  * 
  * Обратитесь к автору плагина, если вам нужны другие методы или команды плагина.
  * 
@@ -104,144 +124,218 @@
  * 
  */
 
- "use strict";
+"use strict";
 
 
- function Phileas_FileManager() {
-     throw new Error("This is a static class");
- }
+function Phileas_FileManager() {
+    throw new Error("This is a static class");
+}
  
- Phileas_FileManager._stampFile = "data/FilesStamp.json";
- Phileas_FileManager._cache = {};
+Phileas_FileManager._stampFile = "data/FilesStamp.json";
+Phileas_FileManager._cache = {};
  
- Phileas_FileManager._parameters = PluginManager.parameters("Phileas_FileManager");
- Phileas_FileManager._updateRequired = Phileas_FileManager._parameters["updateStamp"] == "true";
+Phileas_FileManager._parameters = PluginManager.parameters("Phileas_FileManager");
+Phileas_FileManager._updateRequired = Phileas_FileManager._parameters["updateStamp"] == "true";
  
- Phileas_FileManager.scanFileSystem = async function() {
-     if (!Utils.isNwjs() || !Phileas_FileManager._updateRequired) {
-         return;
-     }
+Phileas_FileManager.scanFileSystem = async function() {
+    if (!Utils.isNwjs() || !Phileas_FileManager._updateRequired) {
+        return;
+    }
  
-     const fs = require("fs");
-     const path = require("path");
-     const projectPath = path.dirname(process.mainModule.filename);
-     const stampFile = path.join(projectPath, Phileas_FileManager._stampFile);
+    const fs = require("fs");
+    const path = require("path");
+    const projectPath = path.dirname(process.mainModule.filename);
+    const stampFile = path.join(projectPath, Phileas_FileManager._stampFile);
  
-     function scanDir(dir) {
-         let result = {};
-         fs.readdirSync(dir).forEach(file => {
-             const fullPath = path.join(dir, file);
-             if (fs.statSync(fullPath).isDirectory()) {
-                 result[file] = scanDir(fullPath);
-             } else {
-                 result[file] = true;
-             }
-         });
+    function scanDir(dir) {
+        let result = {};
+        fs.readdirSync(dir).forEach(file => {
+            const fullPath = path.join(dir, file);
+            if (fs.statSync(fullPath).isDirectory()) {
+                result[file] = scanDir(fullPath);
+            } else {
+                result[file] = true;
+            }
+        });
  
-         return result;
-     }
+        return result;
+    }
  
-     const fileTree = scanDir(projectPath);
-     fs.writeFileSync(stampFile, JSON.stringify(fileTree, null, 2));
-     console.log("Phileas_FileManager: file scanning completed");
- };
+    const fileTree = scanDir(projectPath);
+    fs.writeFileSync(stampFile, JSON.stringify(fileTree, null, 2));
+    console.log("Phileas_FileManager: file scanning completed");
+};
  
- Phileas_FileManager.loadCache = async function() {
-     if (Utils.isNwjs()) {
-         return;
-     }
+Phileas_FileManager.loadCache = async function() {
+    if (Utils.isNwjs()) {
+        return;
+    }
  
-     try {
-         const response = await fetch(Phileas_FileManager._stampFile);
+    try {
+        const response = await fetch(Phileas_FileManager._stampFile);
+
+        if (!response.ok) {
+            throw new Error(`${Phileas_FileManager._stampFile} not found`);
+        }
  
-         if (!response.ok) {
-             throw new Error(`${Phileas_FileManager._stampFile} not found`);
-         }
+        Object.assign(Phileas_FileManager._cache, await response.json());
+        console.log("Phileas_FileManager: cache loaded");
+    } catch (error) {
+        console.error("Phileas_FileManager: cache loading failed", error);
+    }
+};
  
-         Object.assign(Phileas_FileManager._cache, await response.json());
-         console.log("Phileas_FileManager: cache loaded");
-     } catch (error) {
-         console.error("Phileas_FileManager: cache loading failed", error);
-     }
- };
+Phileas_FileManager.fileExistsSync = function(path) {
+    if (Utils.isNwjs()) {
+        const fs = require("fs");
+        return fs.existsSync(path);
+    }
  
- Phileas_FileManager.fileExistsSync = function(path) {
-     if (Utils.isNwjs()) {
-         const fs = require("fs");
-         return fs.existsSync(path);
-     }
+    const parts = path.split("/");
+    let current = Phileas_FileManager._cache;
+    for (const part of parts) {
+        if (!current[part]) {
+            return false;
+        }
  
-     const parts = path.split("/");
-     let current = Phileas_FileManager._cache;
-     for (const part of parts) {
-         if (!current[part]) {
-             return false;
-         }
+        current = current[part];
+    }
  
-         current = current[part];
-     }
+    return true;
+};
  
-     return true;
- };
+Phileas_FileManager.getFilesInDirectoryDesktop = function(path) {
+    const fs = require("fs");
+    const pathModule = require("path");
+    const projectPath = pathModule.dirname(process.mainModule.filename);
+    const fullPath = pathModule.join(projectPath, path);
  
- Phileas_FileManager.getFilesInDirectoryDesktop = function(path) {
-     const fs = require("fs");
-     const pathModule = require("path");
-     const projectPath = pathModule.dirname(process.mainModule.filename);
-     const fullPath = pathModule.join(projectPath, path);
+    function scanDir(dir) {
+        let files = [];
+        fs.readdirSync(dir).forEach(file => {
+            const filePath = pathModule.join(dir, file);
+            if (fs.statSync(filePath).isDirectory()) {
+                files = files.concat(scanDir(filePath).map(subFile => file + "/" + subFile));
+            } else {
+                files.push(file);
+            }
+        });
+        return files;
+    }
  
-     function scanDir(dir) {
-         let files = [];
-         fs.readdirSync(dir).forEach(file => {
-             const filePath = pathModule.join(dir, file);
-             if (fs.statSync(filePath).isDirectory()) {
-                 files = files.concat(scanDir(filePath).map(subFile => file + "/" + subFile));
-             } else {
-                 files.push(file);
-             }
-         });
-         return files;
-     }
+    if (!fs.existsSync(fullPath) || !fs.statSync(fullPath).isDirectory()) {
+        console.warn("Path not found:", path);
+        return [];
+    }
  
-     if (!fs.existsSync(fullPath) || !fs.statSync(fullPath).isDirectory()) {
-         console.warn("Path not found:", path);
-         return [];
-     }
+    return scanDir(fullPath);
+}
  
-     return scanDir(fullPath);
- }
+Phileas_FileManager.getFilesInDirectoryWeb = function(path) {
+    const parts = path.split("/").filter(Boolean);
+    let current = Phileas_FileManager._cache;
+    for (const part of parts) {
+        if (!current[part]) {
+            return [];
+        }
+
+        current = current[part];
+    }
  
- Phileas_FileManager.getFilesInDirectoryWeb = function(path) {
-     const parts = path.split("/").filter(Boolean);
-     let current = Phileas_FileManager._cache;
-     for (const part of parts) {
-         if (!current[part]) {
-             return [];
-         }
-         current = current[part];
-     }
+    function collectFiles(node, prefix = "") {
+        let files = [];
+        for (const key in node) {
+            if (typeof node[key] === "object") {
+                files = files.concat(collectFiles(node[key], prefix + key + "/"));
+            } else {
+                files.push(prefix + key);
+            }
+        }
+
+        return files;
+    }
  
-     function collectFiles(node, prefix = "") {
-         let files = [];
-         for (const key in node) {
-             if (typeof node[key] === "object") {
-                 files = files.concat(collectFiles(node[key], prefix + key + "/"));
-             } else {
-                 files.push(prefix + key);
-             }
-         }
-         return files;
-     }
+    return collectFiles(current);
+}
  
-     return collectFiles(current);
- }
+Phileas_FileManager.getFilesInDirectory = function(path) {
+    return Utils.isNwjs()
+        ? Phileas_FileManager.getFilesInDirectoryDesktop(path)
+        : Phileas_FileManager.getFilesInDirectoryWeb(path);
+};
+
+Phileas_FileManager.readFileDesktop = async function(path) {
+    const fs = require("fs");
+    const pathModule = require("path");
+    const fullPath = pathModule.join(pathModule.dirname(process.mainModule.filename), path);
+    return JSON.parse(fs.readFileSync(fullPath, "utf8"));
+};
+
+Phileas_FileManager.readFileWeb = async function(path) {
+    const data = localStorage.getItem(path);
+    return data ? JSON.parse(data) : null;
+};
+
+Phileas_FileManager.readFile = async function(path) {
+    if (!Phileas_FileManager.fileExistsSync(path)) {
+        throw new Error(`File ${path} not found`);
+    }
+
+    if (Utils.isNwjs()) {
+        return Phileas_FileManager.readFileDesktop(path);
+    }
+
+    return Phileas_FileManager.readFileWeb(path);
+};
+
+Phileas_FileManager.writeFileDesktop = async function(path, data) {
+    const fs = require("fs");
+    const pathModule = require("path");
+    const fullPath = pathModule.join(pathModule.dirname(process.mainModule.filename), path);
+    fs.writeFileSync(fullPath, JSON.stringify(data, null, 2));
+    console.log(`Saved file: ${path}`);
+};
+
+Phileas_FileManager.writeFileWeb = async function(path, data) {
+    localStorage.setItem(path, JSON.stringify(data));
+    console.log(`Saved file to localStorage: ${path}`);
+};
+
+Phileas_FileManager.writeFile = async function(path, data) {
+    if (Utils.isNwjs()) {
+        Phileas_FileManager.writeFileDesktop(path, data);
+        return;
+    }
+
+    Phileas_FileManager.writeFileWeb(path, data);
+};
+
+Phileas_FileManager.downloadFile = function(path) {
+    if (Utils.isNwjs()) {
+        console.warn("Phileas_FileManager.downloadFile method is only for the web environment");
+        return;
+    }
+
+    const data = localStorage.getItem(path);
+    if (!data) {
+        console.warn(`${path} not found in localStorage.`);
+        return;
+    }
+
+    const blob = new Blob([data], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+
+    a.href = url;
+    a.download = path.split("/").pop();
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    URL.revokeObjectURL(url);
+    console.log(`${path} downloaded`);
+};
  
- Phileas_FileManager.getFilesInDirectory = function(path) {
-     return Utils.isNwjs()
-         ? Phileas_FileManager.getFilesInDirectoryDesktop(path)
-         : Phileas_FileManager.getFilesInDirectoryWeb(path);
- };
- 
- Phileas_FileManager.scanFileSystem();
- Phileas_FileManager.loadCache();
+Phileas_FileManager.scanFileSystem();
+Phileas_FileManager.loadCache();
  
