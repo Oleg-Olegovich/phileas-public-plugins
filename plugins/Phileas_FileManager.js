@@ -277,10 +277,6 @@ Phileas_FileManager.readFileWeb = async function(path) {
 };
 
 Phileas_FileManager.readFile = async function(path) {
-    if (!Phileas_FileManager.fileExistsSync(path)) {
-        throw new Error(`File ${path} not found`);
-    }
-
     if (Utils.isNwjs()) {
         return Phileas_FileManager.readFileDesktop(path);
     }
