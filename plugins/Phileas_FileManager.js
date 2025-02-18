@@ -23,9 +23,9 @@
  * 
  * The plugin provides the following methods that can be used in other
  * plugins or scripts:
- * - Phileas_FileManager.fileExistsSync - synchronously checks for file availability
+ * - Phileas_FileManager.fileExistsSync(path) - synchronously checks for file availability
  *   (it is necessary to input the file path relative to the root of the game)
- * - Phileas_FileManager.getFilesInDirectory - synchronously returns a list of files
+ * - Phileas_FileManager.getFilesInDirectory(path) - synchronously returns a list of files
  *   in the specified directory, including nested directories of any level
  * - Phileas_FileManager.readFile(path) - asynchronously returns the contents of the file
  *   (it is necessary to input the file path relative to the root of the game)
