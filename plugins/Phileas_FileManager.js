@@ -24,20 +24,23 @@
  * The plugin provides the following methods that can be used in other
  * plugins or scripts:
  * - Phileas_FileManager.fileExistsSync(path) - synchronously checks for file availability
- *   (it is necessary to input the file path relative to the root of the game)
  * - Phileas_FileManager.getFilesInDirectory(path) - synchronously returns a list of files
  *   in the specified directory, including nested directories of any level
  * - Phileas_FileManager.readFile(path) - asynchronously returns the contents of the file
- *   (it is necessary to input the file path relative to the root of the game)
+ * - Phileas_FileManager.readJsonFile(path) - asynchronously returns the deserialized contents
+ *   of the JSON file
  * - Phileas_FileManager.writeFile(path, data) - asynchronously saves the specified
- *   data to a file (it is necessary to input the file path relative to the root of the game)
+ *   data to a file
+ * - Phileas_FileManager.writeJsonFile(path, data) - serializes the specified data in JSON
+ *   and asynchronously saves it to a file
  * - Phileas_FileManager.downloadFile(path) - downloads a file from the local storage.
  *   This method only works in a web environment and on mobile platforms.
  *   The method must be called after saving the file using Phileas_FileManager.writeFile
- *   (it is necessary to input the file path relative to the root of the game)
+ *   or Phileas_FileManager.writeJsonFile
+ * 
+ * The path in all methods is the path to the file/directory relative to the root of the game.
  * 
  * Contact the author of the plugin if you need other methods or commands of the plugin.
- *
  *
  * In order for the plugin to work in the browser and on mobile devices, it is necessary
  * the current data/FilesStamp.json file.
@@ -82,21 +85,23 @@
  * Плагин предоставляет следующие методы, которые можно использовать в других
  * плагинах или в скриптах:
  * - Phileas_FileManager.fileExistsSync(path) - синхронно проверяет наличие файла
- *   (необходимо передать путь к файлу относительно корня игры)
  * - Phileas_FileManager.getFilesInDirectory(path) - синхронно возвращает список файлов
  *   в указанной директории, включая вложенные директории любого уровня
- *   (необходимо передать путь к директории относительно корня игры)
  * - Phileas_FileManager.readFile(path) - асинхронно возвращает содержимое файла
- *   (необходимо передать путь к файлу относительно корня игры)
+ * - Phileas_FileManager.readJsonFile(path) - асинхронно возвращает десериализованное
+ *   содержимое JSON-файла
  * - Phileas_FileManager.writeFile(path, data) - асинхронно сохраняет указанные
- *   данные в файл файл (необходимо передать путь к файлу относительно корня игры)
+ *   данные в файл
+ * - Phileas_FileManager.writeJsonFile(path, data) - сериализует указанные данные
+ *   в JSON и асинхронно сохраняет их файл
  * - Phileas_FileManager.downloadFile(path) - скачивает файл из локального хранилища.
  *   Этот метод работает только в веб-среде и на мобильных платформах. Метод нужно
- *   вызывать после сохранения файла с помощью Phileas_FileManager.writeFile.
- *   (необходимо передать путь к файлу относительно корня игры)
+ *   вызывать после сохранения файла с помощью Phileas_FileManager.writeFile
+ *   или Phileas_FileManager.writeJsonFile
+ * 
+ * path во всех методах - это путь к файлу/директории относительно корня игры
  * 
  * Обратитесь к автору плагина, если вам нужны другие методы или команды плагина.
- * 
  * 
  * Чтобы плагин работал в браузере и на мобильных устройствах, необходим
  * актуальный файл data/FilesStamp.json.
@@ -268,12 +273,12 @@ Phileas_FileManager.readFileDesktop = async function(path) {
     const fs = require("fs");
     const pathModule = require("path");
     const fullPath = pathModule.join(pathModule.dirname(process.mainModule.filename), path);
-    return JSON.parse(fs.readFileSync(fullPath, "utf8"));
+    return fs.readFileSync(fullPath, "utf8");
 };
 
 Phileas_FileManager.readFileWeb = async function(path) {
     const data = localStorage.getItem(path);
-    return data ? JSON.parse(data) : null;
+    return data;
 };
 
 Phileas_FileManager.readFile = async function(path) {
@@ -284,16 +289,21 @@ Phileas_FileManager.readFile = async function(path) {
     return Phileas_FileManager.readFileWeb(path);
 };
 
+Phileas_FileManager.readJsonFile = async function(path) {
+    const data = Phileas_FileManager.readFile(path);
+    return data ? JSON.parse(data) : null;
+};
+
 Phileas_FileManager.writeFileDesktop = async function(path, data) {
     const fs = require("fs");
     const pathModule = require("path");
     const fullPath = pathModule.join(pathModule.dirname(process.mainModule.filename), path);
-    fs.writeFileSync(fullPath, JSON.stringify(data, null, 2));
+    fs.writeFileSync(fullPath, data);
     console.log(`Saved file: ${path}`);
 };
 
 Phileas_FileManager.writeFileWeb = async function(path, data) {
-    localStorage.setItem(path, JSON.stringify(data));
+    localStorage.setItem(path, data);
     console.log(`Saved file to localStorage: ${path}`);
 };
 
@@ -304,6 +314,10 @@ Phileas_FileManager.writeFile = async function(path, data) {
     }
 
     Phileas_FileManager.writeFileWeb(path, data);
+};
+
+Phileas_FileManager.writeJsonFile = async function(path, data) {
+    Phileas_FileManager.writeFile(path, JSON.stringify(data));
 };
 
 Phileas_FileManager.downloadFile = function(path) {
