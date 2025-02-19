@@ -333,29 +333,37 @@ Phileas_FileManager.downloadFile = function(path) {
     }
 
     const blob = new Blob([data], { type: "application/json" });
+    const fileName = path.split("/").pop();
+
+    if (navigator.userAgent.toLowerCase().includes("android")) {
+        const fileReader = new FileReader();
+        fileReader.onload = function () {
+            const base64Data = fileReader.result.split(",")[1];
+            if (window.Android && window.Android.saveBase64File) {
+                window.Android.saveBase64File(fileName, base64Data);
+                console.log(`File saved on Android: /storage/emulated/0/Download/${fileName}`);
+            } else {
+                console.warn("Android API not found");
+            }
+        };
+
+        fileReader.readAsDataURL(blob);
+        return;
+    }
+
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
 
     a.href = url;
-    a.download = path.split("/").pop();
+    a.download = fileName;
     a.style.display = "none";
     document.body.appendChild(a);
-
-    let fullPath = null;
-
-    if (navigator.userAgent.toLowerCase().includes("android")) {
-        a.target = "_blank";
-        fullPath = `/storage/emulated/0/Download/${a.download}`;
-    } else {
-        fullPath = `Downloads/${a.download}`;
-    }
-
     a.click();
     document.body.removeChild(a);
 
     URL.revokeObjectURL(url);
     console.log(`📂 File downloaded: ${a.download}`);
-    console.log(`📂 Expected save location: ${fullPath}`);
+    console.log(`📂 Expected save location: Downloads/${a.download}`);
 };
  
 Phileas_FileManager.scanFileSystem();
