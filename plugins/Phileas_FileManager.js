@@ -341,15 +341,21 @@ Phileas_FileManager.downloadFile = function(path) {
     a.style.display = "none";
     document.body.appendChild(a);
 
+    let fullPath = null;
+
     if (navigator.userAgent.toLowerCase().includes("android")) {
         a.target = "_blank";
+        fullPath = `/storage/emulated/0/Download/${a.download}`;
+    } else {
+        fullPath = `Downloads/${a.download}`;
     }
 
     a.click();
     document.body.removeChild(a);
 
     URL.revokeObjectURL(url);
-    console.log(`Downloaded file: ${path}`);
+    console.log(`📂 File downloaded: ${a.download}`);
+    console.log(`📂 Expected save location: ${fullPath}`);
 };
  
 Phileas_FileManager.scanFileSystem();
