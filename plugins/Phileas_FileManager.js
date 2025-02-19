@@ -209,7 +209,7 @@ Phileas_FileManager.fileExistsSync = function(path) {
     return true;
 };
  
-Phileas_FileManager.getFilesInDirectoryDesktop = function(path) {
+Phileas_FileManager.getFilesInDirectoryNwJs = function(path) {
     const fs = require("fs");
     const pathModule = require("path");
     const projectPath = pathModule.dirname(process.mainModule.filename);
@@ -265,11 +265,11 @@ Phileas_FileManager.getFilesInDirectoryWeb = function(path) {
  
 Phileas_FileManager.getFilesInDirectory = function(path) {
     return Utils.isNwjs()
-        ? Phileas_FileManager.getFilesInDirectoryDesktop(path)
+        ? Phileas_FileManager.getFilesInDirectoryNwJs(path)
         : Phileas_FileManager.getFilesInDirectoryWeb(path);
 };
 
-Phileas_FileManager.readFileDesktop = async function(path) {
+Phileas_FileManager.readFileNwJs = async function(path) {
     const fs = require("fs");
     const pathModule = require("path");
     const fullPath = pathModule.join(pathModule.dirname(process.mainModule.filename), path);
@@ -283,7 +283,7 @@ Phileas_FileManager.readFileWeb = async function(path) {
 
 Phileas_FileManager.readFile = async function(path) {
     if (Utils.isNwjs()) {
-        return Phileas_FileManager.readFileDesktop(path);
+        return Phileas_FileManager.readFileNwJs(path);
     }
 
     return Phileas_FileManager.readFileWeb(path);
@@ -294,7 +294,7 @@ Phileas_FileManager.readJsonFile = async function(path) {
     return data ? JSON.parse(data) : null;
 };
 
-Phileas_FileManager.writeFileDesktop = async function(path, data) {
+Phileas_FileManager.writeFileNwJs = async function(path, data) {
     const fs = require("fs");
     const pathModule = require("path");
     const fullPath = pathModule.join(pathModule.dirname(process.mainModule.filename), path);
@@ -309,7 +309,7 @@ Phileas_FileManager.writeFileWeb = async function(path, data) {
 
 Phileas_FileManager.writeFile = async function(path, data) {
     if (Utils.isNwjs()) {
-        Phileas_FileManager.writeFileDesktop(path, data);
+        Phileas_FileManager.writeFileNwJs(path, data);
         return;
     }
 
@@ -328,7 +328,7 @@ Phileas_FileManager.downloadFile = function(path) {
 
     const data = localStorage.getItem(path);
     if (!data) {
-        console.warn(`${path} not found in localStorage.`);
+        console.warn(`File not found in localStorage: ${path}`);
         return;
     }
 
@@ -338,12 +338,18 @@ Phileas_FileManager.downloadFile = function(path) {
 
     a.href = url;
     a.download = path.split("/").pop();
+    a.style.display = "none";
     document.body.appendChild(a);
+
+    if (navigator.userAgent.toLowerCase().includes("android")) {
+        a.target = "_blank";
+    }
+
     a.click();
     document.body.removeChild(a);
 
     URL.revokeObjectURL(url);
-    console.log(`${path} downloaded`);
+    console.log(`Downloaded file: ${path}`);
 };
  
 Phileas_FileManager.scanFileSystem();
