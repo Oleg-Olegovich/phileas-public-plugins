@@ -365,6 +365,74 @@ Phileas_FileManager.downloadFile = function(path) {
     console.log(`📂 File downloaded: ${a.download}`);
     console.log(`📂 Expected save location: Downloads/${a.download}`);
 };
+
+Phileas_FileManager.importSaveFileWeb = function() {
+    if (Utils.isNwjs()) {
+        console.warn("Phileas_FileManager.importSaveFile is only for the web environment");
+        return;
+    }
+
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".rpgsave";
+
+    input.onchange = function(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function() {
+            const fileName = file.name;
+            localStorage.setItem(fileName, reader.result);
+            console.log(`📂 Save file imported: ${fileName} (stored in localStorage)`);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    input.click();
+};
+
+Phileas_FileManager.importSaveFileAndroid = function() {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = ".rpgsave";
+
+    input.onchange = function(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function() {
+            const base64Data = reader.result.split(",")[1];
+            const fileName = file.name;
+
+            if (window.Android && window.Android.saveBase64File) {
+                window.Android.saveBase64File("save/" + fileName, base64Data);
+                console.log(`📂 Save file imported: /data/data/com.yourgame.app/files/save/${fileName}`);
+            } else {
+                console.warn("Android API not found");
+            }
+        };
+        reader.readAsDataURL(file);
+    };
+
+    input.click();
+};
+
+Phileas_FileManager.importSaveFile = function() {
+    if (Utils.isNwjs()) {
+        console.warn("Phileas_FileManager.importSaveFile is only for the web environment");
+        return;
+    }
+
+    if (!navigator.userAgent.toLowerCase().includes("android")) {
+        Phileas_FileManager.importSaveFileAndroid();
+        return;
+    }
+
+    Phileas_FileManager.importSaveFileWeb();
+};
+
  
 Phileas_FileManager.scanFileSystem();
 Phileas_FileManager.loadCache();
