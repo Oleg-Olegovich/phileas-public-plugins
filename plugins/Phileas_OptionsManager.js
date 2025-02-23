@@ -14,6 +14,7 @@
 // 2024.November.10 Ver1.3.4 Added window width, status width and visible options max number parameters
 // 2024.December.09 Ver1.3.5 Fixed switch option arrow keys
 // 2024.December.30 Ver1.4.0 Added always dash custom option
+// 2025.February.23 Ver1.4.1 Added fullscreen default value
 
 /*:
  * @target MZ
@@ -374,6 +375,11 @@
  * @type boolean
  * @default true
  * @desc If the value is true, the option value will be restored when the game is restarted.
+ *
+ * @param Default
+ * @text Default value
+ * @type boolean
+ * @default false
  */
  
 /*~struct~Fullscreen:ru
@@ -401,6 +407,11 @@
  * @type boolean
  * @default true
  * @desc Если значение равно true, значение параметра будет восстановлено при перезапуске игры.
+ *
+ * @param Default
+ * @text Значение по умолчанию
+ * @type boolean
+ * @default false
  */
  
 /*~struct~WindowState:
@@ -595,7 +606,7 @@
     var topCustomOptions = [];
     var middleCustomOptions = [];
     var bottomCustomOptions = [];
-    var fullscreenOption = getFullsreenOptionArray(JSON.parse(parameters["Fullscreen option"]) || {"AddFullscreen":false,"Fullscreen option name":"Fullscreen","Position":"Top"});
+    var fullscreenOption = getFullsreenOptionArray(JSON.parse(parameters["Fullscreen option"]) || {"AddFullscreen":false,"Fullscreen option name":"Fullscreen","Position":"Top","Default":false});
     var windowStateOption = getWindowStateOptionArray(JSON.parse(parameters["WindowStateOption"]) || {"AddWindowState":"false","WindowStateOptionName":"Состояние окна","Position":"Top"});
     var messageSpeedOption = getMessageSpeedOptionArray(JSON.parse(parameters["MessageSpeedOption"]) || {"AddMessageSpeed":false,"MessageSpeedOptionName":"Message speed","Position":"Top","MessageSpeedMax":10,"DefaultSpeed":10, "InstantName":"Instant"});
     var alwaysDashOption = parseAlwaysDashOption(parameters["AlwaysDashOption"] || "{\"addAlwaysDash\":\"true\",\"defaultStatusText\":\"true\",\"switchOnText\":\"\",\"switchOffText\":\"\"}");
@@ -646,7 +657,7 @@
                 break;
         }
         
-        return [dict["AddFullscreen"] == "true", dict["Fullscreen option name"], pos, dict["Remember"] == "true"];
+        return [dict["AddFullscreen"] == "true", dict["Fullscreen option name"], pos, dict["Remember"] == "true", dict["Default"] == "true"];
     }
     
     function getWindowStateOptionArray(dict) {
@@ -1008,7 +1019,7 @@
         ConfigManager.save();
         Origin_switchFullscreen.call(this);
     };
-    
+
     const Origin_onWindowResize = Graphics._onWindowResize;
     Graphics._onWindowResize = function() {
         Origin_onWindowResize.call(this);
@@ -1076,6 +1087,10 @@
     const Origin_SceneBoot_start = Scene_Boot.prototype.start;
     Scene_Boot.prototype.start = function () {
         Origin_SceneBoot_start.call(this);
+        if (ConfigManager["fullscreen"] == undefined) {
+            ConfigManager["fullscreen"] = fullscreenOption[4];
+        }
+
         if (ConfigManager["fullscreen"] === true) {
             Graphics._requestFullScreen();
         }
