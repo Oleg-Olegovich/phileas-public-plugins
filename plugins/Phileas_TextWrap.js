@@ -6,6 +6,7 @@
 // 2023.July.03 Ver1.0.1 Fixed TAA bug
 // 2023.July.03 Ver1.0.2 TAA_BookMenu standard padding
 // 2025.February.16 Ver1.1.0 Fixed the display of messages
+// 2025.February.23 Ver1.1.1 Dynamic calculation lines number
 
 /*:
  * @target MZ
@@ -105,11 +106,43 @@
         
         return "";
     }
-    
-    Window_Base.prototype.phileasGetTextWidth = function(text, x, y, width) {
+
+    function getTextSize(word) {
+        for (let i = word.length - 3; i > -1; --i) {
+            if (word[i] == "\\" && word[i + 1] == "F" && word[i + 2] == "S" && word[i + 3] == "[") {
+                let tag = "\\FS[";
+                let j = i + 4;
+                while (word[j] != ']' && j < word.length) {
+                    tag += word[j];
+                    ++j;
+                }
+                if (j == word.length) {
+                    return "";
+                }
+                
+                if (i > 0 && word[i - 1] == "\\") {
+                    tag = "\\" + tag;
+                }
+                
+                return tag + "]"
+            }
+        }
+        
+        return "";
+    }
+
+    Window_Base.prototype.phileasGetTextSizes = function(text, x, y, width) {
         const textState = this.createTextState(text, x, y, width);
         this.processAllText(textState);
-        return textState.outputWidth;
+        return textState;
+    };
+    
+    Window_Base.prototype.phileasGetTextWidth = function(text, x, y, width) {
+        return this.phileasGetTextSizes(text, x, y, width).outputWidth;
+    };
+    
+    Window_Base.prototype.phileasGetTextHeight = function(text, x, y, width) {
+        return this.phileasGetTextSizes(text, x, y, width).outputHeight;
     };
 
     Window_Base.prototype.getWrappedText = function(text, maxWidth) {
@@ -122,6 +155,7 @@
         let line = "";
         let lastIndex = 0;
         let currentColor = "";
+        let currentTextSize = "";
         let nFlag = false;
         if (text[text.length - 1] != " ") {
             text += " ";
@@ -136,9 +170,15 @@
             }
             
             word = text.substring(lastIndex, i + 1);
+
             let newColor = getColor(word);
             if (newColor != "") {
                 currentColor = newColor;
+            }
+
+            let newTextSize = getTextSize(word);
+            if (newTextSize != "") {
+                currentTextSize = newTextSize;
             }
             
             line += word;
@@ -147,14 +187,14 @@
             if (currentWidth > maxWidth) {
                 result += "\n";
                 currentWidth = wrapWindow.textWidth(wrapWindow.convertEscapeCharacters(word));
-                line = word = currentColor + word;
+                line = word = currentTextSize + currentColor + word;
             }
             
             result += word;
             lastIndex = i + 1;
             if (nFlag) {
                 result += "\n";
-                line = word = currentColor;
+                line = word = currentTextSize + currentColor;
                 ++lastIndex;
                 ++i;
                 nFlag = false;
@@ -174,6 +214,7 @@
         let line = "";
         let lastIndex = 0;
         let currentColor = "";
+        let currentTextSize = "";
         let nFlag = false;
         if (text[text.length - 1] != " ") {
             text += " ";
@@ -188,9 +229,15 @@
             }
             
             word = text.substring(lastIndex, i + 1);
+
             let newColor = getColor(word);
             if (newColor != "") {
                 currentColor = newColor;
+            }
+
+            let newTextSize = getTextSize(word);
+            if (newTextSize != "") {
+                currentTextSize = newTextSize;
             }
             
             line += word;
@@ -199,14 +246,14 @@
             if (currentWidth > maxWidth) {
                 result += "\n";
                 currentWidth = wrapWindow.textWidth(wrapWindow.convertEscapeCharacters(word));
-                line = word = currentColor + word;
+                line = word = currentTextSize + currentColor + word;
             }
             
             result += word;
             lastIndex = i + 1;
             if (nFlag) {
                 result += "\n";
-                line = word = currentColor;
+                line = word = currentTextSize + currentColor;
                 ++lastIndex;
                 ++i;
                 nFlag = false;
@@ -241,6 +288,12 @@
         return faceExists ? ImageManager.faceWidth + spacing : 4;
     };
 
+    Window_Message.prototype.phileasNumLines = function(text) {
+        const rect = this.baseTextRect();
+        const lineHeight = this.phileasGetTextHeight(text, rect.x, rect.y, rect.width);
+        $gameMessage._numLines = Math.floor(rect.height / lineHeight);
+    }
+
 //--------CHANGED CORE:
     
     const Origin_startMessage = Window_Message.prototype.startMessage;
@@ -248,9 +301,13 @@
         const text = $gameMessage.allText();
         const maxWidth = this.width - this.phileasGetWindowMessageMargin();
         const wrappedText = getWrappedText(text, maxWidth, this).split("\n");
+
+        this.phileasNumLines(wrappedText[0]);
+
         $gameMessage._texts.length = 0;
-        $gameMessage._texts = wrappedText.slice(0, 4);
-        $gameMessage._nextTexts = wrappedText.slice(4);
+        $gameMessage._texts = wrappedText.slice(0, $gameMessage._numLines);
+        $gameMessage._nextTexts = $gameMessage._nextTexts.concat(wrappedText.slice($gameMessage._numLines));
+
         Origin_startMessage.call(this);
     };
     
@@ -275,8 +332,8 @@
             return;
         }
 
-        this._texts = this._nextTexts.slice(0, 4);
-        this._nextTexts = this._nextTexts.slice(4);
+        this._texts = this._nextTexts.slice(0, $gameMessage._numLines);
+        this._nextTexts = this._nextTexts.slice($gameMessage._numLines);
     };
 
 }());
