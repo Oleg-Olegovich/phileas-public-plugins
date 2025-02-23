@@ -63,6 +63,7 @@
  * This command will allow you to write the processed text to a variable.
  *
  * Feature of the plugin: the text color setting (\C[x]) is saved when the line is moved. Even if the new line is displayed in another window (which often happens when transferring text in the message window).
+ * The same applies to the text size setting (\FS[x]).
  *
  * You can always write to the author if you need support for other windows. Or if you need other features or even plugins.
  * Boosty: https://boosty.to/phileas
