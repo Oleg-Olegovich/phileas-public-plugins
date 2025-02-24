@@ -37,6 +37,7 @@
  *   This method only works in a web environment and on mobile platforms.
  *   The method must be called after saving the file using Phileas_FileManager.writeFile
  *   or Phileas_FileManager.writeJsonFile
+ * - Phileas_FileManager.importSaveFile - imports the save file to and on Android
  * 
  * The path in all methods is the path to the file/directory relative to the root of the game.
  * 
@@ -98,6 +99,7 @@
  *   Этот метод работает только в веб-среде и на мобильных платформах. Метод нужно
  *   вызывать после сохранения файла с помощью Phileas_FileManager.writeFile
  *   или Phileas_FileManager.writeJsonFile
+ * - Phileas_FileManager.importSaveFile - импортирует файл сохранения в и на Android
  * 
  * path во всех методах - это путь к файлу/директории относительно корня игры
  * 
@@ -344,6 +346,7 @@ Phileas_FileManager.downloadFile = function(path) {
                 console.log(`File saved on Android: /storage/emulated/0/Download/${fileName}`);
             } else {
                 console.warn("Android API not found");
+                return;
             }
         };
 
