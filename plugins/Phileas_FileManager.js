@@ -41,6 +41,10 @@
  * 
  * The path in all methods is the path to the file/directory relative to the root of the game.
  * 
+ * To save files on Android, you need to add this Java code
+ * to Android Studio when building the apk:
+ * https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/android/Phileas_FileManager_WebInterface.java
+ * 
  * Contact the author of the plugin if you need other methods or commands of the plugin.
  *
  * In order for the plugin to work in the browser and on mobile devices, it is necessary
@@ -101,7 +105,11 @@
  *   или Phileas_FileManager.writeJsonFile
  * - Phileas_FileManager.importSaveFile - импортирует файл сохранения в и на Android
  * 
- * path во всех методах - это путь к файлу/директории относительно корня игры
+ * path во всех методах - это путь к файлу/директории относительно корня игры.
+ * 
+ * Для сохранения файлов на Android, необходимо добавить этот Java-код в
+ * Anroid Studio при сборке apk:
+ * https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/android/Phileas_FileManager_WebInterface.java
  * 
  * Обратитесь к автору плагина, если вам нужны другие методы или команды плагина.
  * 
