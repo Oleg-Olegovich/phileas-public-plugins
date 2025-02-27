@@ -2,6 +2,11 @@
 // Phileas_UpdatePointerPosition.js
 //=============================================================================
 
+// ??? Ver1.0.0 First Release
+// 2024.December.31 Ver1.1.0
+// 2025.January.01 Ver1.1.1
+// 2025.February.27 Ver1.1.2 Fixed disabling
+
 /*:
  * @target MZ
  * @plugindesc 
@@ -119,7 +124,7 @@
         }
         
         document.removeEventListener("mousemove", handleMouseUpdateEvent);
-        document.addEventListener("mouseover", handleMouseUpdateEvent);
+        document.removeEventListener("mouseover", handleMouseUpdateEvent);
     }
 
     function switchPluginByCommand(params) {
