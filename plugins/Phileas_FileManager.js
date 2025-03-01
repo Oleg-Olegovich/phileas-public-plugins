@@ -4,6 +4,7 @@
 // [Update History]
 // 2025.February.16 Ver1.0.0 First Release
 // 2025.February.17 Ver1.0.1 Added read/write file methods
+// 2025.March.01 Ver1.0.2 Fixed read/write json file methods
 
 /*:
  * @target MZ
@@ -300,7 +301,7 @@ Phileas_FileManager.readFile = async function(path) {
 };
 
 Phileas_FileManager.readJsonFile = async function(path) {
-    const data = Phileas_FileManager.readFile(path);
+    const data = await Phileas_FileManager.readFile(path);
     return data ? JSON.parse(data) : null;
 };
 
@@ -312,14 +313,14 @@ Phileas_FileManager.writeFileNwJs = async function(path, data) {
     console.log(`Saved file: ${path}`);
 };
 
-Phileas_FileManager.writeFileWeb = async function(path, data) {
+Phileas_FileManager.writeFileWeb = function(path, data) {
     localStorage.setItem(path, data);
     console.log(`Saved file to localStorage: ${path}`);
 };
 
 Phileas_FileManager.writeFile = async function(path, data) {
     if (Utils.isNwjs()) {
-        Phileas_FileManager.writeFileNwJs(path, data);
+        await Phileas_FileManager.writeFileNwJs(path, data);
         return;
     }
 
@@ -327,7 +328,7 @@ Phileas_FileManager.writeFile = async function(path, data) {
 };
 
 Phileas_FileManager.writeJsonFile = async function(path, data) {
-    Phileas_FileManager.writeFile(path, JSON.stringify(data));
+    await Phileas_FileManager.writeFile(path, JSON.stringify(data));
 };
 
 Phileas_FileManager.downloadFile = function(path) {
