@@ -3,6 +3,7 @@
 //=============================================================================
 // [Update History]
 // 2025.January.04 Ver1.0.0 First Release
+// 2025.March.07 Ver1.0.1 Fixed cursor picture update
 
 /*:
  * @target MZ
@@ -399,6 +400,7 @@
  * @desc Отступ точки клика по вертикали от верхнего левого угла в пикселях
  */
 
+"use strict";
 
 (function () {
 
@@ -429,7 +431,7 @@
         this.CursorPictureOnClick = params["CursorPictureOnClick"] || "";
         this.CursorXOffset = Number(params["CursorXOffset"]);
         this.CursorYOffset = Number(params["CursorYOffset"]);
-    }
+    };
 
     PhileasCursorData.prototype.setFromParams = function(params) {
         if (params == "" || params == undefined) {
@@ -438,14 +440,23 @@
 
         params = JSON.parse(params);
         this.setFromJson(params);
-    }
+    };
 
     PhileasCursorData.prototype.equals = function(cursorData) {
         return this.CursorPicture == cursorData.CursorPicture
             && this.CursorPictureOnClick == cursorData.CursorPictureOnClick
             && this.CursorXOffset == cursorData.CursorXOffset
             && this.CursorYOffset == cursorData.CursorYOffset;
-    }
+    };
+
+    PhileasCursorData.prototype.clone = function() {
+        const result = new PhileasCursorData();
+        result.CursorPicture = this.CursorPicture;
+        result.CursorPictureOnClick = this.CursorPictureOnClick;
+        result.CursorXOffset = this.CursorXOffset;
+        result.CursorYOffset = this.CursorYOffset;
+        return result;
+    };
 
 
 //-----------------------------------------------------------------------------
@@ -622,7 +633,7 @@
             return;
         }
 
-        currentCursor = cursorData;
+        currentCursor = cursorData.clone();
         setPhileasCursorConfiguration(currentCursor);
 
         if (currentCursor.CursorPictureOnClick == "" || currentCursor.CursorPictureOnClick == undefined) {
@@ -636,18 +647,22 @@
 
     function setDefaultCursor(params) {
         defaultCursor.setFromParams(params["cursorData"]);
+        changeCursorToBasic();
     }
 
     function setBattleCursor(params) {
         battleCursor.setFromParams(params["cursorData"]);
+        changeCursorToBasic();
     }
 
     function setMenuCursor(params) {
         menuCursor.setFromParams(params["cursorData"]);
+        changeCursorToBasic();
     }
 
     function setTitleCursor(params) {
         titleCursor.setFromParams(params["cursorData"]);
+        changeCursorToBasic();
     }
 
     function changeCursorToBasic() {
@@ -791,7 +806,7 @@
     };
 
     if (gamepadHideKeyNumber != 0) {
-        Origin_updateGamepadState = Input._updateGamepadState;
+        const Origin_updateGamepadState = Input._updateGamepadState;
         Input._updateGamepadState = function(gamepad) {
             Origin_updateGamepadState.call(this, gamepad);
             const lastState = this._gamepadStates[gamepad.index] || [];
