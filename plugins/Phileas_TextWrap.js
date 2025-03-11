@@ -293,7 +293,7 @@
         const rect = this.baseTextRect();
         const lineHeight = this.phileasGetTextHeight(text, rect.x, rect.y, rect.width);
         $gameMessage._numLines = Math.floor(rect.height / lineHeight);
-    }
+    };
 
 //--------CHANGED CORE:
     
