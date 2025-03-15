@@ -16,6 +16,7 @@
 //                           Fixed title screen loading
 //                           Fixed the operation of the plugin in the browser
 //                           Removed files parameter
+// 2025.March.15 Ver1.3.1 Added language selection menu text padding
 
 /*:
  * @target MZ
@@ -50,6 +51,13 @@
  * @desc The value is added to the margin items vertically
  * @type number
  * @default 32
+ * 
+ * @param languageSelectionTextPadding
+ * @parent languageSelectionMenuParent
+ * @text Language selection text padding
+ * @desc The value is added to the padding items horizontally
+ * @type number
+ * @default 16
  *
  * 
  * @command setLanguage
@@ -370,6 +378,13 @@
  * @desc Значение прибавляется к отступу пунктов по вертикали
  * @type number
  * @default 32
+ * 
+ * @param languageSelectionTextPadding
+ * @parent languageSelectionMenuParent
+ * @text Отступ текста
+ * @desc Значение прибавляется к отступу пунктов по горизонтали
+ * @type number
+ * @default 16
  *
  * 
  * @command setLanguage
@@ -690,6 +705,7 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
     var $files = null;
     var $openLanuageSelectionMenu = $parameters["openLanuageSelectionMenu"] == "true";
     var $languageSelectionWindowMargin = Number($parameters["languageSelectionWindowMargin"]);
+    var $languageSelectionTextPadding = Number($parameters["languageSelectionTextPadding"]);
 
     var $languageData = {};
 
@@ -1287,11 +1303,11 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
 
     Scene_LanguageSelection.prototype.maxLabelWidth = function() {
         const calcWindow = new Window_Base(new Rectangle(0, 0, Graphics.boxWidth, Graphics.boxHeight));
-        let maxWidth = 96;
+        let maxWidth = 0;
 
         for (const language of $languages) {
             const textWidth = calcWindow.textSizeEx(language.label).width;
-            const choiceWidth = Math.ceil(textWidth) + 16;
+            const choiceWidth = Math.ceil(textWidth) + $languageSelectionTextPadding;
 
             if (maxWidth < choiceWidth) {
                 maxWidth = choiceWidth;
