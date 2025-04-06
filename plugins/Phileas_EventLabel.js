@@ -13,6 +13,7 @@
 // 2024.May.19 Ver1.2.5 Displaying labels on hover
 // 2025.January.07 Ver1.3.0 Alternative commands with parameters
 // 2025.January.08 Ver1.3.1 Fixed center picture rendering
+// 2025.April.06 Ver1.4.0 Added font family tag
 
 /*:
  * @target MZ
@@ -32,6 +33,11 @@
  * @param Default y offset
  * @type number
  * @default 25
+ * @desc Applies if the parameter is not specified via the tag.
+ *
+ * @param defaultFontFamily
+ * @text Default font family
+ * @default rmmz-mainfont
  * @desc Applies if the parameter is not specified via the tag.
  *
  * @param Default font size
@@ -134,6 +140,9 @@
  * @text Text
  * @type string
  * 
+ * @arg LabelFontFamily
+ * @text Font family
+ * 
  * @arg LabelFontSize
  * @text Font size
  * @type number
@@ -189,6 +198,9 @@
  * @arg LabelText
  * @text Text
  * @type string
+ * 
+ * @arg LabelFontFamily
+ * @text Font family
  * 
  * @arg LabelFontSize
  * @text Font size
@@ -246,6 +258,7 @@
  * Use the note field. It is located to the right of the name field in the event editor. 
  * There you can enter one or more of the following tags:
  * <LabelText:Name> - shows the label "Name". Standard engine control symbols are supported here (\C, \V, etc).
+ * <LabelFontFamily:Arial> - sets the font family for a specific label.
  * <LabelFontSize:26> - sets the font size for a specific label.
  * <LabelLineSpacing:-10> - reduces or increases the line spacing.
  * <LabelImage:Actor1> - displays the picture "Actor1.png".
@@ -256,6 +269,12 @@
  * <LabelCheckDirection:yes> - if "yes", the label is not shown if the player is not looking towards the event.
  * <LabelHideInvisible:no> - if "yes", the label will be hidden if the event is invisible.
  * <LabelOnlyOnHover:yes> - if "yes", the label will only be displayed when the cursor is hovered over.
+ * 
+ * If you are using a non-default font family (LabelFontFamily),
+ * then you need the Phileas_CustomFonts plugin:
+ * https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_CustomFonts.js
+ * Use the name of the font family as the value of the LabelFontFamily tag,
+ * which you have set in the Phileas_CustomFonts plugin parameters.
  *
  * It is mandatory to use the <LabelText> or <LabelImage> tag (at least one of them, you can use both)
  * if you want to display the label above the event. The other tags are optional.
@@ -303,6 +322,11 @@
  * @text Смещение по Y по умолчанию
  * @type number
  * @default 25
+ * @desc Применяется если параметр не задан тегом.
+ *
+ * @param defaultFontFamily
+ * @text Семейство шрифта по умолчанию
+ * @default rmmz-mainfont
  * @desc Применяется если параметр не задан тегом.
  *
  * @param Default font size
@@ -412,6 +436,9 @@
  * @text Текст
  * @type string
  * 
+ * @arg LabelFontFamily
+ * @text Семейство шрифта
+ * 
  * @arg LabelFontSize
  * @text Размер шрифта
  * @type number
@@ -467,6 +494,9 @@
  * @arg LabelText
  * @text Текст
  * @type string
+ * 
+ * @arg LabelFontFamily
+ * @text Семейство шрифта
  * 
  * @arg LabelFontSize
  * @text Размер шрифта
@@ -533,6 +563,7 @@
  * Используйте поле "Заметка". Оно расположено справа от поля "Название" в редакторе событий.
  * Там вы можете ввести один или больше из следующих тегов:
  * <LabelText:Name> - показывает надпись "Name". Здесь поддерживаются стандартные символы управления движка (\C, \V и т.д.).
+ * <LabelFontFamily:Arial> - устанавливает семейство шрифта для конкретной надписи.
  * <LabelFontSize:26> - устанавливает размер шрифта для конкретной надписи.
  * <LabelLineSpacing:-10> - уменьшает или увеличивает междустрочный интервал.
  * <LabelImage:Actor1> - показывает картинку "Actor1.png".
@@ -543,6 +574,12 @@
  * <LabelCheckDirection:yes> - если "yes", надпись не показывается, если игрок не смотрит в сторону события.
  * <LabelHideInvisible:no> - если "yes", надпись скрывается, если событие невидимое.
  * <LabelOnlyOnHover:yes> - если "yes",надпись будет показываться только при наведении курсора.
+ * 
+ * Если вы используете семейство шрифта не по умолчанию (LabelFontFamily),
+ * то вам необходим плагин Phileas_CustomFonts:
+ * https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_CustomFonts.js
+ * В качестве значения тега LabelFontFamily используйте название семейства шрифта,
+ * которое вы установили в параметрах плагина Phileas_CustomFonts.
  *
  * Обязательно используйте тег <LabelText> или <LabelImage> (хотя бы один из них, вы можете использовать оба),
  * если хотите отобразить надпись над событием. Остальные теги необязательны.
@@ -588,6 +625,7 @@
     PhileasEventLabelSettings.drawByDefault = (parameters["Draw by default"] || "true") == "true";
     PhileasEventLabelSettings.defaultXOffset = parameters["Default x offset"] || 0;
     PhileasEventLabelSettings.defaultYOffset = parameters["Default y offset"] || 25;
+    PhileasEventLabelSettings.defaultFontFamily = parameters["defaultFontFamily"];
     PhileasEventLabelSettings.defaultFontSize = parameters["Default font size"] || 26;
     PhileasEventLabelSettings.defaultLineSpacing = parameters["Default line spacing"] || 0;
     PhileasEventLabelSettings.defaultDistance = parameters["Default distance"] || 500;
@@ -597,7 +635,7 @@
     PhileasEventLabelSettings.hideInvisibleCharacterLabel = (parameters["Hide the invisible character label"] || "true") == "true";
     PhileasEventLabelSettings.defaultOnlyOnHover = parameters["defaultOnlyOnHover"] == "true";
     PhileasEventLabelSettings.defaultPicturePosition = parameters["defaultPicturePosition"];
-    PhileasEventLabelSettings.tags = ["LabelText", "LabelFontSize", "LabelLineSpacing", "LabelXOffset", "LabelYOffset", "LabelDistance", "LabelCheckDirection", "LabelHideInvisible", "LabelImage", "LabelImagePosition", "LabelOnlyOnHover"];
+    PhileasEventLabelSettings.tags = ["LabelText", "LabelFontFamily", "LabelFontSize", "LabelLineSpacing", "LabelXOffset", "LabelYOffset", "LabelDistance", "LabelCheckDirection", "LabelHideInvisible", "LabelImage", "LabelImagePosition", "LabelOnlyOnHover"];
 
     var playerLabelWindow = null;
 
@@ -612,6 +650,7 @@
         this.LabelText = "";
         this.LabelXOffset = PhileasEventLabelSettings.defaultXOffset;
         this.LabelYOffset = PhileasEventLabelSettings.defaultYOffset;
+        this.LabelFontFamily = PhileasEventLabelSettings.defaultFontFamily;
         this.LabelFontSize = PhileasEventLabelSettings.defaultFontSize;
         this.LabelLineSpacing = PhileasEventLabelSettings.defaultLineSpacing;
         this.LabelDistance = PhileasEventLabelSettings.defaultDistance;
@@ -684,6 +723,9 @@
 
         this.phileasEventLabelData.LabelText = this.phileasEventLabelData.LabelText || "";
         this.phileasEventLabelData.LabelImage = this.phileasEventLabelData.LabelImage || "";
+        this.phileasEventLabelData.LabelFontFamily = this.phileasEventLabelData.LabelFontFamily == "" || !this.phileasEventLabelData.LabelFontFamily
+            ? PhileasEventLabelSettings.defaultFontFamily
+            : this.phileasEventLabelData.LabelFontFamily;
         this.phileasEventLabelData.LabelFontSize = Number(this.phileasEventLabelData.LabelFontSize);
         this.phileasEventLabelData.LabelLineSpacing = Number(this.phileasEventLabelData.LabelLineSpacing);
         this.phileasEventLabelData.LabelXOffset = Number(this.phileasEventLabelData.LabelXOffset);
@@ -796,6 +838,7 @@
 
     Window_PhileasEventLabel.prototype.resetFontSettings = function() {
         Window_Base.prototype.resetFontSettings.call(this);
+        this.contents.fontFace = this.phileasEventLabelData.LabelFontFamily;
         this.contents.fontSize = this.phileasEventLabelData.LabelFontSize;
     };
 
@@ -1022,19 +1065,27 @@
         for (let i in PhileasEventLabelSettings.tags) {
             const tag = PhileasEventLabelSettings.tags[i];
             const value = params[tag];
-            if (value != undefined && value != "") {
-                if (value == "true") {
-                    text.push(`<${tag}:yes>`);
-                    continue;
-                }
 
-                if (value == "false") {
-                    text.push(`<${tag}:no>`);
-                    continue;
-                }
-
+            if (tag == "LabelFontFamily") {
                 text.push(`<${tag}:${value}>`);
+                continue;
             }
+
+            if (!value || value == "") {
+                continue;
+            }
+
+            if (value == "true") {
+                text.push(`<${tag}:yes>`);
+                continue;
+            }
+
+            if (value == "false") {
+                text.push(`<${tag}:no>`);
+                continue;
+            }
+
+            text.push(`<${tag}:${value}>`);
         }
 
         return text.join("");
