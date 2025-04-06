@@ -17,6 +17,7 @@
 //                           Fixed the operation of the plugin in the browser
 //                           Removed files parameter
 // 2025.March.15 Ver1.3.1 Added language selection menu text padding
+// 2025.April.06 Ver1.3.2 Added file filtering
 
 /*:
  * @target MZ
@@ -727,17 +728,23 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
     function loadFiles() {
         const dir = `${FOLDER}/${$languages[0].code}`;
         const filesList = Phileas_FileManager.getFilesInDirectory(dir);
+        const result = [];
 
         for (let i = 0; i < filesList.length; ++i) {
             const index = filesList[i].indexOf(".");
-            filesList[i] = filesList[i].slice(0, index);
+
+            if (index == -1 || filesList[i].slice(index + 1) != "json") {
+                continue;
+            }
+
+            result.push(filesList[i].slice(0, index));
         }
         
-        const mainIndex = filesList.indexOf(MAIN_FILE);
-        filesList[mainIndex] = filesList[0];
-        filesList[0] = MAIN_FILE;
+        const mainIndex = result.indexOf(MAIN_FILE);
+        result[mainIndex] = result[0];
+        result[0] = MAIN_FILE;
 
-        return filesList;
+        return result;
     }
 
     function setLanguage(id, nextFunction = () => {}, ...args) {
