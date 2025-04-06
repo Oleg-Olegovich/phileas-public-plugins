@@ -15,6 +15,7 @@
 // 2024.December.09 Ver1.3.5 Fixed switch option arrow keys
 // 2024.December.30 Ver1.4.0 Added always dash custom option
 // 2025.February.23 Ver1.4.1 Added fullscreen default value
+// 2025.April.06 Ver1.4.2 Fixed compatibility with plugin Animated busts by Astfgl
 
 /*:
  * @target MZ
@@ -1132,7 +1133,7 @@
     
         Origin_updateShowFast.call(this);
         
-        if (this._showFast == false && messageSpeedValue < messageSpeedOption[4]) {
+        if (!this._anim && !this._showFast && messageSpeedValue < messageSpeedOption[4]) {
             this.startWait(messageSpeedOption[4] - messageSpeedValue);
         }
     };
