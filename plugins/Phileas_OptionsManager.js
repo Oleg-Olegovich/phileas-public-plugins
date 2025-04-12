@@ -16,7 +16,7 @@
 // 2024.December.30 Ver1.4.0 Added always dash custom option
 // 2025.February.23 Ver1.4.1 Added fullscreen default value
 // 2025.April.06 Ver1.4.2 Fixed compatibility with plugin Animated busts by Astfgl
-// 2025.April.06 Ver1.5.0 Customizable names for different message speeds
+// 2025.April.12 Ver1.5.0 Customizable names for different message speeds
 
 /*:
  * @target MZ
