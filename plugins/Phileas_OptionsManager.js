@@ -16,6 +16,7 @@
 // 2024.December.30 Ver1.4.0 Added always dash custom option
 // 2025.February.23 Ver1.4.1 Added fullscreen default value
 // 2025.April.06 Ver1.4.2 Fixed compatibility with plugin Animated busts by Astfgl
+// 2025.April.06 Ver1.5.0 Customizable names for different message speeds
 
 /*:
  * @target MZ
@@ -490,9 +491,10 @@
  * @desc >= 1 and <= max.
  * @default 10
  *
- * @param InstantName
- * @text Name of the instant text variant
- * @default Instant
+ * @param SpeedNames
+ * @text Text names of speeds
+ * @type struct<MessageSpeedName>[]
+ * @default ["{\"value\":10,\"name\":\"Instant\"}"]
  *
  * @param Position
  * @desc The position of the option in the options menu.
@@ -506,6 +508,18 @@
  * @type boolean
  * @default true
  * @desc If the value is true, the option value will be restored when the game is restarted.
+ */
+
+/*~struct~MessageSpeedName:
+ * @param value
+ * @text Value
+ * @type number
+ * @desc Numeric value
+ *
+ * @param name
+ * @text Name
+ * @type string
+ * @desc String value
  */
  
 /*~struct~MessageSpeed:ru
@@ -522,7 +536,7 @@
  * @param MessageSpeedMax
  * @text Максимальное число
  * @type number
- * @desc Шкала скорости будет разбита на числа от 1 до max. max - это моментальная скорость. max >= 1.
+ * @desc Шкала скорости будет разбита на числа от 1 до max. max - это моментальная скорость. max >= 1
  * @default 10
  *
  * @param DefaultSpeed
@@ -531,9 +545,10 @@
  * @desc >= 1 и <= max.
  * @default 10
  *
- * @param InstantName
- * @text Название варианта моментального текста
- * @default Моментально
+ * @param SpeedNames
+ * @text Текстовые названия скоростей
+ * @type struct<MessageSpeedName>[]
+ * @default ["{\"value\":10,\"name\":\"Моментально\"}"]
  *
  * @param Position
  * @text Положение
@@ -549,6 +564,18 @@
  * @type boolean
  * @default true
  * @desc Если значение равно true, значение параметра будет восстановлено при перезапуске игры.
+ */
+
+/*~struct~MessageSpeedName:ru
+ * @param value
+ * @text Значение
+ * @type number
+ * @desc Числовое значение
+ *
+ * @param name
+ * @text Название
+ * @type string
+ * @desc Строковое значение
  */
 
 /*~struct~AlwaysDash:
@@ -609,7 +636,7 @@
     var bottomCustomOptions = [];
     var fullscreenOption = getFullsreenOptionArray(JSON.parse(parameters["Fullscreen option"]) || {"AddFullscreen":false,"Fullscreen option name":"Fullscreen","Position":"Top","Default":false});
     var windowStateOption = getWindowStateOptionArray(JSON.parse(parameters["WindowStateOption"]) || {"AddWindowState":"false","WindowStateOptionName":"Состояние окна","Position":"Top"});
-    var messageSpeedOption = getMessageSpeedOptionArray(JSON.parse(parameters["MessageSpeedOption"]) || {"AddMessageSpeed":false,"MessageSpeedOptionName":"Message speed","Position":"Top","MessageSpeedMax":10,"DefaultSpeed":10, "InstantName":"Instant"});
+    var messageSpeedOption = getMessageSpeedOptionArray(JSON.parse(parameters["MessageSpeedOption"]) || {"AddMessageSpeed":false,"MessageSpeedOptionName":"Message speed","Position":"Top","MessageSpeedMax":10,"DefaultSpeed":10, "SpeedNames":{10: "Instant"}});
     var alwaysDashOption = parseAlwaysDashOption(parameters["AlwaysDashOption"] || "{\"addAlwaysDash\":\"true\",\"defaultStatusText\":\"true\",\"switchOnText\":\"\",\"switchOffText\":\"\"}");
     var showCommandRemember = parameters["Show 'Command Remember' option?"] == "true";
     var showTouchUI = parameters["Show 'Touch UI' option?"] == "true";
@@ -701,8 +728,15 @@
         if (def < 1 || def > max + 1) {
             def = max;
         }
+
+        const speedNamesArray = JSON.parse(dict["SpeedNames"]);
+        const speedNames = {};
+        for (let i = 0; i < speedNamesArray.length; ++i) {
+            const pair = JSON.parse(speedNamesArray[i]);
+            speedNames[Number(pair.value)] = pair.name;
+        }
         
-        return [dict["AddMessageSpeed"] == "true", dict["MessageSpeedOptionName"], pos, dict["Remember"] == "true", max, def, dict["InstantName"]];
+        return [dict["AddMessageSpeed"] == "true", dict["MessageSpeedOptionName"], pos, dict["Remember"] == "true", max, def, speedNames];
     }
 
     function parseAlwaysDashOption(par) {
@@ -962,7 +996,8 @@
     Window_Options.prototype.statusText = function(index) {
         const symbol = this.commandSymbol(index);
         if (symbol == "messageSpeedVolume") {
-            return messageSpeedValue == messageSpeedOption[4] ? messageSpeedOption[6] : messageSpeedValue;
+            const speedName = messageSpeedOption[6][messageSpeedValue];
+            return speedName ? speedName : messageSpeedValue;
         }
 
         const value = this.getConfigValue(symbol);
