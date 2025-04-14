@@ -7,6 +7,7 @@
 // 2023.July.03 Ver1.0.2 TAA_BookMenu standard padding
 // 2025.February.16 Ver1.1.0 Fixed the display of messages
 // 2025.February.23 Ver1.1.1 Dynamic calculation lines number
+// 2025.April.14 Ver1.1.2 Fixed control characters processing
 
 /*:
  * @target MZ
@@ -240,10 +241,9 @@
             if (newTextSize != "") {
                 currentTextSize = newTextSize;
             }
-            
+
             line += word;
             let currentWidth = wrapWindow.phileasGetTextWidth(line, rect.x, rect.y, rect.width);
-            //console.log('parsed: ', [line, currentWidth]);
             if (currentWidth > maxWidth) {
                 result += "\n";
                 currentWidth = wrapWindow.textWidth(wrapWindow.convertEscapeCharacters(word));
@@ -290,8 +290,9 @@
     };
 
     Window_Message.prototype.phileasNumLines = function(text) {
+        const wrapWindow = new Window_Base(new Rectangle(this.x, this.y, this.width, this.height));
         const rect = this.baseTextRect();
-        const lineHeight = this.phileasGetTextHeight(text, rect.x, rect.y, rect.width);
+        const lineHeight = wrapWindow.phileasGetTextHeight(text, rect.x, rect.y, rect.width);
         $gameMessage._numLines = Math.floor(rect.height / lineHeight);
     };
 
