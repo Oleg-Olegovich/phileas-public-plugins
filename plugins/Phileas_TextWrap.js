@@ -8,6 +8,7 @@
 // 2025.February.16 Ver1.1.0 Fixed the display of messages
 // 2025.February.23 Ver1.1.1 Dynamic calculation lines number
 // 2025.April.14 Ver1.1.2 Fixed control characters processing
+// 2025.April.19 Ver1.1.3 Fixed text wrapping
 
 /*:
  * @target MZ
@@ -244,7 +245,8 @@
 
             line += word;
             let currentWidth = wrapWindow.phileasGetTextWidth(line, rect.x, rect.y, rect.width);
-            if (currentWidth > maxWidth) {
+
+            if (currentWidth > rect.width) {
                 result += "\n";
                 currentWidth = wrapWindow.textWidth(wrapWindow.convertEscapeCharacters(word));
                 line = word = currentTextSize + currentColor + word;
@@ -285,7 +287,7 @@
     
     Window_Message.prototype.phileasGetWindowMessageMargin = function() {
         const faceExists = $gameMessage.faceName() !== "";
-        const spacing = 30;
+        const spacing = 20;
         return faceExists ? ImageManager.faceWidth + spacing : 4;
     };
 
