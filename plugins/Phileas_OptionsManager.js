@@ -17,6 +17,7 @@
 // 2025.February.23 Ver1.4.1 Added fullscreen default value
 // 2025.April.06 Ver1.4.2 Fixed compatibility with plugin Animated busts by Astfgl
 // 2025.April.12 Ver1.5.0 Customizable names for different message speeds
+// 2025.April.21 Ver1.5.1 Option to skip message speeds without names
 
 /*:
  * @target MZ
@@ -496,6 +497,12 @@
  * @type struct<MessageSpeedName>[]
  * @default ["{\"value\":10,\"name\":\"Instant\"}"]
  *
+ * @param SkipSpeedsWithoutNames
+ * @text Skip speeds without names
+ * @type boolean
+ * @default false
+ * @desc If the speed doesn`t have a text name, it will be skipped in the options menu
+ *
  * @param Position
  * @desc The position of the option in the options menu.
  * @type combo
@@ -549,6 +556,12 @@
  * @text Текстовые названия скоростей
  * @type struct<MessageSpeedName>[]
  * @default ["{\"value\":10,\"name\":\"Моментально\"}"]
+ *
+ * @param SkipSpeedsWithoutNames
+ * @text Пропускать скорости без названий
+ * @type boolean
+ * @desc Если у скорости нет текстового названия, она будет пропускаться в меню опций
+ * @default false
  *
  * @param Position
  * @text Положение
@@ -626,6 +639,8 @@
  * @desc Надпись состояния.
  */
 
+"use strict";
+
 (function() {
 
 //--------DATA:
@@ -636,7 +651,7 @@
     var bottomCustomOptions = [];
     var fullscreenOption = getFullsreenOptionArray(JSON.parse(parameters["Fullscreen option"]) || {"AddFullscreen":false,"Fullscreen option name":"Fullscreen","Position":"Top","Default":false});
     var windowStateOption = getWindowStateOptionArray(JSON.parse(parameters["WindowStateOption"]) || {"AddWindowState":"false","WindowStateOptionName":"Состояние окна","Position":"Top"});
-    var messageSpeedOption = getMessageSpeedOptionArray(JSON.parse(parameters["MessageSpeedOption"]) || {"AddMessageSpeed":false,"MessageSpeedOptionName":"Message speed","Position":"Top","MessageSpeedMax":10,"DefaultSpeed":10, "SpeedNames":{10: "Instant"}});
+    var messageSpeedOption = getMessageSpeedOptionArray(JSON.parse(parameters["MessageSpeedOption"]) || {"AddMessageSpeed":false,"MessageSpeedOptionName":"Message speed","Position":"Top","MessageSpeedMax":10,"DefaultSpeed":10, "SpeedNames":{10: "Instant"}, "SkipSpeedsWithoutNames":false});
     var alwaysDashOption = parseAlwaysDashOption(parameters["AlwaysDashOption"] || "{\"addAlwaysDash\":\"true\",\"defaultStatusText\":\"true\",\"switchOnText\":\"\",\"switchOffText\":\"\"}");
     var showCommandRemember = parameters["Show 'Command Remember' option?"] == "true";
     var showTouchUI = parameters["Show 'Touch UI' option?"] == "true";
@@ -735,8 +750,10 @@
             const pair = JSON.parse(speedNamesArray[i]);
             speedNames[Number(pair.value)] = pair.name;
         }
+
+        const skipSpeedsWithoutNames = dict["SkipSpeedsWithoutNames"] == "true" && speedNamesArray.length > 0;
         
-        return [dict["AddMessageSpeed"] == "true", dict["MessageSpeedOptionName"], pos, dict["Remember"] == "true", max, def, speedNames];
+        return [dict["AddMessageSpeed"] == "true", dict["MessageSpeedOptionName"], pos, dict["Remember"] == "true", max, def, speedNames, skipSpeedsWithoutNames];
     }
 
     function parseAlwaysDashOption(par) {
@@ -788,32 +805,43 @@
         if (fullscreenOption[0] === true && fullscreenOption[2] == pos) {
             this.addCommand(fullscreenOption[1], "fullscreen");
         }
-    }
+    };
     
     Window_Options.prototype.addWindowStateOption = function(pos) {
         if (windowStateOption[0] === true && windowStateOption[2] == pos) {
             this.addCommand(windowStateOption[1], "windowStateOption");
         }
-    }
+    };
     
     Window_Options.prototype.addMessageSpeedOption = function(pos) {
         if (messageSpeedOption[0] === true && messageSpeedOption[2] == pos) {
             this.addCommand(messageSpeedOption[1], "messageSpeedVolume");
             this.changeValue("messageSpeedVolume", messageSpeedValue);
         }
-    }
-    
-    Window_Options.prototype.changeMessageSpeed = function(symbol, forward, wrap) {
-        const offset = 1;
-        messageSpeedValue += (forward ? offset : -offset);
+    };
+
+    Window_Options.prototype.updateMessageSpeed = function(offset, wrap) {
+        messageSpeedValue += offset;
+
         if (messageSpeedValue > (messageSpeedOption[4]) && wrap) {
             messageSpeedValue = 1;
         } else {
             messageSpeedValue = getClamp(messageSpeedValue, 1, messageSpeedOption[4]);
         }
+    };
+    
+    Window_Options.prototype.changeMessageSpeed = function(symbol, forward, wrap) {
+        const offset = (forward ? 1 : -1);
+        this.updateMessageSpeed(offset, wrap);
+
+        if (messageSpeedOption[7]) {
+            while (!messageSpeedOption[6][messageSpeedValue]) {
+                this.updateMessageSpeed(offset, wrap);
+            }
+        }
         
         this.changeValue("messageSpeedVolume", messageSpeedValue);
-    }
+    };
     
     Window_Options.prototype.addCustomOptions = function(pos) {
         let arr = undefined;
@@ -853,7 +881,7 @@
                 this.changeValue(arr[i][0], value);
             }
         }
-    }
+    };
 
     Window_Options.prototype.phileasProcessOk = function(method) {
         const index = this.index();
@@ -869,7 +897,7 @@
             
             method.call(this);
         }
-    }
+    };
 
 //--------CHANGED CORE:
 
