@@ -5,6 +5,7 @@
 // 2025.February.16 Ver1.0.0 First Release
 // 2025.February.17 Ver1.0.1 Added read/write file methods
 // 2025.March.01 Ver1.0.2 Fixed read/write json file methods
+// 2025.April.23 Ver1.0.3 When writing a file, non-existent folders are created from its path
 
 /*:
  * @target MZ
@@ -305,10 +306,12 @@ Phileas_FileManager.readJsonFile = async function(path) {
     return data ? JSON.parse(data) : null;
 };
 
-Phileas_FileManager.writeFileNwJs = async function(path, data) {
+Phileas_FileManager.writeFileNwJs = function(path, data) {
     const fs = require("fs");
     const pathModule = require("path");
     const fullPath = pathModule.join(pathModule.dirname(process.mainModule.filename), path);
+    const dirPath = pathModule.dirname(fullPath);
+    fs.mkdirSync(dirPath, { recursive: true });
     fs.writeFileSync(fullPath, data);
     console.log(`Saved file: ${path}`);
 };
@@ -320,7 +323,7 @@ Phileas_FileManager.writeFileWeb = function(path, data) {
 
 Phileas_FileManager.writeFile = async function(path, data) {
     if (Utils.isNwjs()) {
-        await Phileas_FileManager.writeFileNwJs(path, data);
+        Phileas_FileManager.writeFileNwJs(path, data);
         return;
     }
 
