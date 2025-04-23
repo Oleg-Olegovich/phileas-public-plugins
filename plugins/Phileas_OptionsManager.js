@@ -18,6 +18,7 @@
 // 2025.April.06 Ver1.4.2 Fixed compatibility with plugin Animated busts by Astfgl
 // 2025.April.12 Ver1.5.0 Customizable names for different message speeds
 // 2025.April.21 Ver1.5.1 Option to skip message speeds without names
+// 2025.April.23 Ver1.5.2 Fixed pause
 
 /*:
  * @target MZ
@@ -1195,9 +1196,9 @@
         }
     
         Origin_updateShowFast.call(this);
-        
+
         if (!this._anim && !this._showFast && messageSpeedValue < messageSpeedOption[4]) {
-            this.startWait(messageSpeedOption[4] - messageSpeedValue);
+            this.startWait(messageSpeedOption[4] - messageSpeedValue - 1);
         }
     };
     
