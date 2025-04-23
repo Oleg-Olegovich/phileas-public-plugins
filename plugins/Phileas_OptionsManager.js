@@ -19,6 +19,7 @@
 // 2025.April.12 Ver1.5.0 Customizable names for different message speeds
 // 2025.April.21 Ver1.5.1 Option to skip message speeds without names
 // 2025.April.23 Ver1.5.2 Fixed pause
+// 2025.April.23 Ver1.5.3 Fixed calculation of min message speed value
 
 /*:
  * @target MZ
@@ -666,6 +667,7 @@
     var optionsWindowMaxVisibleCommands = Number(parameters["optionsWindowMaxVisibleCommands"]) || 0;
     
     var messageSpeedValue = messageSpeedOption[5];
+    var messageSpeedMinValue = getMinMessageSpeedValue();
     
     setCustomOptionsDictionaries();
 
@@ -757,6 +759,14 @@
         return [dict["AddMessageSpeed"] == "true", dict["MessageSpeedOptionName"], pos, dict["Remember"] == "true", max, def, speedNames, skipSpeedsWithoutNames];
     }
 
+    function getMinMessageSpeedValue() {
+        if (!messageSpeedOption[7]) {
+            return 1;
+        }
+
+        return Object.entries(messageSpeedOption[6]).sort(([,a], [,b]) => a - b)[0][0];
+    }
+
     function parseAlwaysDashOption(par) {
         var opt = JSON.parse(par);
         opt.addAlwaysDash = opt.addAlwaysDash == "true";
@@ -825,9 +835,9 @@
         messageSpeedValue += offset;
 
         if (messageSpeedValue > (messageSpeedOption[4]) && wrap) {
-            messageSpeedValue = 1;
+            messageSpeedValue = messageSpeedMinValue;
         } else {
-            messageSpeedValue = getClamp(messageSpeedValue, 1, messageSpeedOption[4]);
+            messageSpeedValue = getClamp(messageSpeedValue, messageSpeedMinValue, messageSpeedOption[4]);
         }
     };
     
