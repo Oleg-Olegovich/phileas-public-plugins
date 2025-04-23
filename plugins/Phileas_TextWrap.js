@@ -9,6 +9,7 @@
 // 2025.February.23 Ver1.1.1 Dynamic calculation lines number
 // 2025.April.14 Ver1.1.2 Fixed control characters processing
 // 2025.April.19 Ver1.1.3 Fixed text wrapping
+// 2025.April.23 Ver1.1.4 Fixed text wrapping
 
 /*:
  * @target MZ
@@ -302,9 +303,13 @@
     
     const Origin_startMessage = Window_Message.prototype.startMessage;
     Window_Message.prototype.startMessage = function() {
+        this.resetFontSettings();
+
         const text = $gameMessage.allText();
         const maxWidth = this.width - this.phileasGetWindowMessageMargin();
         const wrappedText = getWrappedText(text, maxWidth, this).split("\n");
+
+        console.log(wrappedText);
 
         this.phileasNumLines(wrappedText[0]);
 
