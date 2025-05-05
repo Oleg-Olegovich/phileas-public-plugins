@@ -305,6 +305,11 @@
     Window_SavefileList.prototype.scrollTo = function(n) {
     };
 
+    Window_Scrollable.prototype.updateArrows = function() {
+        this.downArrowVisible = false;
+        this.upArrowVisible = false;
+    };
+
     const Origin_Scene_Map_callMenu = Scene_Map.prototype.callMenu;
     Scene_Map.prototype.callMenu = function() {
         SceneManager.snapForBackground();
