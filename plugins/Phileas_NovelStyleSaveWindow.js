@@ -6,7 +6,7 @@
 
 /*:
  * @target MZ
- * @plugindesc 
+ * @plugindesc 1.0.0 A novel-style save menu
  * @author Phileas
  * 
  * @param screenshotSettings
@@ -128,7 +128,7 @@
  
 /*:ru
  * @target MZ
- * @plugindesc 
+ * @plugindesc 1.0.0 Меню сохранений в стиле новеллы
  * @author Phileas
  *
  * @param screenshotSettings
