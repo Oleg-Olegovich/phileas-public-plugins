@@ -321,9 +321,9 @@
     Sprite_PageNumber.prototype = Object.create(Sprite_Clickable.prototype);
     Sprite_PageNumber.prototype.constructor = Sprite_PageNumber;
 
-    Sprite_PageNumber.prototype.initialize = function(window, number) {
+    Sprite_PageNumber.prototype.initialize = function(scene, number) {
         Sprite_Clickable.prototype.initialize.call(this);
-        this._window = window;
+        this._scene = scene;
         this._number = number;
         this.drawNumberBitmap();
         this.enable();
@@ -367,8 +367,8 @@
     };
 
     Sprite_PageNumber.prototype.onClick = function() {
-        this._window.setPage(this._number);
-        this._window.createPageButtons();
+        this._scene.setPage(this._number);
+        this._scene.createPageButtons();
     };
 
     Sprite_PageNumber.prototype.updateNumberBitmap = function() {
@@ -715,8 +715,14 @@
 
         const prevButton = new Sprite_SavelistButton("pageup");
         const nextButton = new Sprite_SavelistButton("pagedown");
-        prevButton.setClickHandler(() => this.setPage($page - 1));
-        nextButton.setClickHandler(() => this.setPage($page + 1));
+        prevButton.setClickHandler(() => {
+            this.setPage($page - 1); 
+            this.createPageButtons();
+        });
+        nextButton.setClickHandler(() => {
+            this.setPage($page + 1); 
+            this.createPageButtons();
+        });
         this.addWindow(prevButton);
         this.addWindow(nextButton);
 
