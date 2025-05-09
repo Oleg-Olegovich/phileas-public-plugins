@@ -20,6 +20,7 @@
 // 2025.April.21 Ver1.5.1 Option to skip message speeds without names
 // 2025.April.23 Ver1.5.2 Fixed pause
 // 2025.April.23 Ver1.5.3 Fixed calculation of min message speed value
+// 2025.May.09 Ver1.5.4 Fixed custom options
 
 /*:
  * @target MZ
@@ -1080,7 +1081,7 @@
     const Origin_switchFullscreen = Graphics._switchFullScreen;
     Graphics._switchFullScreen = function() {
         if (SceneManager._scene instanceof Scene_Options) {
-            for (var i = 0; i < SceneManager._scene._windowLayer.children.length; ++i) {
+            for (let i = 0; i < SceneManager._scene._windowLayer.children.length; ++i) {
                 if (SceneManager._scene._windowLayer.children[i] instanceof Window_Options) {
                     SceneManager._scene._windowLayer.children[i].changeValue("fullscreen", !ConfigManager["fullscreen"]);
                     break;
@@ -1119,7 +1120,7 @@
         config.screenHeight = ConfigManager["windowStateOption"] === true ? ConfigManager["windowHeight"] : undefined;
         config.windowState = ConfigManager["windowStateOption"] === true ? ConfigManager["windowState"] : undefined;
 
-        for (tag in customOptions) {
+        for (let tag in customOptions) {
             let opt = customOptions[tag];
             customOptions[tag].push(opt[0] ? $gameSwitches.value(opt[1]) : $gameVariables.value(opt[1]));
         }
@@ -1150,7 +1151,7 @@
         ConfigManager["windowState"] = config.windowState || "normal";
         
         if (config.phileasCustomOption != undefined) {
-            for (tag in config.phileasCustomOption) {
+            for (let tag in config.phileasCustomOption) {
                 let opt = config.phileasCustomOption[tag];
                 ConfigManager[tag] = opt[opt.length - 1];
             }
@@ -1188,7 +1189,7 @@
     const Origin_createGameObjects = DataManager.createGameObjects;
     DataManager.createGameObjects = function() {
         Origin_createGameObjects.call(this);
-        for (tag in customOptions) {
+        for (let tag in customOptions) {
             let opt = customOptions[tag];
             if (opt[0] === true) {
                 $gameSwitches.setValue(opt[1], ConfigManager[tag]);
