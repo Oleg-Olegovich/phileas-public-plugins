@@ -2,7 +2,7 @@
 // Phileas_NovelStyleSaveWindow.js
 //=============================================================================
 // [Update History]
-// 2025.May.08 Ver1.0.0 First Release
+// 2025.May.09 Ver1.0.0 First Release
 
 /*:
  * @target MZ
@@ -425,6 +425,23 @@
         return this.itemHeight() / $screenshotSettings.height;
     };
 
+    Window_SavefileList.prototype.drawTitleSafe = function(savefileId, rect) {
+        const titleOutX = rect.x + this.screenshotScale() * $screenshotSettings.width + 10;
+        const titleInX = rect.x + rect.width - this._autosaveTextWidth;
+        const titleX = Math.min(titleOutX, titleInX);
+ 
+        this.drawTitle(savefileId,
+            titleX,
+            rect.y + 4);
+    };
+
+    Window_SavefileList.prototype.isCurrentPage = function(index) {
+        const itemsPerPage = this.maxPageItems();
+        const firstIndex = $page * itemsPerPage;
+        const lastIndex = firstIndex + itemsPerPage;
+        return firstIndex <= index && index < lastIndex;
+    };
+
 //-----------------------------------------------------------------------------
 // Scenes
 
@@ -480,6 +497,16 @@
         const max = this.maxPageCount() - 1;
         $page = page.clamp(0, max);
         this._listWindow.refresh();
+    };
+
+    Scene_File.prototype.initializePage = function() {
+        const fileId = DataManager.latestSavefileId() - ($gameSystem.isAutosaveEnabled() ? 0 : 1);
+        const itemsPerPage = this._listWindow.maxPageItems();
+        const pageId = Math.floor(fileId / itemsPerPage);
+        this.setPage(pageId);
+        const startIndex = $page * itemsPerPage;
+        const index = fileId - startIndex;
+        this._listWindow.selectSavefile(index);
     };
 
 
@@ -580,25 +607,26 @@
 
             if (!bitmap.isReady()) {
                 bitmap.addLoadListener(function() {
-                    this.drawContents(bitmap, savefileId, info, rect);
+                    if (!this.isCurrentPage(index)) {
+                        return;
+                    }
+
+                    this.drawContents(bitmap, info, rect);
+                    this.drawTitleSafe(savefileId, rect);
                 }.bind(this));
             } else {
-                this.drawContents(bitmap, savefileId, info, rect);
+                this.drawContents(bitmap, info, rect);
+                this.drawTitleSafe(savefileId, rect);
             }
+        } else {
+            this.drawTitleSafe(savefileId, rect);
         }
     };
 
-    Window_SavefileList.prototype.drawContents = function(bitmap, savefileId, info, rect) {
+    Window_SavefileList.prototype.drawContents = function(bitmap, info, rect) {
         if (bitmap && !bitmap.isError()) {
             this.drawScreenshotBitmap(bitmap, rect);
         }
-
-        const titleOutX = rect.x + this.screenshotScale() * $screenshotSettings.width + 10;
-        const titleInX = rect.x + rect.width - this._autosaveTextWidth;
-        const titleX = Math.min(titleOutX, titleInX);
-        this.drawTitle(savefileId,
-            titleX,
-            rect.y + 4);
         
         const lineHeight = this.lineHeight();
         const bottom = rect.y + rect.height;
@@ -615,7 +643,7 @@
 
         for (let i = 0; i < itemsPerPage; ++i) {
             const index = startIndex + i;
-            if (index < $windowSettings.maxSaveFiles) {
+            if (index < this.maxItems()) {
                 this.drawItemBackground(i);
                 this.drawItem(index, i);
             }
@@ -729,16 +757,14 @@
         this._listWindow.setHandler("ok", this.onSavefileOk.bind(this));
         this._listWindow.setHandler("cancel", this.popScene.bind(this));
         this._listWindow.setMode(this.mode(), this.needsAutosave());
-
-        const fileId = this.firstSavefileId();
-        const itemsPerPage = this._listWindow.maxPageItems();
-        this.setPage(Math.floor(fileId / itemsPerPage));
-        const startIndex = $page * itemsPerPage;
-        const index = fileId - startIndex;
-        this._listWindow.selectSavefile(index);
-        this._listWindow.refresh();
-
+        this.initializePage();
         this.addWindow(this._listWindow);
+    };
+
+    
+    Window_SavefileList.prototype.setMode = function(mode, autosave) {
+        this._mode = mode;
+        this._autosave = autosave;
     };
 
     const Origin_Scene_Save_executeSave = Scene_Save.prototype.executeSave;
@@ -750,5 +776,5 @@
     DataManager.maxSavefiles = function() {
         return $windowSettings.maxSaveFiles;
     };
-    
+
 }());
