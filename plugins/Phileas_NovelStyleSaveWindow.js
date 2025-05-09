@@ -2,7 +2,7 @@
 // Phileas_NovelStyleSaveWindow.js
 //=============================================================================
 // [Update History]
-// 2025.April.08 Ver1.0.0 First Release
+// 2025.May.08 Ver1.0.0 First Release
 
 /*:
  * @target MZ
@@ -100,6 +100,16 @@
  * 
  * The plugin does not provide commands,
  * configure it using the parameters.
+ * 
+ *-----------------------------------------------------------------------------
+ * INSTALLATION
+ * 
+ * For the plugin to work, you need to install Phileas's File Manager:
+ * https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_FileManager.js
+ * This plugin is required to save and upload screenshots.
+ * In the plugin manager, place Phileas's File Manager above Phileas's Novel Style Save Window.
+ * 
+ *-----------------------------------------------------------------------------
  * 
  * You can always write to the author if you need other features or even plugins.
  * Boosty: https://boosty.to/phileas
@@ -212,6 +222,16 @@
  * 
  * Плагин не предоставляет команд,
  * настраивайте его с помощью параметров.
+ * 
+ *-----------------------------------------------------------------------------
+ * УСТАНОВКА
+ * 
+ * Для работы плагина необходимо установить Phileas`s File Manager:
+ * https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_FileManager.js
+ * Этот плагин необходим для сохранения и загрузки скриншотов.
+ * В менеджере плагинов расположите  Phileas`s File Manager выше Phileas`s Novel Style Save Window.
+ * 
+ *-----------------------------------------------------------------------------
  *
  * Вы всегда можете написать автору, если вам нужны другие функции или даже плагины.
  * Boosty: https://boosty.to/phileas
@@ -396,7 +416,9 @@
         const height = rect.height;
         const width = bitmap.width * (height / bitmap.height);
         const scaledBitmap = scaleBitmap(bitmap, width, height);
-        this.contents.blt(scaledBitmap, 0, 0, width, height, rect.x, rect.y);
+        const dw = Math.min(width, rect.width);
+        const dh = Math.min(width, rect.height);
+        this.contents.blt(scaledBitmap, 0, 0, width, height, rect.x, rect.y, dw, dh);
     };
 
     Window_SavefileList.prototype.screenshotScale = function() {
@@ -526,6 +548,12 @@
 
 //--------CHANGED CORE:
 
+    const Origin_Window_SavefileList_initialize = Window_SavefileList.prototype.initialize;
+    Window_SavefileList.prototype.initialize = function(rect) {
+        Origin_Window_SavefileList_initialize.call(this, rect);
+        this._autosaveTextWidth = this.textWidth(TextManager.autosave);
+    };
+
     Window_SavefileList.prototype.itemHeight = function() {
         return Math.floor(this.innerHeight / $windowSettings.rows
             - this.padding * 2 - $windowSettings.spacing);
@@ -547,27 +575,30 @@
         this.resetTextColor();
         this.changePaintOpacity(this.isEnabled(savefileId));
 
-        this.drawTitle(savefileId,
-            rect.x + this.screenshotScale() * $screenshotSettings.width + 10,
-            rect.y + 4);
-
         if (info) {
             const bitmap = loadScreenshot(savefileId);
 
             if (!bitmap.isReady()) {
                 bitmap.addLoadListener(function() {
-                    this.drawContents(bitmap, info, rect);
+                    this.drawContents(bitmap, savefileId, info, rect);
                 }.bind(this));
             } else {
-                this.drawContents(bitmap, info, rect);
+                this.drawContents(bitmap, savefileId, info, rect);
             }
         }
     };
 
-    Window_SavefileList.prototype.drawContents = function(bitmap, info, rect) {
+    Window_SavefileList.prototype.drawContents = function(bitmap, savefileId, info, rect) {
         if (bitmap && !bitmap.isError()) {
             this.drawScreenshotBitmap(bitmap, rect);
         }
+
+        const titleOutX = rect.x + this.screenshotScale() * $screenshotSettings.width + 10;
+        const titleInX = rect.x + rect.width - this._autosaveTextWidth;
+        const titleX = Math.min(titleOutX, titleInX);
+        this.drawTitle(savefileId,
+            titleX,
+            rect.y + 4);
         
         const lineHeight = this.lineHeight();
         const bottom = rect.y + rect.height;
