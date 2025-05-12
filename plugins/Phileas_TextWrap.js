@@ -10,6 +10,7 @@
 // 2025.April.14 Ver1.1.2 Fixed control characters processing
 // 2025.April.19 Ver1.1.3 Fixed text wrapping
 // 2025.April.23 Ver1.1.4 Fixed text wrapping
+// 2025.May.12 Ver1.1.5 Fixed text size step tag
 
 /*:
  * @target MZ
@@ -88,7 +89,7 @@
     PluginManager.registerCommand("Phileas_TextWrap", "getWrappedText", getWrappedTextByCommand);
     
     function getColor(word) {
-        for (let i = word.length - 2; i > -1; --i) {
+        for (let i = word.length - 3; i > -1; --i) {
             if (word[i] == "\\" && word[i + 1] == "C" && word[i + 2] == "[") {
                 let tag = "\\C[";
                 let j = i + 3;
@@ -112,7 +113,7 @@
     }
 
     function getTextSize(word) {
-        for (let i = word.length - 3; i > -1; --i) {
+        for (let i = word.length - 4; i > -1; --i) {
             if (word[i] == "\\" && word[i + 1] == "F" && word[i + 2] == "S" && word[i + 3] == "[") {
                 let tag = "\\FS[";
                 let j = i + 4;
@@ -133,6 +134,38 @@
         }
         
         return "";
+    }
+
+    function getTextSizeStep(word) {
+        let textSizeStep = 0;
+        for (let i = word.length - 2; i > -1; --i) {
+            if (word[i] == "\\" && word[i + 1] == "{") {
+                ++textSizeStep;
+                continue;
+            }
+
+            if (word[i] == "\\" && word[i + 1] == "}") {
+                --textSizeStep;
+            }
+        }
+        
+        return textSizeStep;
+    }
+
+    function textSizeStepToTag(textSizeStep) {
+        if (textSizeStep == 0) {
+            return "";
+        }
+
+        const base = textSizeStep > 0 ? "\\{" : "\\}";
+        const n = Math.abs(textSizeStep);
+        let tag = "";
+
+        for (let i = 0; i < n; ++i) {
+            tag += base;
+        }
+
+        return tag;
     }
 
     Window_Base.prototype.phileasGetTextSizes = function(text, x, y, width) {
@@ -186,10 +219,12 @@
             }
             
             line += word;
+            wrapWindow.resetFontSettings();
             let currentWidth = wrapWindow.phileasGetTextWidth(line, rect.x, rect.y, rect.width);
             //console.log('parsed: ', [line, currentWidth]);
             if (currentWidth > maxWidth) {
                 result += "\n";
+                wrapWindow.resetFontSettings();
                 currentWidth = wrapWindow.textWidth(wrapWindow.convertEscapeCharacters(word));
                 line = word = currentTextSize + currentColor + word;
             }
@@ -208,18 +243,23 @@
         return result;
     };
     
-    function getWrappedText(text, maxWidth, mainWindow) {
+    function getWrappedText(text, maxWidth, mainWindow, windowMaxLines = 4) {
         const wrapWindow = new Window_Base(new Rectangle(mainWindow.x, mainWindow.y, maxWidth, mainWindow.height));
         wrapWindow.contents.fontFace = mainWindow.contents.fontFace;
         wrapWindow.contents.fontSize = mainWindow.contents.fontSize;
         const rect = wrapWindow.baseTextRect();
+
         let result = "";
         let word = "";
         let line = "";
         let lastIndex = 0;
         let currentColor = "";
         let currentTextSize = "";
+        let previousTextSizeSteps = 0;
+        let textSizeSteps = 0;
         let nFlag = false;
+        let lines = 0;
+
         if (text[text.length - 1] != " ") {
             text += " ";
         }
@@ -245,19 +285,47 @@
             }
 
             line += word;
-            let currentWidth = wrapWindow.phileasGetTextWidth(line, rect.x, rect.y, rect.width);
+            wrapWindow.resetFontSettings();
+            let currentWidth = wrapWindow.phileasGetTextWidth(textSizeStepToTag(previousTextSizeSteps) + line, rect.x, rect.y, rect.width);
 
             if (currentWidth > rect.width) {
                 result += "\n";
+                ++lines;
+
+                let textSizeStepTag = "";
+
+                if (lines >= windowMaxLines) {
+                    textSizeStepTag = textSizeStepToTag(textSizeSteps);
+                    previousTextSizeSteps = lines = 0;
+                } else {
+                    previousTextSizeSteps = textSizeSteps;
+                }
+
+                textSizeSteps += getTextSizeStep(word);
+
+                line = word = currentTextSize + currentColor + textSizeStepTag + word;
+                wrapWindow.resetFontSettings();
                 currentWidth = wrapWindow.textWidth(wrapWindow.convertEscapeCharacters(word));
-                line = word = currentTextSize + currentColor + word;
+            } else {
+                textSizeSteps += getTextSizeStep(word);
             }
             
             result += word;
             lastIndex = i + 1;
             if (nFlag) {
                 result += "\n";
-                line = word = currentTextSize + currentColor;
+                ++lines;
+
+                let textSizeStepTag = "";
+
+                if (lines >= windowMaxLines) {
+                    textSizeStepTag = textSizeStepToTag(textSizeSteps);
+                    previousTextSizeSteps = lines = 0;
+                } else {
+                    previousTextSizeSteps = textSizeSteps;
+                }
+
+                line = word = currentTextSize + currentColor + textSizeStepTag;
                 ++lastIndex;
                 ++i;
                 nFlag = false;
@@ -306,12 +374,11 @@
         this.resetFontSettings();
 
         const text = $gameMessage.allText();
+        this.phileasNumLines(text);
+
         const maxWidth = this.width - this.phileasGetWindowMessageMargin();
-        const wrappedText = getWrappedText(text, maxWidth, this).split("\n");
+        const wrappedText = getWrappedText(text, maxWidth, this, $gameMessage._numLines).split("\n");
 
-        console.log(wrappedText);
-
-        this.phileasNumLines(wrappedText[0]);
 
         $gameMessage._texts.length = 0;
         $gameMessage._texts = wrappedText.slice(0, $gameMessage._numLines);
