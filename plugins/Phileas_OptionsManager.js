@@ -21,10 +21,11 @@
 // 2025.April.23 Ver1.5.2 Fixed pause
 // 2025.April.23 Ver1.5.3 Fixed calculation of min message speed value
 // 2025.May.09 Ver1.5.4 Fixed custom options
+// 2025.May.13 Ver1.5.5 Fixed parameters parsing
 
 /*:
  * @target MZ
- * @plugindesc Configures the options menu, adds an unlimited number of custom options
+ * @plugindesc v1.5.5 Configures the options menu, adds an unlimited number of custom options
  * @author Phileas
  *
  * @param Options
@@ -43,7 +44,7 @@
  * @param MessageSpeedOption
  * @text Message speed option
  * @type struct<MessageSpeed>
- * @default {"AddMessageSpeed":"false","MessageSpeedOptionName":"Message speed","Position":"Top"}
+ * @default {"AddMessageSpeed":false,"MessageSpeedOptionName":"Message speed","Position":"Top","MessageSpeedMax":10,"DefaultSpeed":10, "SpeedNames":{10: "Instant"}, "SkipSpeedsWithoutNames":false}
  *
  * @param AlwaysDashOption
  * @text 'Always Dash' option
@@ -135,7 +136,7 @@
  
 /*:ru
  * @target MZ
- * @plugindesc Настраивает меню опций, добавляет неограниченное количество пользовательских опций
+ * @plugindesc v1.5.5 Настраивает меню опций, добавляет неограниченное количество пользовательских опций
  * @author Phileas
  *
  * @param Options
@@ -156,7 +157,7 @@
  * @param MessageSpeedOption
  * @text Опция скорости сообщения
  * @type struct<MessageSpeed>
- * @default {"AddMessageSpeed":"false","MessageSpeedOptionName":"Скорость сообщения","Position":"Top"}
+ * @default {"AddMessageSpeed":false,"MessageSpeedOptionName":"Скорость сообщения","Position":"Top","MessageSpeedMax":10,"DefaultSpeed":10, "SpeedNames":{10: "Моментально"}, "SkipSpeedsWithoutNames":false}
  *
  * @param AlwaysDashOption
  * @text Опция 'Бег по умолчанию'
@@ -748,14 +749,21 @@
             def = max;
         }
 
-        const speedNamesArray = JSON.parse(dict["SpeedNames"]);
         const speedNames = {};
-        for (let i = 0; i < speedNamesArray.length; ++i) {
-            const pair = JSON.parse(speedNamesArray[i]);
-            speedNames[Number(pair.value)] = pair.name;
-        }
+        let skipSpeedsWithoutNames = false;
+        
+        if (dict["SpeedNames"]) {
+            const speedNamesArray = JSON.parse(dict["SpeedNames"]);
 
-        const skipSpeedsWithoutNames = dict["SkipSpeedsWithoutNames"] == "true" && speedNamesArray.length > 0;
+            if (Array.isArray(speedNamesArray)) {
+                for (let i = 0; i < speedNamesArray.length; ++i) {
+                    const pair = JSON.parse(speedNamesArray[i]);
+                    speedNames[Number(pair.value)] = pair.name;
+                }
+
+                skipSpeedsWithoutNames = dict["SkipSpeedsWithoutNames"] == "true" && speedNamesArray.length > 0;
+            }
+        }
         
         return [dict["AddMessageSpeed"] == "true", dict["MessageSpeedOptionName"], pos, dict["Remember"] == "true", max, def, speedNames, skipSpeedsWithoutNames];
     }
