@@ -22,10 +22,11 @@
 // 2025.April.23 Ver1.5.3 Fixed calculation of min message speed value
 // 2025.May.09 Ver1.5.4 Fixed custom options
 // 2025.May.13 Ver1.5.5 Fixed parameters parsing
+// 2025.May.14 Ver1.5.6 Fixed visible options number customization
 
 /*:
  * @target MZ
- * @plugindesc v1.5.5 Configures the options menu, adds an unlimited number of custom options
+ * @plugindesc v1.5.6 Configures the options menu, adds an unlimited number of custom options
  * @author Phileas
  *
  * @param Options
@@ -136,7 +137,7 @@
  
 /*:ru
  * @target MZ
- * @plugindesc v1.5.5 Настраивает меню опций, добавляет неограниченное количество пользовательских опций
+ * @plugindesc v1.5.6 Настраивает меню опций, добавляет неограниченное количество пользовательских опций
  * @author Phileas
  *
  * @param Options
@@ -921,14 +922,9 @@
 
 //--------CHANGED CORE:
 
-    const Origin_Scene_Option_optionsWindowRect = Scene_Options.prototype.optionsWindowRect;
     Scene_Options.prototype.optionsWindowRect = function() {
-        if (optionsWindowWidth == 0) {
-            return Origin_Scene_Option_optionsWindowRect.call(this);
-        }
-
         const n = Math.min(this.maxCommands(), this.maxVisibleCommands());
-        const ww = optionsWindowWidth;
+        const ww = optionsWindowWidth == 0 ? 400 : optionsWindowWidth;
         const wh = this.calcWindowHeight(n, true);
         const wx = (Graphics.boxWidth - ww) / 2;
         const wy = (Graphics.boxHeight - wh) / 2;
@@ -944,7 +940,9 @@
 
     const Origin_Scene_Options_maxCommands = Scene_Options.prototype.maxCommands;
     Scene_Options.prototype.maxCommands = function() {
-        return this.maxVisibleCommands();
+        return optionsWindowMaxVisibleCommands == 0
+            ? Origin_Scene_Options_maxCommands.call(this)
+            : optionsWindowMaxVisibleCommands;
     };
 
     Window_Options.prototype.makeCommandList = function() {
