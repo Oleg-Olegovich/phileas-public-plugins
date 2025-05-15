@@ -1,5 +1,5 @@
 //=============================================================================
-// Phileas_OpenMenuAnytime.js
+// Phileas_OpenMenuPlus.js
 //=============================================================================
 // [Update History]
 // 2025.May.11 Ver1.0.0 First Release
@@ -12,10 +12,10 @@
  * 
  * @help
  * 
- * Open the menu during event processing (messages&choices).
+ * Open the menu during event processing (messages and choices).
  * 
  * If you use plugins that modify messages or choices,
- * then place Phileas_OpenMenuAnytime under them in the plugins menu.
+ * then place Phileas_OpenMenuPlus under them in the plugins menu.
  * 
  *-----------------------------------------------------------------------------
  * 
@@ -43,10 +43,10 @@
  * 
  * @help
  * 
- * Открывает меню во время обработки событий (сообщения&выборы).
+ * Открывает меню во время обработки событий (сообщения и выборы).
  * 
- * Если вы используете плагины, которые модифицируют сообщения или choices,
- * то разместите Phileas_OpenMenuAnytime под ними в меню плагинов.
+ * Если вы используете плагины, которые модифицируют сообщения или выборы,
+ * то разместите Phileas_OpenMenuPlus под ними в меню плагинов.
  * 
  *-----------------------------------------------------------------------------
  *
