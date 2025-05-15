@@ -24,6 +24,7 @@
 // 2025.May.13 Ver1.5.5 Fixed parameters parsing
 // 2025.May.14 Ver1.5.6 Fixed visible options number customization
 // 2025.May.15 Ver1.5.7 Fixed parameter parsing
+// 2025.May.15 Ver1.5.8 Added error descriptions
 
 /*:
  * @target MZ
@@ -694,12 +695,16 @@
             return undefined;
         }
         
-        let arr = JSON.parse(data);
-        for (let i = 0; i < arr.length; ++i) {
-            arr[i] = JSON.parse(arr[i]);
-        }
+        try {
+            let arr = JSON.parse(data);
+            for (let i = 0; i < arr.length; ++i) {
+                arr[i] = JSON.parse(arr[i]);
+            }
 
-        return arr;
+            return arr;
+        } catch {
+            throw new Error("Couldn't parse the 'Custom options' parameter. Fix the Phileas_OptionsManager plugin parameters.");
+        }
     }
 
     function getFullsreenOptionArray(dict) {
@@ -764,15 +769,19 @@
         let skipSpeedsWithoutNames = false;
         
         if (dict["SpeedNames"]) {
-            const speedNamesArray = JSON.parse(dict["SpeedNames"]);
+            try {
+                const speedNamesArray = JSON.parse(dict["SpeedNames"]);
 
-            if (Array.isArray(speedNamesArray)) {
-                for (let i = 0; i < speedNamesArray.length; ++i) {
-                    const pair = JSON.parse(speedNamesArray[i]);
-                    speedNames[pair.value] = pair.name;
+                if (Array.isArray(speedNamesArray)) {
+                    for (let i = 0; i < speedNamesArray.length; ++i) {
+                        const pair = JSON.parse(speedNamesArray[i]);
+                        speedNames[pair.value] = pair.name;
+                    }
+
+                    skipSpeedsWithoutNames = dict["SkipSpeedsWithoutNames"] == "true" && speedNamesArray.length > 0;
                 }
-
-                skipSpeedsWithoutNames = dict["SkipSpeedsWithoutNames"] == "true" && speedNamesArray.length > 0;
+            } catch {
+                throw new Error("Couldn't parse the 'Speed names' parameter. Fix the Phileas_OptionsManager plugin parameters.");
             }
         }
         
@@ -788,10 +797,14 @@
     }
 
     function parseAlwaysDashOption(par) {
-        var opt = JSON.parse(par);
-        opt.addAlwaysDash = opt.addAlwaysDash == "true";
-        opt.defaultStatusText = opt.defaultStatusText == "true";
-        return opt;
+        try {
+            var opt = JSON.parse(par);
+            opt.addAlwaysDash = opt.addAlwaysDash == "true";
+            opt.defaultStatusText = opt.defaultStatusText == "true";
+            return opt;
+        } catch {
+            throw new Error("Couldn't parse the 'Always Dash' parameter. Fix the Phileas_OptionsManager plugin parameters.");
+        }
     }
     
     function setCustomOptionsDictionaries() {
