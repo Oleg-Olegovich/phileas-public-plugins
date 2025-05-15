@@ -23,6 +23,7 @@
 // 2025.May.09 Ver1.5.4 Fixed custom options
 // 2025.May.13 Ver1.5.5 Fixed parameters parsing
 // 2025.May.14 Ver1.5.6 Fixed visible options number customization
+// 2025.May.15 Ver1.5.7 Fixed parameter parsing
 
 /*:
  * @target MZ
@@ -45,7 +46,7 @@
  * @param MessageSpeedOption
  * @text Message speed option
  * @type struct<MessageSpeed>
- * @default {"AddMessageSpeed":false,"MessageSpeedOptionName":"Message speed","Position":"Top","MessageSpeedMax":10,"DefaultSpeed":10, "SpeedNames":{10: "Instant"}, "SkipSpeedsWithoutNames":false}
+ * @default {"AddMessageSpeed":false,"MessageSpeedOptionName":"Message speed","Position":"Top","MessageSpeedMax":10,"DefaultSpeed":10, "SpeedNames":["{\"value\":10,\"name\":\"Instant\"}"], "SkipSpeedsWithoutNames":false}
  *
  * @param AlwaysDashOption
  * @text 'Always Dash' option
@@ -158,7 +159,7 @@
  * @param MessageSpeedOption
  * @text Опция скорости сообщения
  * @type struct<MessageSpeed>
- * @default {"AddMessageSpeed":false,"MessageSpeedOptionName":"Скорость сообщения","Position":"Top","MessageSpeedMax":10,"DefaultSpeed":10, "SpeedNames":{10: "Моментально"}, "SkipSpeedsWithoutNames":false}
+ * @default {"AddMessageSpeed":false,"MessageSpeedOptionName":"Скорость сообщения","Position":"Top","MessageSpeedMax":10,"DefaultSpeed":10, "SpeedNames":["{\"value\":10,\"name\":\"Моментально\"}"], "SkipSpeedsWithoutNames":false}
  *
  * @param AlwaysDashOption
  * @text Опция 'Бег по умолчанию'
@@ -654,9 +655,9 @@
     var topCustomOptions = [];
     var middleCustomOptions = [];
     var bottomCustomOptions = [];
-    var fullscreenOption = getFullsreenOptionArray(JSON.parse(parameters["Fullscreen option"]) || {"AddFullscreen":false,"Fullscreen option name":"Fullscreen","Position":"Top","Default":false});
-    var windowStateOption = getWindowStateOptionArray(JSON.parse(parameters["WindowStateOption"]) || {"AddWindowState":"false","WindowStateOptionName":"Состояние окна","Position":"Top"});
-    var messageSpeedOption = getMessageSpeedOptionArray(JSON.parse(parameters["MessageSpeedOption"]) || {"AddMessageSpeed":false,"MessageSpeedOptionName":"Message speed","Position":"Top","MessageSpeedMax":10,"DefaultSpeed":10, "SpeedNames":{10: "Instant"}, "SkipSpeedsWithoutNames":false});
+    var fullscreenOption = getFullsreenOptionArray(parseParameter(parameters["Fullscreen option"], {"AddFullscreen":false,"Fullscreen option name":"Fullscreen","Position":"Top","Default":false}));
+    var windowStateOption = getWindowStateOptionArray(parseParameter(parameters["WindowStateOption"], {"AddWindowState":"false","WindowStateOptionName":"Состояние окна","Position":"Top"}));
+    var messageSpeedOption = getMessageSpeedOptionArray(parseParameter(parameters["MessageSpeedOption"], {"AddMessageSpeed":false,"MessageSpeedOptionName":"Message speed","Position":"Top","MessageSpeedMax":10,"DefaultSpeed":10, "SpeedNames":[{"value":10, "name":"Instant"}], "SkipSpeedsWithoutNames":false}));
     var alwaysDashOption = parseAlwaysDashOption(parameters["AlwaysDashOption"] || "{\"addAlwaysDash\":\"true\",\"defaultStatusText\":\"true\",\"switchOnText\":\"\",\"switchOffText\":\"\"}");
     var showCommandRemember = parameters["Show 'Command Remember' option?"] == "true";
     var showTouchUI = parameters["Show 'Touch UI' option?"] == "true";
@@ -675,8 +676,17 @@
     setCustomOptionsDictionaries();
 
 //--------MY CODE:
+
     function getClamp(number, min, max) {
         return Math.min(Math.max(number, min), max);
+    }
+
+    function parseParameter(data, defaultValue) {
+        try {
+            return JSON.parse(data);
+        } catch {
+            return defaultValue;
+        }
     }
 
     function parsePluginParamArray(data) {
@@ -759,7 +769,7 @@
             if (Array.isArray(speedNamesArray)) {
                 for (let i = 0; i < speedNamesArray.length; ++i) {
                     const pair = JSON.parse(speedNamesArray[i]);
-                    speedNames[Number(pair.value)] = pair.name;
+                    speedNames[pair.value] = pair.name;
                 }
 
                 skipSpeedsWithoutNames = dict["SkipSpeedsWithoutNames"] == "true" && speedNamesArray.length > 0;
@@ -1042,7 +1052,7 @@
     Window_Options.prototype.statusText = function(index) {
         const symbol = this.commandSymbol(index);
         if (symbol == "messageSpeedVolume") {
-            const speedName = messageSpeedOption[6][messageSpeedValue];
+            const speedName = messageSpeedOption[6][String(messageSpeedValue)];
             return speedName ? speedName : messageSpeedValue;
         }
 
