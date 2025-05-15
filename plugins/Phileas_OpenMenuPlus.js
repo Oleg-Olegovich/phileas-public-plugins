@@ -17,6 +17,10 @@
  * If you use plugins that modify messages or choices,
  * then place Phileas_OpenMenuPlus under them in the plugins menu.
  * 
+ * Plugin features:
+ * - Correct processing of saves during a parallel event.
+ * - Restore the position of the choices window after loading.
+ * 
  *-----------------------------------------------------------------------------
  * 
  * You can always write to the author if you need other features or even plugins.
@@ -47,6 +51,10 @@
  * 
  * Если вы используете плагины, которые модифицируют сообщения или выборы,
  * то разместите Phileas_OpenMenuPlus под ними в меню плагинов.
+ * 
+ * Особенности плагина:
+ * - Корректная обработка сохранений во время параллельного события.
+ * - Восстановление положения окна выбора после загрузки.
  * 
  *-----------------------------------------------------------------------------
  *
