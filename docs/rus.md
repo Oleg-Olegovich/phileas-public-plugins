@@ -43,6 +43,7 @@
 #### Остальное
 | Название | Описание | Код | Форум |
 | --- | --- | --- | --- |
+| **Phileas's Audio Manager** | Расширение управления музыкой и звуком | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_AudioManager.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-audio-manager.1594) |
 | **Phileas's Custom Fonts** | Назначение кастомных шрифтов кастомным семействам шрифтов | [MV](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_CustomFonts_MV.js) [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_CustomFonts.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-custom-fonts.746) |
 | **Phileas's File Manager** | Кроссплатформенный менеджер файлов | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_FileManager.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-file-manager.1426) |
 | **Phileas's Movie Skipping** | Воспроизведение видео с опцией пропуска | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_MovieSkipping.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-movie-skipping.1349) |
