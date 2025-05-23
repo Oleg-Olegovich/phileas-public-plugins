@@ -43,7 +43,7 @@ Some of the plugins for MZ can work on MV. But I haven't tested it. Write to [me
 #### Others
 | Name | Description | Code | Forum |
 | --- | --- | --- | --- |
-| **Phileas's Audio Manager** | Enhanced music and sound management | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_AudioManager.js) | [Thread](https://forums.rpgmakerweb.com/index.php?threads/phileas-s-file-manager.177868/) |
+| **Phileas's Audio Manager** | Enhanced music and sound management | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_AudioManager.js) | [Thread](https://forums.rpgmakerweb.com/index.php?threads/phileas-s-audio-manager-enhanced-music-and-sound-management.177868/) |
 | **Phileas's Custom Fonts** | Assigns custom fonts to custom font families | [MV](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_CustomFonts_MV.js) [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_CustomFonts.js) | [Thread](https://forums.rpgmakerweb.com/index.php?threads/mz-phileass-custom-fonts.167944/) |
 | **Phileas's File Manager** | Cross-platform file manager | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_FileManager.js) | [Thread](https://forums.rpgmakerweb.com/index.php?threads/phileas-s-file-manager.175503/) |
 | **Phileas's Movie Skipping** | Movie playback with skip function | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_MovieSkipping.js) | [Thread](https://forums.rpgmakerweb.com/index.php?threads/mz-phileass-movie-skipping.174645/) |
