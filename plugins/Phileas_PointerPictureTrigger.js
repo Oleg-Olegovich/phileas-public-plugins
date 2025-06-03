@@ -15,6 +15,7 @@
 // 2024.September.25 Ver1.5.1 Fixed exit trigger
 // 2024.October.3 Ver1.5.2 Fixed alpha pixel check
 // 2024.October.24 Ver1.6.0 Added running the JS script
+// 2025.May.03 Ver1.6.1 Added API
 
 /*:
  * @target MZ
@@ -180,6 +181,16 @@
  * For example, you can assign two switches to one picture: to Enter and to Click.
  * 
  * After deleting an picture, all triggers associated with its number are also deleted.
+ * 
+ * You can also use the plugin API to invoke plugin commands through a script:
+ * Phileas_PointerPictureTrigger.assign(params)
+ * Phileas_PointerPictureTrigger.eraseAction(params)
+ * Phileas_PointerPictureTrigger.eraseAllAction(params)
+ * Phileas_PointerPictureTrigger.assignGlobal(params)
+ * Phileas_PointerPictureTrigger.eraseGlobal(params)
+ * Phileas_PointerPictureTrigger.eraseAllGlobal()
+ * Phileas_PointerPictureTrigger.disablePlugin()
+ * Phileas_PointerPictureTrigger.enablePlugin()
  *
  * You can always write to the author if you need support for other windows. Or if you need other features or even plugins.
  * Boosty: https://boosty.to/phileas
@@ -421,6 +432,16 @@
  * Например, можно на одну картинку назначить два переключателя: на Enter и на Click.
  *
  * После удаления картинки все привязанные к её номеру триггеры тоже удаляются.
+ * 
+ * Вы также можете использовать API плагина, чтобы вызывать команды плагина через скрипт:
+ * Phileas_PointerPictureTrigger.assign(params)
+ * Phileas_PointerPictureTrigger.eraseAction(params)
+ * Phileas_PointerPictureTrigger.eraseAllAction(params)
+ * Phileas_PointerPictureTrigger.assignGlobal(params)
+ * Phileas_PointerPictureTrigger.eraseGlobal(params)
+ * Phileas_PointerPictureTrigger.eraseAllGlobal()
+ * Phileas_PointerPictureTrigger.disablePlugin()
+ * Phileas_PointerPictureTrigger.enablePlugin()
  *
  * Вы всегда можете написать автору, если вам нужны другие функции или даже плагины.
  * Boosty: https://boosty.to/phileas
@@ -497,9 +518,13 @@
  * @default 0
  */
 
+const Phileas_PointerPictureTrigger = { };
+
 (function() {
 
-//--------MY CODE:    
+//-----------------------------------------------------------------------------
+// My code
+
     PluginManager.registerCommand("Phileas_PointerPictureTrigger", "assign", assignAction);
     PluginManager.registerCommand("Phileas_PointerPictureTrigger", "eraseAction", eraseAction);
     PluginManager.registerCommand("Phileas_PointerPictureTrigger", "eraseAllAction", eraseAllAction);
@@ -711,7 +736,20 @@
         return true;
     }
 
-//--------CHANGED CORE:
+//-----------------------------------------------------------------------------
+// API
+
+Phileas_PointerPictureTrigger.assign = assignAction;
+Phileas_PointerPictureTrigger.eraseAction = eraseAction;
+Phileas_PointerPictureTrigger.eraseAllAction = eraseAllAction;
+Phileas_PointerPictureTrigger.assignGlobal = assignGlobal;
+Phileas_PointerPictureTrigger.eraseGlobal = eraseGlobal;
+Phileas_PointerPictureTrigger.eraseAllGlobal = eraseAllGlobal;
+Phileas_PointerPictureTrigger.disablePlugin = disablePlugin;
+Phileas_PointerPictureTrigger.enablePlugin = enablePlugin;
+
+//-----------------------------------------------------------------------------
+// Modified code
 
     const Origin_onMouseEnter = Sprite_Picture.prototype.onMouseEnter;
     Sprite_Picture.prototype.onMouseEnter = function() {

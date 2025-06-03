@@ -18,6 +18,7 @@
 //                           Removed files parameter
 // 2025.March.15 Ver1.3.1 Added language selection menu text padding
 // 2025.April.06 Ver1.3.2 Added file filtering
+// 2025.May.06 Ver1.3.3 Fixed config loading
 
 /*:
  * @target MZ
@@ -1582,8 +1583,8 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
 
     const Origin_ConfigManager_applyData = ConfigManager.applyData;
     ConfigManager.applyData = function(config) {
-        Origin_ConfigManager_applyData.call(this, config);
         this.phileasLanguageIndex = config["phileasLanguageIndex"];
+        Origin_ConfigManager_applyData.call(this, config);
     };
 
     const Origin_TextManager_basic = TextManager.basic;
