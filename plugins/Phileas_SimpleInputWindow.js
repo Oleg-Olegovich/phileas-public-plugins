@@ -12,7 +12,8 @@
 // 2024.October.13 Ver1.2.2 Fixed the type of the "message" argument
 // 2025.January.02 Ver1.3.0 Added additional keys
 // 2025.January.06 Ver1.3.1 Fixed window without help message 
-// 2025.May.03 Ver1.3.2 Fixed russian keyboard 
+// 2025.June.03 Ver1.3.2 Fixed russian keyboard
+// 2025.June.07 Ver1.3.3 Fixed russian keyboard input
 
 /*:
  * @target MZ
@@ -492,22 +493,22 @@ const PHILEAS_KEYBOARD_ENGLISH_LOWERCASE =
 
 const PHILEAS_KEYBOARD_RUSSIAN_UPPERCASE =
     ["А", "Б", "В", "Г", "Д",
-     "Е", "Ё", "Ж", "З", "И",
-     "Й", "К", "Л", "М", "Н",
-     "О", "П", "Р", "С", "Т",
-     "У", "Ф","Х", "Ц", "Ч",
-     "Ш", "Щ", "Ъ", "Ы", "Ь",
-     "Э", "Ю", "Я", SPACE_CHAR,
+     "Е", "Ж", "З", "И", "Й",
+     "К", "Л", "М", "Н", "О",
+     "П", "Р", "С", "Т", "У",
+     "Ф","Х", "Ц", "Ч", "Ш",
+     "Щ", "Ъ", "Ы", "Ь", "Э",
+     "Ю", "Я", SPACE_CHAR, "Ё",
      BACKSPACE_CHAR, KEYBOARD_SWITCH_CHAR, CONFIRM_CHAR];
 
 const PHILEAS_KEYBOARD_RUSSIAN_LOWERCASE =
     ["а", "б", "в", "г", "д",
-     "е", "ё", "ж", "з", "и",
-     "й", "к", "л", "м", "н",
-     "о", "п", "р", "с", "т",
-     "у", "ф", "х", "ц", "ч",
-     "ш", "щ", "ъ", "ы", "ь",
-     "э", "ю", "я", SPACE_CHAR,
+     "е", "ж", "з", "и", "й",
+     "к", "л", "м", "н", "о",
+     "п", "р", "с", "т", "у",
+     "ф", "х", "ц", "ч", "ш",
+     "щ", "ъ", "ы", "ь", "э",
+     "ю", "я", SPACE_CHAR, "ё",
      BACKSPACE_CHAR, KEYBOARD_SWITCH_CHAR, CONFIRM_CHAR];
 
 const PHILEAS_KEYBOARD_JAPANESE =
@@ -917,7 +918,9 @@ Window_PhileasInput.prototype.character = function() {
         return;
     }
 
-    console.log(this._index, this._table.lengt);
+    if (this._language == "ru" && this._index == 33) {
+        return this._table[this._index];
+    }
 
     return this._index + 3 < this._table.length ? this._table[this._index] : "";
 };
