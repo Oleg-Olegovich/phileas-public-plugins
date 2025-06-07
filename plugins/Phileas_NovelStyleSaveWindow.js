@@ -4,6 +4,7 @@
 // [Update History]
 // 2025.May.09 Ver1.0.0 First Release
 // 2025.May.15 Ver1.0.1 Fixed encrypted game processing
+// 2025.June.07 Ver1.0.1 Fixed compatibility with the web environment.
 
 /*:
  * @target MZ
@@ -563,11 +564,16 @@
  
     async function saveScreenshot(savefileId) {
         const fileName = getFileName(savefileId);
-        const bitmap = getScreenshotBitmap();
-        const dataUrl = bitmap.canvas.toDataURL("image/png");
-        const base64Data = dataUrl.replace(/^data:image\/png;base64,/, "");
-        const buffer = Buffer.from(base64Data, "base64");
-        await Phileas_FileManager.writeFile(fileName, buffer);
+        const bitmap   = getScreenshotBitmap();
+        const dataURL  = bitmap.canvas.toDataURL("image/png");
+        const base64   = dataURL.split(",")[1];
+    
+        if (Utils.isNwjs()) {
+            const buffer = Buffer.from(base64, "base64");
+            await Phileas_FileManager.writeFile(fileName, buffer);
+        } else {
+            await Phileas_FileManager.writeFile(fileName, dataURL);
+        }
     }
  
     function loadScreenshot(savefileId) {
