@@ -4,7 +4,7 @@
 // [Update History]
 // 2025.May.09 Ver1.0.0 First Release
 // 2025.May.15 Ver1.0.1 Fixed encrypted game processing
-// 2025.June.07 Ver1.0.1 Fixed compatibility with the web environment
+// 2025.June.07 Ver1.0.2 Fixed compatibility with the web environment
 
 /*:
  * @target MZ
