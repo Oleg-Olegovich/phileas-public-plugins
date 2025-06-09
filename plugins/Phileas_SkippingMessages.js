@@ -415,7 +415,7 @@
         });
     }
 
-//--------CHANGED CORE:
+//--------MODIFIED CODE:
 
     if (skipUnseenFeatureEnabled) {
         const Origin_SceneManager_terminate = SceneManager.terminate;

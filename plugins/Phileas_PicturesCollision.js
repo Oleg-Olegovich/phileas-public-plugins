@@ -134,7 +134,7 @@
         $gameSwitches.setValue(resultSwitchId, result);
     }
 
-//--------CHANGED CORE:
+//--------MODIFIED CODE:
     Origin_SpriteInitialize = Sprite_Picture.prototype.initialize;
     Sprite_Picture.prototype.initialize = function(pictureId) {
         phileasCollisionPictures[pictureId] = this;

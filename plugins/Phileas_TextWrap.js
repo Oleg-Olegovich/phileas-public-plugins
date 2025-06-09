@@ -311,7 +311,7 @@
         $gameMessage._numLines = Math.floor(rect.height / lineHeight);
     };
 
-//--------CHANGED CORE:
+//--------MODIFIED CODE:
     
     const Origin_startMessage = Window_Message.prototype.startMessage;
     Window_Message.prototype.startMessage = function() {

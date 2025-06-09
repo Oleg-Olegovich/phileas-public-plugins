@@ -1374,7 +1374,7 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
     };
 
 
-//--------CHANGED CORE:
+//--------MODIFIED CODE:
 
 //-----------------------------------------------------------------------------
 // Core

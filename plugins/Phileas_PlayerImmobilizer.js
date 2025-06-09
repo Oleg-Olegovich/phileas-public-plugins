@@ -116,7 +116,7 @@
         stopPlayer = params["stopPlayer"] == "true";
     }
 
-//--------CHANGED CORE:
+//--------MODIFIED CODE:
     const Origin_setupNewGame = DataManager.setupNewGame;
     DataManager.setupNewGame = function() {
         Origin_setupNewGame.call(this);

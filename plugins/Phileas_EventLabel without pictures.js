@@ -454,7 +454,7 @@
         hidePhileasEventLabel(playerLabelWindow);
     }
 
-//--------CHANGED CORE:
+//--------MODIFIED CODE:
 
     const Origin_onMapLoaded = Scene_Map.prototype.onMapLoaded;
     Scene_Map.prototype.onMapLoaded = function() {

@@ -143,7 +143,7 @@
         restoreByKey(this, stateKey);
     };
 
-//--------CHANGED CORE:
+//--------MODIFIED CODE:
 
     const Origin_Game_Temp_initialize = Game_Temp.prototype.initialize;
     Game_Temp.prototype.initialize = function() {

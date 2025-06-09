@@ -475,7 +475,7 @@
         setHotKeysState(params["enableHotKeys"] != "true");
     }
 
-//--------CHANGED CORE:
+//--------MODIFIED CODE:
     
     const Origin_updateGamepadState = Input._updateGamepadState;
     Input._updateGamepadState = function(gamepad) {

@@ -1371,7 +1371,7 @@
         return false;
     };
 
-//--------CHANGED CORE:
+//--------MODIFIED CODE:
 
     const Origin_loaded = Scene_Boot.prototype.onDatabaseLoaded;
     Scene_Boot.prototype.onDatabaseLoaded = function() {

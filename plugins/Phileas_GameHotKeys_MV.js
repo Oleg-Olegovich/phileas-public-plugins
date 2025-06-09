@@ -458,7 +458,7 @@
         }
     }
 
-//--------CHANGED CORE:
+//--------MODIFIED CODE:
 
     const Origin_Game_Interpreter_pluginCommand = Game_Interpreter.prototype.pluginCommand;
     Game_Interpreter.prototype.pluginCommand = function(command, args) {

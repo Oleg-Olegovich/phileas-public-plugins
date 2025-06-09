@@ -943,7 +943,7 @@
         }
     };
 
-//--------CHANGED CORE:
+//--------MODIFIED CODE:
 
     Scene_Options.prototype.optionsWindowRect = function() {
         const n = Math.min(this.maxCommands(), this.maxVisibleCommands());

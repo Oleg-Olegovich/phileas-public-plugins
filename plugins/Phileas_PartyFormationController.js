@@ -155,7 +155,7 @@
         lockedPositions = JSON.parse(params["lockedPositions"]).map(element => parseInt(element, 10));
     }
     
-//--------CHANGED CORE:
+//--------MODIFIED CODE:
     const Origin_setupNewGame = DataManager.setupNewGame;
     DataManager.setupNewGame = function() {
         Origin_setupNewGame.call(this);

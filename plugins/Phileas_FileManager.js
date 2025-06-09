@@ -6,10 +6,11 @@
 // 2025.February.17 Ver1.0.1 Added read/write file methods
 // 2025.March.01 Ver1.0.2 Fixed read/write json file methods
 // 2025.April.23 Ver1.0.3 When writing a file, non-existent folders are created from its path
+// 2025.June.09 Ver1.1.0 Switched web storage from localStorage to IndexedDB (Web)
 
 /*:
  * @target MZ
- * @plugindesc 1.0.0 Cross-platform file manager
+ * @plugindesc 1.1.0 Cross-platform file manager
  * @author Phileas
  * 
  * @param updateStamp
@@ -75,7 +76,7 @@
 
 /*:ru
  * @target MZ
- * @plugindesc 1.0.0 Кроссплатформенный менеджер файлов
+ * @plugindesc 1.1.0 Кроссплатформенный менеджер файлов
  * @author Phileas
  * 
  * @param updateStamp
@@ -147,23 +148,78 @@
 function Phileas_FileManager() {
     throw new Error("This is a static class");
 }
- 
+
 Phileas_FileManager._stampFile = "data/FilesStamp.json";
 Phileas_FileManager._cache = {};
- 
+
 Phileas_FileManager._parameters = PluginManager.parameters("Phileas_FileManager");
-Phileas_FileManager._updateRequired = Phileas_FileManager._parameters["updateStamp"] == "true";
- 
+Phileas_FileManager._updateRequired = Phileas_FileManager._parameters["updateStamp"] === "true";
+
+Phileas_FileManager._openDb = function() {
+    if (this._db) {
+        return Promise.resolve(this._db);
+    }
+    
+    return new Promise((resolve, reject) => {
+        const req = indexedDB.open("RMMZ-Screenshots", 1);
+        req.onupgradeneeded = e => {
+            e.target.result.createObjectStore("files");
+        };
+        req.onsuccess = e => {
+            this._db = e.target.result;
+            resolve(this._db);
+        };
+        req.onerror = e => reject(e.target.error);
+    });
+};
+
+Phileas_FileManager.writeFileWeb = function(path, data) {
+    return this._openDb().then(db => new Promise((res, rej) => {
+        const tx = db.transaction("files", "readwrite");
+        tx.objectStore("files").put(data, path);
+        tx.oncomplete = () => {
+            console.log(`Saved file to IndexedDB: ${path}`);
+            res();
+        };
+        tx.onerror = e => rej(e.target.error);
+    }));
+};
+
+Phileas_FileManager.readFileWeb = function(path) {
+    return this._openDb().then(db => new Promise((res, rej) => {
+        const tx = db.transaction("files", "readonly");
+        const req = tx.objectStore("files").get(path);
+        req.onsuccess = () => {
+            if (req.result != null) {
+                res(req.result);
+            } else {
+                rej(new Error(`No entry for ${path}`));
+            }
+        };
+        req.onerror = e => rej(e.target.error);
+    }));
+};
+
+Phileas_FileManager.removeFileWeb = function(path) {
+    return this._openDb().then(db => new Promise((res, rej) => {
+        const tx = db.transaction("files", "readwrite");
+        tx.objectStore("files").delete(path);
+        tx.oncomplete = () => res();
+        tx.onerror = e => rej(e.target.error);
+    }));
+};
+// -----------------------------------------------
+
 Phileas_FileManager.scanFileSystem = async function() {
     if (!Utils.isNwjs() || !Phileas_FileManager._updateRequired) {
         return;
     }
- 
+
     const fs = require("fs");
     const path = require("path");
     const projectPath = path.dirname(process.mainModule.filename);
     const stampFile = path.join(projectPath, Phileas_FileManager._stampFile);
- 
+
     function scanDir(dir) {
         let result = {};
         fs.readdirSync(dir).forEach(file => {
@@ -174,15 +230,15 @@ Phileas_FileManager.scanFileSystem = async function() {
                 result[file] = true;
             }
         });
- 
+
         return result;
     }
- 
+
     const fileTree = scanDir(projectPath);
     fs.writeFileSync(stampFile, JSON.stringify(fileTree, null, 2));
     console.log("Phileas_FileManager: file scanning completed");
 };
- 
+
 Phileas_FileManager.loadCache = async function() {
     if (Utils.isNwjs()) {
         return;
@@ -201,7 +257,7 @@ Phileas_FileManager.loadCache = async function() {
         console.error("Phileas_FileManager: cache loading failed", error);
     }
 };
- 
+
 Phileas_FileManager.fileExistsSync = function(path) {
     if (Utils.isNwjs()) {
         const fs = require("fs");
@@ -220,7 +276,7 @@ Phileas_FileManager.fileExistsSync = function(path) {
  
     return true;
 };
- 
+
 Phileas_FileManager.getFilesInDirectoryNwJs = function(path) {
     const fs = require("fs");
     const pathModule = require("path");
@@ -246,8 +302,8 @@ Phileas_FileManager.getFilesInDirectoryNwJs = function(path) {
     }
  
     return scanDir(fullPath);
-}
- 
+};
+
 Phileas_FileManager.getFilesInDirectoryWeb = function(path) {
     const parts = path.split("/").filter(Boolean);
     let current = Phileas_FileManager._cache;
@@ -273,8 +329,8 @@ Phileas_FileManager.getFilesInDirectoryWeb = function(path) {
     }
  
     return collectFiles(current);
-}
- 
+};
+
 Phileas_FileManager.getFilesInDirectory = function(path) {
     return Utils.isNwjs()
         ? Phileas_FileManager.getFilesInDirectoryNwJs(path)
@@ -288,17 +344,10 @@ Phileas_FileManager.readFileNwJs = async function(path) {
     return fs.readFileSync(fullPath, "utf8");
 };
 
-Phileas_FileManager.readFileWeb = async function(path) {
-    const data = localStorage.getItem(path);
-    return data;
-};
-
 Phileas_FileManager.readFile = async function(path) {
-    if (Utils.isNwjs()) {
-        return Phileas_FileManager.readFileNwJs(path);
-    }
-
-    return Phileas_FileManager.readFileWeb(path);
+    return Utils.isNwjs()
+        ? Phileas_FileManager.readFileNwJs(path)
+        : Phileas_FileManager.readFileWeb(path);
 };
 
 Phileas_FileManager.readJsonFile = async function(path) {
@@ -316,114 +365,91 @@ Phileas_FileManager.writeFileNwJs = function(path, data) {
     console.log(`Saved file: ${path}`);
 };
 
-Phileas_FileManager.writeFileWeb = function(path, data) {
-    localStorage.setItem(path, data);
-    console.log(`Saved file to localStorage: ${path}`);
-};
-
 Phileas_FileManager.writeFile = async function(path, data) {
     if (Utils.isNwjs()) {
         Phileas_FileManager.writeFileNwJs(path, data);
-        return;
+    } else {
+        await Phileas_FileManager.writeFileWeb(path, data);
     }
-
-    Phileas_FileManager.writeFileWeb(path, data);
 };
 
 Phileas_FileManager.writeJsonFile = async function(path, data) {
     await Phileas_FileManager.writeFile(path, JSON.stringify(data));
 };
 
-Phileas_FileManager.downloadFile = function(path) {
+Phileas_FileManager.downloadFile = async function(path) {
     if (Utils.isNwjs()) {
-        console.warn("Phileas_FileManager.downloadFile method is only for the web environment");
+        console.warn("Phileas_FileManager.downloadFile is only for web builds");
         return;
     }
-
-    const data = localStorage.getItem(path);
-    if (!data) {
-        console.warn(`File not found in localStorage: ${path}`);
-        return;
+    try {
+        const data = await Phileas_FileManager.readFileWeb(path);
+        const blob = new Blob([data], { type: "application/json" });
+        const fileName = path.split("/").pop();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileName;
+        a.style.display = "none";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        console.log(`📂 File downloaded: ${fileName}`);
+    } catch (e) {
+        console.error(`Download failed for ${path}`, e);
     }
-
-    const blob = new Blob([data], { type: "application/json" });
-    const fileName = path.split("/").pop();
-
-    if (navigator.userAgent.toLowerCase().includes("android")) {
-        const fileReader = new FileReader();
-        fileReader.onload = function () {
-            const base64Data = fileReader.result.split(",")[1];
-            if (window.Android && window.Android.saveBase64File) {
-                window.Android.saveBase64File(fileName, base64Data);
-                console.log(`File saved on Android: /storage/emulated/0/Download/${fileName}`);
-            } else {
-                console.warn("Android API not found");
-                return;
-            }
-        };
-
-        fileReader.readAsDataURL(blob);
-        return;
-    }
-
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-
-    a.href = url;
-    a.download = fileName;
-    a.style.display = "none";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-
-    URL.revokeObjectURL(url);
-    console.log(`📂 File downloaded: ${a.download}`);
-    console.log(`📂 Expected save location: Downloads/${a.download}`);
 };
 
 Phileas_FileManager.importSaveFileWeb = function() {
     if (Utils.isNwjs()) {
-        console.warn("Phileas_FileManager.importSaveFile is only for the web environment");
+        console.warn("Phileas_FileManager.importSaveFile is only for web builds");
         return;
     }
-
     const input = document.createElement("input");
     input.type = "file";
     input.accept = ".rpgsave";
-
     input.onchange = function(event) {
         const file = event.target.files[0];
         if (!file) return;
-
         const reader = new FileReader();
-        reader.onload = function() {
+        reader.onload = () => {
             const fileName = file.name;
-            localStorage.setItem(fileName, reader.result);
-            console.log(`📂 Save file imported: ${fileName} (stored in localStorage)`);
+            Phileas_FileManager.writeFileWeb(fileName, reader.result)
+                .then(() => console.log(`📂 Save file imported: ${fileName} (stored in IndexedDB)`))
+                .catch(err => console.error("Import failed", err));
         };
         reader.readAsDataURL(file);
     };
-
     input.click();
+};
+
+Phileas_FileManager.importSaveFile = function() {
+    if (!navigator.userAgent.toLowerCase().includes("android")) {
+        Phileas_FileManager.importSaveFileWeb();
+    } else {
+        Phileas_FileManager.importSaveFileAndroid();
+    }
 };
 
 Phileas_FileManager.importSaveFileAndroid = function() {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = ".rpgsave";
-
-    input.onchange = function(event) {
+    input.onchange = event => {
         const file = event.target.files[0];
-        if (!file) return;
+        if (!file) {
+            return;
+        }
 
         const reader = new FileReader();
-        reader.onload = function() {
+        reader.onload = () => {
             const base64Data = reader.result.split(",")[1];
             const fileName = file.name;
 
             if (window.Android && window.Android.saveBase64File) {
                 window.Android.saveBase64File("save/" + fileName, base64Data);
-                console.log(`📂 Save file imported: /data/data/com.yourgame.app/files/save/${fileName}`);
+                console.log(`📂 Save file imported to Android: ${fileName}`);
             } else {
                 console.warn("Android API not found");
             }
@@ -434,21 +460,5 @@ Phileas_FileManager.importSaveFileAndroid = function() {
     input.click();
 };
 
-Phileas_FileManager.importSaveFile = function() {
-    if (Utils.isNwjs()) {
-        console.warn("Phileas_FileManager.importSaveFile is only for the web environment");
-        return;
-    }
-
-    if (!navigator.userAgent.toLowerCase().includes("android")) {
-        Phileas_FileManager.importSaveFileAndroid();
-        return;
-    }
-
-    Phileas_FileManager.importSaveFileWeb();
-};
-
- 
 Phileas_FileManager.scanFileSystem();
 Phileas_FileManager.loadCache();
- 

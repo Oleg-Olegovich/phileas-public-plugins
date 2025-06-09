@@ -6,10 +6,11 @@
 // 2025.May.15 Ver1.0.1 Fixed encrypted game processing
 // 2025.June.07 Ver1.0.2 Fixed compatibility with the web environment
 // 2025.June.09 Ver1.0.3 Fixed bitmap loading in the web environment
+// 2025.June.09 Ver1.0.4 Added bitmap compression
 
 /*:
  * @target MZ
- * @plugindesc 1.0.0 A novel-style save menu
+ * @plugindesc 1.0.3 A novel-style save menu
  * @author Phileas
  * 
  * @param screenshotSettings
@@ -131,7 +132,7 @@
  
 /*:ru
  * @target MZ
- * @plugindesc 1.0.0 Меню сохранений в стиле новеллы
+ * @plugindesc 1.0.3 Меню сохранений в стиле новеллы
  * @author Phileas
  *
  * @param screenshotSettings
@@ -284,9 +285,95 @@
         pageButtonSize: 48,
         pageButtonMargin: Number(parameters["pageButtonMargin"] || 8)
     };
+
+    let $windowItemSizes = null;
  
     let $page = 0;
+
+
+ //-----------------------------------------------------------------------------
+ // Main
+ 
+    function getFileName(savefileId) {
+        return $screenshotFolder + savefileId + ".png";
+    }
+ 
+    function getCropBitmapX(width) {
+        switch ($screenshotSettings.anchorX) {
+           case "left":
+              return 0;
+           case "right":
+              return width - $screenshotSettings.width;
+           case "middle":
+           default:
+              return (width - $screenshotSettings.width) / 2;
+        }
+    }
+ 
+    function getCropBitmapY(height) {
+        switch ($screenshotSettings.anchorX) {
+           case "top":
+              return 0;
+           case "bottom":
+              return height - $screenshotSettings.height;
+           case "middle":
+           default:
+              return (height - $screenshotSettings.height) / 2;
+        }
+    }
+ 
+    function getScreenshotBitmap() {
+        const bitmap = SceneManager._backgroundBitmap;
+ 
+        const startX = getCropBitmapX(bitmap.width);
+        const startY = getCropBitmapY(bitmap.height);
+ 
+        const cropBitmap = new Bitmap($screenshotSettings.width, $screenshotSettings.height);
+        cropBitmap.blt(bitmap, startX, startY, $screenshotSettings.width, $screenshotSettings.height, 0, 0);
+ 
+        return cropBitmap;
+    }
+ 
+    function scaleBitmap(bitmap, newWidth, newHeight) {
+        const result = new Bitmap(newWidth, newHeight);
+        const ctx = result.canvas.getContext("2d");
+        ctx.drawImage(bitmap.canvas, 0, 0, newWidth, newHeight);
+        return result;
+    }
+ 
+    async function saveScreenshot(savefileId) {
+        const fileName = getFileName(savefileId);
+        const bitmap   = getScreenshotBitmap();
+        const width = bitmap.width * ($windowItemSizes.height / bitmap.height);
+        const scaledBitmap = scaleBitmap(bitmap, width, $windowItemSizes.height);
+        const dataURL  = scaledBitmap.canvas.toDataURL("image/png");
+        const base64   = dataURL.split(",")[1];
     
+        if (Utils.isNwjs()) {
+            const buffer = Buffer.from(base64, "base64");
+            await Phileas_FileManager.writeFile(fileName, buffer);
+        } else {
+            await Phileas_FileManager.writeFile(fileName, dataURL);
+        }
+    }
+ 
+    function loadScreenshot(savefileId) {
+        return Bitmap.load(getFileName(savefileId));
+    }
+
+    function getWindowItemSizes() {
+        const padding = 12;
+		const helpAreaHeight = 36 + 12 * 2;
+        const innerHeight = Graphics.boxHeight - padding * 2 - 52 - helpAreaHeight;
+        const innerWidth = Graphics.boxWidth - padding * 2;
+
+        return {
+            width: Math.floor(innerWidth / $windowSettings.columns - padding * 2 - $windowSettings.spacing),
+            height: Math.floor(innerHeight / $windowSettings.rows - padding * 2 - $windowSettings.spacing)
+        };
+    }
+    
+
  //-----------------------------------------------------------------------------
  // Sprites
  
@@ -402,9 +489,7 @@
  // Windows
  
     Window_SavefileList.prototype.itemWidth = function() {
-        return Math.floor(this.innerWidth / $windowSettings.columns
-           - this.padding * 2 - $windowSettings.spacing
-        );
+        return $windowItemSizes.width;
     };
  
     Window_SavefileList.prototype.leftMargin = function() {
@@ -418,6 +503,7 @@
     Window_SavefileList.prototype.drawScreenshotBitmap = function(bitmap, rect) {
         const height = rect.height;
         const width = bitmap.width * (height / bitmap.height);
+
         const scaledBitmap = scaleBitmap(bitmap, width, height);
         const dw = Math.min(width, rect.width);
         const dh = Math.min(width, rect.height);
@@ -511,78 +597,16 @@
         const index = fileId - startIndex;
         this._listWindow.selectSavefile(index);
     };
- 
- 
- //-----------------------------------------------------------------------------
- // Main
- 
-    function getFileName(savefileId) {
-        return $screenshotFolder + savefileId + ".png";
-    }
- 
-    function getCropBitmapX(width) {
-        switch ($screenshotSettings.anchorX) {
-           case "left":
-              return 0;
-           case "right":
-              return width - $screenshotSettings.width;
-           case "middle":
-           default:
-              return (width - $screenshotSettings.width) / 2;
-        }
-    }
- 
-    function getCropBitmapY(height) {
-        switch ($screenshotSettings.anchorX) {
-           case "top":
-              return 0;
-           case "bottom":
-              return height - $screenshotSettings.height;
-           case "middle":
-           default:
-              return (height - $screenshotSettings.height) / 2;
-        }
-    }
- 
-    function getScreenshotBitmap() {
-        const bitmap = SceneManager._backgroundBitmap;
- 
-        const startX = getCropBitmapX(bitmap.width);
-        const startY = getCropBitmapY(bitmap.height);
- 
-        const cropBitmap = new Bitmap($screenshotSettings.width, $screenshotSettings.height);
-        cropBitmap.blt(bitmap, startX, startY, $screenshotSettings.width, $screenshotSettings.height, 0, 0);
- 
-        return cropBitmap;
-    }
- 
-    function scaleBitmap(bitmap, newWidth, newHeight) {
-        const result = new Bitmap(newWidth, newHeight);
-        const ctx = result.canvas.getContext("2d");
-        ctx.drawImage(bitmap.canvas, 0, 0, newWidth, newHeight);
-        return result;
-    }
- 
-    async function saveScreenshot(savefileId) {
-        const fileName = getFileName(savefileId);
-        const bitmap   = getScreenshotBitmap();
-        const dataURL  = bitmap.canvas.toDataURL("image/png");
-        const base64   = dataURL.split(",")[1];
-    
-        if (Utils.isNwjs()) {
-            const buffer = Buffer.from(base64, "base64");
-            await Phileas_FileManager.writeFile(fileName, buffer);
-        } else {
-            await Phileas_FileManager.writeFile(fileName, dataURL);
-        }
-    }
- 
-    function loadScreenshot(savefileId) {
-        return Bitmap.load(getFileName(savefileId));
-    }
- 
- //--------CHANGED CORE:
 
+ 
+ //--------MODIFIED CODE:
+
+    const Origin_Scene_Boot_adjustBoxSize = Scene_Boot.prototype.adjustBoxSize;
+    Scene_Boot.prototype.adjustBoxSize = function() {
+        Origin_Scene_Boot_adjustBoxSize.call(this);
+        $windowItemSizes = getWindowItemSizes();
+    };
+ 
     const Origin_Bitmap_startLoading = Bitmap.prototype._startLoading;
     Bitmap.prototype._startLoading = function() {
         if (!this._url.startsWith($screenshotFolder)) {
@@ -618,8 +642,7 @@
     };
  
     Window_SavefileList.prototype.itemHeight = function() {
-        return Math.floor(this.innerHeight / $windowSettings.rows
-           - this.padding * 2 - $windowSettings.spacing);
+        return $windowItemSizes.height;
     };
  
     Window_SavefileList.prototype.itemRect = function(index) {
