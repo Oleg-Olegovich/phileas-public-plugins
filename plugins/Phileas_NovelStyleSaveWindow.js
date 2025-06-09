@@ -5,6 +5,7 @@
 // 2025.May.09 Ver1.0.0 First Release
 // 2025.May.15 Ver1.0.1 Fixed encrypted game processing
 // 2025.June.07 Ver1.0.2 Fixed compatibility with the web environment
+// 2025.June.09 Ver1.0.3 Fixed bitmap loading in the web environment
 
 /*:
  * @target MZ
@@ -589,16 +590,25 @@
             return;
         }
 
+        if (Utils.isNwjs()) {
+            Origin_Bitmap_startLoading.call(this);
+            return;
+        }
+
         this._image = new Image();
-        this._image.onload = this._onLoad.bind(this);
+        this._image.onload  = this._onLoad.bind(this);
         this._image.onerror = this._onError.bind(this);
         this._destroyCanvas();
         this._loadingState = "loading";
-        this._image.src = this._url;
-        if (this._image.width > 0) {
-            this._image.onload = null;
-            this._onLoad();
-        }
+        Phileas_FileManager
+            .readFile(this._url)
+            .then(dataURL => {
+                this._image.src = dataURL;
+            })
+            .catch(error => {
+                console.error(`Не удалось загрузить скриншот ${this._url}:`, error);
+                this._onError();
+            });
     };
  
     const Origin_Window_SavefileList_initialize = Window_SavefileList.prototype.initialize;
