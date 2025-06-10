@@ -110,6 +110,7 @@
     function removeMouseMove() {
         document.removeEventListener("mousemove", handleMouseUpdateEvent);
         document.removeEventListener("mouseover", handleMouseUpdateEvent);
+        document.removeEventListener("touchstart", handleMouseUpdateEvent);
         document.removeEventListener("touchmove", handleMouseUpdateEvent);
     }
 
@@ -117,6 +118,7 @@
         const pf = { passive: false };
         document.addEventListener("mousemove", handleMouseUpdateEvent);
         document.addEventListener("mouseover", handleMouseUpdateEvent);
+        document.addEventListener("touchstart", handleMouseUpdateEvent, pf);
         document.addEventListener("touchmove", handleMouseUpdateEvent, pf);
     }
     
@@ -162,6 +164,10 @@
     }
     
     function handleMouseUpdateEvent(event) {
+        if (event.changedTouches) {
+            event = event.changedTouches[0];
+        }
+
         let x = Graphics.pageToCanvasX(event.pageX);
         let y = Graphics.pageToCanvasY(event.pageY);
         updateVariables(x, y);
