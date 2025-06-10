@@ -17,7 +17,7 @@
 // 2024.October.24 Ver1.6.0 Added running the JS script
 // 2025.May.03 Ver1.6.1 Added API
 // 2025.June.10 Ver1.6.2 Fixed russian commands
-// 2025.June.10 Ver1.7.0 Fixed the Exit trigger when ignoring transparent pixels.
+// 2025.June.10 Ver1.7.0 Fixed the Exit trigger when ignoring transparent pixels
 
 /*:
  * @target MZ
