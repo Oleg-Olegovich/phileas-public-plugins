@@ -25,6 +25,7 @@
 // 2025.May.14 Ver1.5.6 Fixed visible options number customization
 // 2025.May.15 Ver1.5.7 Fixed parameter parsing
 // 2025.May.15 Ver1.5.8 Added error descriptions
+// 2025.June.10 Ver1.5.9 Fixed config saving
 
 /*:
  * @target MZ
@@ -1149,9 +1150,12 @@
         config.screenHeight = ConfigManager["windowStateOption"] === true ? ConfigManager["windowHeight"] : undefined;
         config.windowState = ConfigManager["windowStateOption"] === true ? ConfigManager["windowState"] : undefined;
 
+        const switches = $gameSwitches ? $gameSwitches : new Game_Switches();
+        const variables = $gameVariables ? $gameVariables : new Game_Variables();
+
         for (let tag in customOptions) {
             let opt = customOptions[tag];
-            customOptions[tag].push(opt[0] ? $gameSwitches.value(opt[1]) : $gameVariables.value(opt[1]));
+            customOptions[tag].push(opt[0] ? switches.value(opt[1]) : variables.value(opt[1]));
         }
         
         config.phileasCustomOption = customOptions;
