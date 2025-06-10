@@ -17,6 +17,7 @@
 // 2024.October.24 Ver1.6.0 Added running the JS script
 // 2025.May.03 Ver1.6.1 Added API
 // 2025.June.10 Ver1.6.2 Fixed russian commands
+// 2025.June.10 Ver1.7.0 Fixed the Exit trigger when ignoring transparent pixels.
 
 /*:
  * @target MZ
@@ -268,7 +269,7 @@
  * @desc The value that will be assigned to the variable when the action is performed if the "Variable delta" is 0.
  * @default 0
  */
- 
+
 /*:ru
  * @target MZ
  * @plugindesc Срабатывание переключателя/переменной/общего события при действии указателя с картинкой
@@ -519,12 +520,14 @@
  * @default 0
  */
 
-const Phileas_PointerPictureTrigger = { };
+"use strict";
+
+const Phileas_PointerPictureTrigger = {};
 
 (function() {
 
-//-----------------------------------------------------------------------------
-// My code
+    //-----------------------------------------------------------------------------
+    // My code
 
     PluginManager.registerCommand("Phileas_PointerPictureTrigger", "assign", assignAction);
     PluginManager.registerCommand("Phileas_PointerPictureTrigger", "eraseAction", eraseAction);
@@ -537,7 +540,7 @@ const Phileas_PointerPictureTrigger = { };
 
     var globalPhileasPictureTrigger = {};
     var isPluginEnabled = true;
-    
+
     function getAct(params) {
         let switchData = {
             id: 0,
@@ -577,7 +580,7 @@ const Phileas_PointerPictureTrigger = { };
             variableData.delta = Number(data["variableDelta"]) || 0;
             variableData.exactValue = Number(data["variableExactValue"]) || 0;
         }
-        
+
         const pictureVariableId = Number(params["pictureVariableId"]);
         const commonEventId = Number(params["commonEventId"]);
         const runScript = params["runScript"];
@@ -602,12 +605,12 @@ const Phileas_PointerPictureTrigger = { };
             if (picture.phileasPictureTrigger == undefined) {
                 picture.phileasPictureTrigger = {};
             }
-            
+
             const action = params["action"];
             picture.phileasPictureTrigger[action] = getAct(params);
         }
     }
-    
+
     function eraseAction(params) {
         const pictureId = Number(params["pictureId"]) || 1;
         const action = params["action"];
@@ -620,7 +623,7 @@ const Phileas_PointerPictureTrigger = { };
             picture.phileasPictureTrigger[action] = undefined;
         }
     }
-    
+
     function eraseAllAction(params) {
         const pictureId = Number(params["pictureId"]) || 1;
         const picture = $gameScreen.picture(pictureId);
@@ -638,7 +641,7 @@ const Phileas_PointerPictureTrigger = { };
         const action = params["action"];
         globalPhileasPictureTrigger[action] = undefined;
     }
-    
+
     function eraseAllGlobal() {
         globalPhileasPictureTrigger = {};
     }
@@ -666,7 +669,7 @@ const Phileas_PointerPictureTrigger = { };
             const key = [act.selfSwitchData.mapId, act.selfSwitchData.eventId, act.selfSwitchData.id];
             $gameSelfSwitches.setValue(key, act.selfSwitchData.state);
         }
-        
+
         if (act.variableData.id != undefined && act.variableData.id > 0) {
             if (act.variableData.delta != undefined && act.variableData.delta != 0) {
                 const current = $gameVariables.value(act.variableData.id);
@@ -685,7 +688,7 @@ const Phileas_PointerPictureTrigger = { };
                 act.pictureVariableId,
                 pictureId);
         }
-        
+
         if (act.commonEventId != undefined) {
             $gameTemp.reserveCommonEvent(act.commonEventId);
         }
@@ -694,7 +697,7 @@ const Phileas_PointerPictureTrigger = { };
             eval(act.runScript);
         }
     }
-    
+
     function tryTrigger(pictureId, action) {
         if (!isPluginEnabled) {
             return;
@@ -705,52 +708,46 @@ const Phileas_PointerPictureTrigger = { };
         if (picture != undefined && picture.phileasPictureTrigger != undefined) {
             tryAct(picture.phileasPictureTrigger[action], pictureId);
         }
-        
+
         tryAct(globalPhileasPictureTrigger[action], pictureId);
     }
 
     function checkPixel(sprite, act) {
-        if (act == undefined) {
+        if (!act || !act.ignoreTransparentPixels) {
             return true;
         }
 
-        if (act.ignoreTransparentPixels === true) {
-            const touchPos = new Point(TouchInput.x, TouchInput.y);
-            const localPos = sprite.worldTransform.applyInverse(touchPos);
-            const bitmap = sprite._bitmap;
+        const touchPos = new Point(TouchInput.x, TouchInput.y);
+        const localPos = sprite.worldTransform.applyInverse(touchPos);
+        const bitmap = sprite._bitmap;
 
-            let x = localPos.x;
-            let y = localPos.y;
+        let x = localPos.x;
+        let y = localPos.y;
 
-            if (sprite._anchor.x == 0.5) {
-                x += sprite._frame.width / 2;
-                y += sprite._frame.height / 2;
-            }
-
-            const alpha = bitmap.getAlphaPixel(x, y);
-
-            if (alpha === 0) {
-                return false;
-            }
+        if (sprite._anchor.x == 0.5) {
+            x += sprite._frame.width / 2;
+            y += sprite._frame.height / 2;
         }
 
-        return true;
+        const alpha = bitmap.getAlphaPixel(x, y);
+
+        return alpha !== 0;
     }
 
-//-----------------------------------------------------------------------------
-// API
+    //-----------------------------------------------------------------------------
+    // API
 
-Phileas_PointerPictureTrigger.assign = assignAction;
-Phileas_PointerPictureTrigger.eraseAction = eraseAction;
-Phileas_PointerPictureTrigger.eraseAllAction = eraseAllAction;
-Phileas_PointerPictureTrigger.assignGlobal = assignGlobal;
-Phileas_PointerPictureTrigger.eraseGlobal = eraseGlobal;
-Phileas_PointerPictureTrigger.eraseAllGlobal = eraseAllGlobal;
-Phileas_PointerPictureTrigger.disablePlugin = disablePlugin;
-Phileas_PointerPictureTrigger.enablePlugin = enablePlugin;
+    Phileas_PointerPictureTrigger.assign = assignAction;
+    Phileas_PointerPictureTrigger.eraseAction = eraseAction;
+    Phileas_PointerPictureTrigger.eraseAllAction = eraseAllAction;
+    Phileas_PointerPictureTrigger.assignGlobal = assignGlobal;
+    Phileas_PointerPictureTrigger.eraseGlobal = eraseGlobal;
+    Phileas_PointerPictureTrigger.eraseAllGlobal = eraseAllGlobal;
+    Phileas_PointerPictureTrigger.disablePlugin = disablePlugin;
+    Phileas_PointerPictureTrigger.enablePlugin = enablePlugin;
 
-//-----------------------------------------------------------------------------
-// Modified code
+    //-----------------------------------------------------------------------------
+    // Modified code
 
     const Origin_onMouseEnter = Sprite_Picture.prototype.onMouseEnter;
     Sprite_Picture.prototype.onMouseEnter = function() {
@@ -784,45 +781,60 @@ Phileas_PointerPictureTrigger.enablePlugin = enablePlugin;
 
         const picture = $gameScreen.picture(this._pictureId);
 
-        if (picture == undefined || picture.phileasPictureTrigger == undefined
-            || picture.phileasPictureTrigger["Enter"] == undefined
-            && picture.phileasPictureTrigger["Exit"] == undefined
-            && picture.phileasPictureTrigger["Press"] == undefined
-            && picture.phileasPictureTrigger["Click"] == undefined) {
+        if (!picture || !picture.phileasPictureTrigger
+            || (!picture.phileasPictureTrigger.Enter
+                && !picture.phileasPictureTrigger.Exit
+                && !picture.phileasPictureTrigger.Press
+                && !picture.phileasPictureTrigger.Click)) {
 
             Origin_processTouch.call(this);
             return;
         }
-        
-        enterAct = picture.phileasPictureTrigger["Enter"];
-        exitAct = picture.phileasPictureTrigger["Exit"];
-        pressAct = picture.phileasPictureTrigger["Press"];
-        clickAct = picture.phileasPictureTrigger["Click"];
 
-        if (this.isClickEnabled()) {
-            if (this.isBeingTouched()) {
-                if (!this._hovered && TouchInput.isHovered() && checkPixel(this, enterAct)) {
-                    this._hovered = true;
-                    this.onMouseEnter();
-                }
-                if (TouchInput.isTriggered() && checkPixel(this, pressAct)) {
-                    this._pressed = true;
-                    this.onPress();
-                }
-            } else {
-                if (this._hovered && (exitAct == undefined || checkPixel(this, exitAct))) {
-                    this.onMouseExit();
-                }
-                this._pressed = false;
-                this._hovered = false;
-            }
-            if (this._pressed && TouchInput.isReleased() && checkPixel(this, clickAct)) {
-                this._pressed = false;
-                this.onClick();
-            }
-        } else {
-            this._pressed = false;
+        const enterAct = picture.phileasPictureTrigger.Enter;
+        const exitAct = picture.phileasPictureTrigger.Exit;
+        const pressAct = picture.phileasPictureTrigger.Press;
+        const clickAct = picture.phileasPictureTrigger.Click;
+
+        if (!this.isClickEnabled()) {
             this._hovered = false;
+            this._pressed = false;
+            delete this._prevExitArea;
+            return;
+        }
+
+        const isInside        = this.isBeingTouched();
+        const nowOverEnter    = isInside && checkPixel(this, enterAct);
+        const nowOverExitArea = exitAct === undefined
+            ? isInside
+            : (isInside && checkPixel(this, exitAct));
+
+        if (!this._hovered && nowOverEnter && TouchInput.isHovered()) {
+            this._hovered = true;
+            this.onMouseEnter();
+        }
+
+        if (this._prevExitArea === undefined) {
+            this._prevExitArea = nowOverExitArea;
+        } else if (this._prevExitArea && !nowOverExitArea) {
+            this._hovered = false;
+            this.onMouseExit();
+        }
+
+        this._prevExitArea = nowOverExitArea;
+
+        if (TouchInput.isTriggered() && checkPixel(this, pressAct)) {
+            this._pressed = true;
+            this.onPress();
+        }
+
+        if (this._pressed && TouchInput.isReleased() && checkPixel(this, clickAct)) {
+            this._pressed = false;
+            this.onClick();
+        }
+
+        if (!TouchInput.isPressed()) {
+            this._pressed = false;
         }
     };
 
@@ -842,14 +854,14 @@ Phileas_PointerPictureTrigger.enablePlugin = enablePlugin;
     };
 
     const Origin_setupNewGame = DataManager.setupNewGame;
-    DataManager.setupNewGame = function () {
+    DataManager.setupNewGame = function() {
         Origin_setupNewGame.call(this);
         isPluginEnabled = true;
         globalPhileasPictureTrigger = {};
     };
 
     const Origin_makeSaveContents = DataManager.makeSaveContents;
-    DataManager.makeSaveContents = function () {
+    DataManager.makeSaveContents = function() {
         let contents = Origin_makeSaveContents.call(this);
         contents.phileasIsPointerPictureTriggerEnabled = isPluginEnabled;
         contents.globalPhileasPictureTrigger = globalPhileasPictureTrigger;
@@ -857,7 +869,7 @@ Phileas_PointerPictureTrigger.enablePlugin = enablePlugin;
     };
 
     const Origin_extractSaveContents = DataManager.extractSaveContents;
-    DataManager.extractSaveContents = function (contents) {
+    DataManager.extractSaveContents = function(contents) {
         Origin_extractSaveContents.call(this, contents);
         isPluginEnabled = contents.phileasIsPointerPictureTriggerEnabled == undefined
             ? true
