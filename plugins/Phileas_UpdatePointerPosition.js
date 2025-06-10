@@ -10,7 +10,7 @@
 
 /*:
  * @target MZ
- * @plugindesc 
+ * @plugindesc v1.2.0
  * @author Phileas
  *
  * @param isEnabledDefault
@@ -55,7 +55,7 @@
  
 /*:ru
  * @target MZ
- * @plugindesc 
+ * @plugindesc  v1.2.0
  * @author Phileas
  *
  * @param isEnabledDefault

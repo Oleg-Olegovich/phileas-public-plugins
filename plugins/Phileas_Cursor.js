@@ -22,7 +22,7 @@
 
 /*:
  * @target MZ
- * @plugindesc Advanced cursor configuration
+ * @plugindesc v1.3.10 Advanced cursor configuration
  * @author Phileas
  *
  * @param basicCursors
@@ -364,7 +364,7 @@
 
 /*:ru
  * @target MZ
- * @plugindesc Расширенная конфигурация курсора
+ * @plugindesc v1.3.10 Расширенная конфигурация курсора
  * @author Phileas
  *
  * @param basicCursors

@@ -10,7 +10,7 @@
 
 /*:
  * @target MZ
- * @plugindesc The plugin allows to skip messages by pressing any key
+ * @plugindesc v1.3.0 The plugin allows to skip messages by pressing any key
  * @author Phileas
  *
  * @param Default skip key
@@ -130,7 +130,7 @@
  
 /*:ru
  * @target MZ
- * @plugindesc Плагин позволяет пропускать сообщения нажатием любой клавиши
+ * @plugindesc v1.3.0 Плагин позволяет пропускать сообщения нажатием любой клавиши
  * @author Phileas
  *
  * @param Default skip key

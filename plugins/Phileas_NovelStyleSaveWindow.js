@@ -10,7 +10,7 @@
 
 /*:
  * @target MZ
- * @plugindesc 1.0.3 A novel-style save menu
+ * @plugindesc v1.0.4 A novel-style save menu
  * @author Phileas
  * 
  * @param screenshotSettings
@@ -132,7 +132,7 @@
  
 /*:ru
  * @target MZ
- * @plugindesc 1.0.3 Меню сохранений в стиле новеллы
+ * @plugindesc v1.0.4 Меню сохранений в стиле новеллы
  * @author Phileas
  *
  * @param screenshotSettings

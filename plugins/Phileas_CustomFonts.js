@@ -6,7 +6,7 @@
 
 /*:
  * @target MZ
- * @plugindesc Assigns custom fonts to custom font families
+ * @plugindesc v1.0.0 Assigns custom fonts to custom font families
  * @author Phileas
  *
  * @param fonts
@@ -41,7 +41,7 @@
 
 /*:ru
  * @target MZ
- * @plugindesc Назначает кастомные шрифты кастомным семействам шрифтов
+ * @plugindesc v1.0.0 Назначает кастомные шрифты кастомным семействам шрифтов
  * @author Phileas
  *
  * @param fonts

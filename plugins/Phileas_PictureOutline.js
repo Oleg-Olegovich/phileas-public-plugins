@@ -12,7 +12,7 @@
 
 /*:
  * @target MZ
- * @plugindesc Clear picture outlines
+ * @plugindesc v1.2.1 Clear picture outlines
  * @author Phileas
  *
  * @command set
@@ -170,7 +170,7 @@
  
 /*:ru
  * @target MZ
- * @plugindesc Чёткие обводки картинок
+ * @plugindesc v1.2.1 Чёткие обводки картинок
  * @author Phileas
  *
  * @command set

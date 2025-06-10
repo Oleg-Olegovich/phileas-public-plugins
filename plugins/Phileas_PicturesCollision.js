@@ -6,7 +6,7 @@
 
 /*:
  * @target MZ
- * @plugindesc Picture collision search
+ * @plugindesc v1.0.0 Picture collision search
  * @author Phileas
  *
  * @command isColliding
@@ -49,7 +49,7 @@
  
 /*:ru
  * @target MZ
- * @plugindesc Поиск коллизии картинок
+ * @plugindesc v1.0.0 Поиск коллизии картинок
  * @author Phileas
  *
  * @command isColliding

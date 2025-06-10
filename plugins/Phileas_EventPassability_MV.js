@@ -6,7 +6,7 @@
 
 /*:
  * @target MV
- * @plugindesc Advanced event passability settings
+ * @plugindesc v1.0.0 Advanced event passability settings
  * @author Phileas
  *
  * 
@@ -31,7 +31,7 @@
  
 /*:ru
  * @target MV
- * @plugindesc Расширенная настройка проходимости событий
+ * @plugindesc v1.0.0 Расширенная настройка проходимости событий
  * @author Phileas
  *
  * 

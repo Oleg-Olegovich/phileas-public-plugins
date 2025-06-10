@@ -17,7 +17,7 @@
 
 /*:
  * @target MZ
- * @plugindesc Minimalistic input of names and variables
+ * @plugindesc v1.3.3 Minimalistic input of names and variables
  * @author Phileas
  *
  * @command nameInput
@@ -244,7 +244,7 @@
 
 /*:ru
  * @target MZ
- * @plugindesc Минималистичный ввод имён и переменных
+ * @plugindesc v1.3.3 Минималистичный ввод имён и переменных
  * @author Phileas
  *
  * @command nameInput

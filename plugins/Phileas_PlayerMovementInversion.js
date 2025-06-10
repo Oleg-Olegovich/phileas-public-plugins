@@ -8,7 +8,7 @@
 
 /*:
  * @target MZ
- * @plugindesc Inverts the player's movement control
+ * @plugindesc v1.1.1 Inverts the player's movement control
  * @author Phileas
  *
  * @param saveState
@@ -47,7 +47,7 @@
  
 /*:ru
  * @target MZ
- * @plugindesc Инверсирует управление движением игрока
+ * @plugindesc v1.1.1 Инверсирует управление движением игрока
  * @author Phileas
  *
  * @param saveState

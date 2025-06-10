@@ -7,7 +7,7 @@
 
 /*:
  * @target MZ
- * @plugindesc Customize the destination sprite
+ * @plugindesc v1.0.1 Customize the destination sprite
  * @author Phileas
  *
  * @param type
@@ -128,7 +128,7 @@
  
 /*:ru
  * @target MZ
- * @plugindesc Кастомизация спрайта назначения
+ * @plugindesc v1.0.1 Кастомизация спрайта назначения
  * @author Phileas
  *
  * @param type

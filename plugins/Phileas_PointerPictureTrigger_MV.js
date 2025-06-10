@@ -6,7 +6,7 @@
 
 /*:
  * @target MV
- * @plugindesc Triggering of the switch/variable/common event when the pointer acts with the picture
+ * @plugindesc v1.0.0 Triggering of the switch/variable/common event when the pointer acts with the picture
  * @author Phileas
  *
  * @help
@@ -78,7 +78,7 @@
 
 /*:ru
  * @target MV
- * @plugindesc Срабатывание переключателя/переменной/общего события при действии указателя с картинкой
+ * @plugindesc v1.0.0 Срабатывание переключателя/переменной/общего события при действии указателя с картинкой
  * @author Phileas
  * 
  * @help

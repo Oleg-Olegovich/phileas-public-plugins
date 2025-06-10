@@ -11,7 +11,7 @@
 
 /*:
  * @target MV
- * @plugindesc Assigns common events and switches to keyboard, gamepad, and mouse keys
+ * @plugindesc v1.2.0 Assigns common events and switches to keyboard, gamepad, and mouse keys
  * @author Phileas
  *
  * @param Common events
@@ -153,7 +153,7 @@
  
 /*:ru
  * @target MZ
- * @plugindesc Назначает общие события и переключатели на клавиши клавиатуры, геймпада и мыши
+ * @plugindesc v1.2.0 Назначает общие события и переключатели на клавиши клавиатуры, геймпада и мыши
  * @author Phileas
  *
  * @param Common events

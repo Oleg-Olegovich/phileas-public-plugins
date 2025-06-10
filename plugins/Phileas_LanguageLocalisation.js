@@ -22,7 +22,7 @@
 
 /*:
  * @target MZ
- * @plugindesc 1.3.0 Language localizations of text in the game
+ * @plugindesc v1.3.3 Language localizations of text in the game
  * @author Phileas
  * 
  * @param option
@@ -349,7 +349,7 @@
 
 /*:ru
  * @target MZ
- * @plugindesc 1.3.0 Языковые локализации текста в игре
+ * @plugindesc v1.3.3 Языковые локализации текста в игре
  * @author Phileas
  * 
  * @param option

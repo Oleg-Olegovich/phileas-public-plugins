@@ -11,7 +11,7 @@
 
 /*:
  * @target MZ
- * @plugindesc Customization of the size and position of message and choice lists windows
+ * @plugindesc v1.3.0 Customization of the size and position of message and choice lists windows
  * @author Phileas
  *
  * @param messageWindowWidth
@@ -152,7 +152,7 @@
  
 /*:ru
  * @target MZ
- * @plugindesc Кастомизация размера и положения окон сообщений и списков выбора
+ * @plugindesc v1.3.0 Кастомизация размера и положения окон сообщений и списков выбора
  * @author Phileas
  *
  * @param messageWindowWidth

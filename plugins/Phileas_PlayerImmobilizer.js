@@ -9,7 +9,7 @@
 
 /*:
  * @target MZ
- * @plugindesc Prohibit the player's movement
+ * @plugindesc v1.2.0 Prohibit the player's movement
  * @author Phileas
  *
  * @param Movement switch
@@ -56,7 +56,7 @@
  
 /*:ru
  * @target MZ
- * @plugindesc Запретить движение чаракта игрока
+ * @plugindesc v1.2.0 Запретить движение чаракта игрока
  * @author Phileas
  *
  * @param Movement switch

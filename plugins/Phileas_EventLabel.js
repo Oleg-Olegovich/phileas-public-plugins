@@ -17,7 +17,7 @@
 
 /*:
  * @target MZ
- * @plugindesc Labels above map events
+ * @plugindesc v1.4.0 Labels above map events
  * @author Phileas
  *
  * @param Draw by default
@@ -303,7 +303,7 @@
 
 /*:ru
  * @target MZ
- * @plugindesc Надписи над событиями карты
+ * @plugindesc v1.4.0 Надписи над событиями карты
  * @author Phileas
  *
  * @param Draw by default

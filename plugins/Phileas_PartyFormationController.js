@@ -7,7 +7,7 @@
 
 /*:
  * @target MZ
- * @plugindesc Managing the swap of actors
+ * @plugindesc v1.0.1 Managing the swap of actors
  * @author Phileas
  *
  * @param enableSwitch
@@ -70,7 +70,7 @@
  
 /*:ru
  * @target MZ
- * @plugindesc Управление перестановкой героев
+ * @plugindesc v1.0.1 Управление перестановкой героев
  * @author Phileas
  *
  * @param enableSwitch

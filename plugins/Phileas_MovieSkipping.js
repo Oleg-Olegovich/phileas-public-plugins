@@ -8,7 +8,7 @@
 
 /*:
  * @target MZ
- * @plugindesc Movie playback with skip function
+ * @plugindesc v1.0.2 Movie playback with skip function
  * @author Phileas
  *
  * @command playMovie
@@ -161,7 +161,7 @@
  
 /*:ru
  * @target MZ
- * @plugindesc Воспроизведение видео с опцией пропуска
+ * @plugindesc v1.0.2 Воспроизведение видео с опцией пропуска
  * @author Phileas
  *
  * @command playMovie

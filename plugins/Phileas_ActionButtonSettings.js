@@ -6,7 +6,7 @@
 
 /*:
  * @target MZ
- * @plugindesc Customization of action (OK) button features
+ * @plugindesc v1.0.0 Customization of action (OK) button features
  * @author Phileas
  *
  * @command disableFastForward
@@ -53,7 +53,7 @@
  
 /*:ru
  * @target MZ
- * @plugindesc Кастомизация функций кнопки действия (OK)
+ * @plugindesc v1.0.0 Кастомизация функций кнопки действия (OK)
  * @author Phileas
  *
  * @command disableFastForward

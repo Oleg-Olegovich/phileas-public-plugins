@@ -2,12 +2,12 @@
 // Phileas_FullscreenOption.js
 //=============================================================================
 // [Update History]
-// 2023.June.18 Ver1.1.0 The parameter value is updated when f4 is pressed.
 // 2023.March.05 Ver1.0.0 First Release
+// 2023.June.18 Ver1.1.0 The parameter value is updated when f4 is pressed.
 
 /*:
  * @target MZ
- * @plugindesc Adds a fullscreen option to the Options window.
+ * @plugindesc v1.1.0 (deprecated) Adds a fullscreen option to the Options window
  * @author Phileas
  *
  * @param Option name

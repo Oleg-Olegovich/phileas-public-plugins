@@ -8,7 +8,7 @@
 
 /*:
  * @target MZ
- * @plugindesc Controls the movement of the player and events
+ * @plugindesc v1.0.2 Controls the movement of the player and events
  * @author Phileas
  *
  * @param playerMovementSwitch
@@ -90,7 +90,7 @@
  
 /*:ru
  * @target MZ
- * @plugindesc Контроль движения игрока и событий
+ * @plugindesc v1.0.2 Контроль движения игрока и событий
  * @author Phileas
  *
  * @param playerMovementSwitch

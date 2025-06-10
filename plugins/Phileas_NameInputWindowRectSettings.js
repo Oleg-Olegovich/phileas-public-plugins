@@ -6,7 +6,7 @@
 
 /*:
  * @target MZ
- * @plugindesc Allows you to set custom name input window sizes and coordinates.
+ * @plugindesc v1.0.0 Allows you to set custom name input window sizes and coordinates.
  * @author Phileas
  *
  * @param nameWindowWidth
@@ -56,7 +56,7 @@
  
 /*:ru
  * @target MZ
- * @plugindesc Позволяет задать пользовательские размеры и координаты окна ввода имени.
+ * @plugindesc v1.0.0 Позволяет задать пользовательские размеры и координаты окна ввода имени.
  * @author Phileas
  *
  * @param nameWindowWidth

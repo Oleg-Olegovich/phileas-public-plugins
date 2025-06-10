@@ -15,7 +15,7 @@
 
 /*:
  * @target MZ
- * @plugindesc Automatic text wrapping.
+ * @plugindesc v1.1.6 Automatic text wrapping.
  * @author Phileas
  *
  * @command getWrappedText

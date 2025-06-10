@@ -29,7 +29,7 @@
 
 /*:
  * @target MZ
- * @plugindesc v1.5.6 Configures the options menu, adds an unlimited number of custom options
+ * @plugindesc v1.5.9 Configures the options menu, adds an unlimited number of custom options
  * @author Phileas
  *
  * @param Options
@@ -140,7 +140,7 @@
  
 /*:ru
  * @target MZ
- * @plugindesc v1.5.6 Настраивает меню опций, добавляет неограниченное количество пользовательских опций
+ * @plugindesc v1.5.9 Настраивает меню опций, добавляет неограниченное количество пользовательских опций
  * @author Phileas
  *
  * @param Options

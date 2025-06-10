@@ -9,7 +9,7 @@
 
 /*:
  * @target MV
- * @plugindesc 
+ * @plugindesc v.1.1.2
  * @author Phileas
  *
  * @param isEnabledDefault
@@ -52,7 +52,7 @@
  
 /*:ru
  * @target MV
- * @plugindesc 
+ * @plugindesc v.1.1.2
  * @author Phileas
  *
  * @param isEnabledDefault
