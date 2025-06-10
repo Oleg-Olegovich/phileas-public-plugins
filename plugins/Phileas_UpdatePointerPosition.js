@@ -6,6 +6,7 @@
 // 2024.December.31 Ver1.1.0
 // 2025.January.01 Ver1.1.1
 // 2025.February.27 Ver1.1.2 Fixed disabling
+// 2025.June.10 Ver1.2.0 Fixed compatibility with the web environment
 
 /*:
  * @target MZ
@@ -105,10 +106,22 @@
     var updateSwitch = Number(parameters["updateSwitch"] || 0);
     
     PluginManager.registerCommand("Phileas_UpdatePointerPosition", "switchPlugin", switchPluginByCommand);
-    
-    if (isEnabled) {
+
+    function removeMouseMove() {
+        document.removeEventListener("mousemove", handleMouseUpdateEvent);
+        document.removeEventListener("mouseover", handleMouseUpdateEvent);
+        document.removeEventListener("touchmove", handleMouseUpdateEvent);
+    }
+
+    function setMouseMove() {
+        const pf = { passive: false };
         document.addEventListener("mousemove", handleMouseUpdateEvent);
         document.addEventListener("mouseover", handleMouseUpdateEvent);
+        document.addEventListener("touchmove", handleMouseUpdateEvent, pf);
+    }
+    
+    if (isEnabled) {
+        setMouseMove();
     }
     
     function switchPlugin(newValue) {
@@ -118,13 +131,11 @@
         
         isEnabled = !isEnabled;
         if (isEnabled) {
-            document.addEventListener("mousemove", handleMouseUpdateEvent);
-            document.addEventListener("mouseover", handleMouseUpdateEvent);
+            setMouseMove();
             return;
         }
         
-        document.removeEventListener("mousemove", handleMouseUpdateEvent);
-        document.removeEventListener("mouseover", handleMouseUpdateEvent);
+        removeMouseMove();
     }
 
     function switchPluginByCommand(params) {
