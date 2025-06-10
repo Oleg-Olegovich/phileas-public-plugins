@@ -16,6 +16,7 @@
 // 2024.October.3 Ver1.5.2 Fixed alpha pixel check
 // 2024.October.24 Ver1.6.0 Added running the JS script
 // 2025.May.03 Ver1.6.1 Added API
+// 2025.June.10 Ver1.6.2 Fixed russian commands
 
 /*:
  * @target MZ
@@ -406,7 +407,7 @@
  * @option Click
  * @default Enter
  *
- * @command eraseAllAction
+ * @command eraseAllGlobal
  * @text Удалить все глобальные действия
  * @desc Удаляет привязки ко всем глобальным действиям.
  * 
