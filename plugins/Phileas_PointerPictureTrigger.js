@@ -18,6 +18,7 @@
 // 2025.May.03 Ver1.6.1 Added API
 // 2025.June.10 Ver1.6.2 Fixed russian commands
 // 2025.June.10 Ver1.7.0 Fixed the Exit trigger when ignoring transparent pixels
+// 2025.June.11 Ver1.7.1 Fixed touch processing for global triggers
 
 /*:
  * @target MZ
@@ -781,20 +782,33 @@ const Phileas_PointerPictureTrigger = {};
 
         const picture = $gameScreen.picture(this._pictureId);
 
-        if (!picture || !picture.phileasPictureTrigger
-            || (!picture.phileasPictureTrigger.Enter
-                && !picture.phileasPictureTrigger.Exit
-                && !picture.phileasPictureTrigger.Press
-                && !picture.phileasPictureTrigger.Click)) {
-
+        if (!picture) {
             Origin_processTouch.call(this);
             return;
         }
 
-        const enterAct = picture.phileasPictureTrigger.Enter;
-        const exitAct = picture.phileasPictureTrigger.Exit;
-        const pressAct = picture.phileasPictureTrigger.Press;
-        const clickAct = picture.phileasPictureTrigger.Click;
+        const pictureTrigger = picture.phileasPictureTrigger || {};
+        const globalTrigger = globalPhileasPictureTrigger || {};
+
+
+        const enterAct = pictureTrigger.Enter;
+        const exitAct = pictureTrigger.Exit;
+        const pressAct = pictureTrigger.Press;
+        const clickAct = pictureTrigger.Click;
+        const globalEnterAct = globalTrigger.Enter;
+        const globalExitAct = globalTrigger.Exit;
+        const globalPressAct = globalTrigger.Press;
+        const globalClickAct = globalTrigger.Click;
+
+        const anyEnter = !!(enterAct || globalEnterAct);
+        const anyExit  = !!(exitAct  || globalExitAct);
+        const anyPress = !!(pressAct || globalPressAct);
+        const anyClick = !!(clickAct || globalClickAct);
+
+        if (!anyEnter && !anyExit && !anyPress && !anyClick) {
+            Origin_processTouch.call(this);
+            return;
+        }
 
         if (!this.isClickEnabled()) {
             this._hovered = false;
@@ -804,31 +818,41 @@ const Phileas_PointerPictureTrigger = {};
         }
 
         const isInside        = this.isBeingTouched();
-        const nowOverEnter    = isInside && checkPixel(this, enterAct);
-        const nowOverExitArea = exitAct === undefined
-            ? isInside
-            : (isInside && checkPixel(this, exitAct));
+        const nowOverEnter    = isInside
+            && ((enterAct   && checkPixel(this, enterAct))
+            || (globalEnterAct && checkPixel(this, globalEnterAct))
+        );
+        const nowOverExitArea = isInside && (
+            (exitAct        && checkPixel(this, exitAct))
+            || (globalExitAct  && checkPixel(this, globalExitAct))
+        );
 
-        if (!this._hovered && nowOverEnter && TouchInput.isHovered()) {
+        if (!this._hovered && anyEnter && nowOverEnter && TouchInput.isHovered()) {
             this._hovered = true;
             this.onMouseEnter();
         }
 
         if (this._prevExitArea === undefined) {
             this._prevExitArea = nowOverExitArea;
-        } else if (this._prevExitArea && !nowOverExitArea) {
+        } else if (this._prevExitArea && anyExit && !nowOverExitArea) {
             this._hovered = false;
             this.onMouseExit();
         }
 
         this._prevExitArea = nowOverExitArea;
 
-        if (TouchInput.isTriggered() && checkPixel(this, pressAct)) {
+        if (TouchInput.isTriggered() && anyPress
+            && ((pressAct   && checkPixel(this, pressAct))
+            || (globalPressAct && checkPixel(this, globalPressAct))
+        )) {
             this._pressed = true;
             this.onPress();
         }
 
-        if (this._pressed && TouchInput.isReleased() && checkPixel(this, clickAct)) {
+        if (this._pressed && TouchInput.isReleased() && anyClick
+            && ((clickAct   && checkPixel(this, clickAct))
+            || (globalClickAct && checkPixel(this, globalClickAct))
+        )) {
             this._pressed = false;
             this.onClick();
         }
@@ -874,6 +898,6 @@ const Phileas_PointerPictureTrigger = {};
         isPluginEnabled = contents.phileasIsPointerPictureTriggerEnabled == undefined
             ? true
             : contents.phileasIsPointerPictureTriggerEnabled;
-        globalPhileasPictureTrigger = contents.globalPhileasPictureTrigger;
+        globalPhileasPictureTrigger = contents.globalPhileasPictureTrigger || {};
     };
 }());
