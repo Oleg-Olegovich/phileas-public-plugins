@@ -19,10 +19,11 @@
 // 2025.June.10 Ver1.6.2 Fixed russian commands
 // 2025.June.10 Ver1.7.0 Fixed the Exit trigger when ignoring transparent pixels
 // 2025.June.11 Ver1.7.1 Fixed touch processing for global triggers
+// 2025.June.12 Ver1.7.2 Fixed click trigger
 
 /*:
  * @target MZ
- * @plugindesc v1.7.0 Triggering of the switch/variable/common event when the pointer acts with the picture
+ * @plugindesc v1.7.2 Triggering of the switch/variable/common event when the pointer acts with the picture
  * @author Phileas, ZX_Lost_Soul
  *
  * @command assign
@@ -273,7 +274,7 @@
 
 /*:ru
  * @target MZ
- * @plugindesc v1.7.0 Срабатывание переключателя/переменной/общего события при действии указателя с картинкой
+ * @plugindesc v1.7.2 Срабатывание переключателя/переменной/общего события при действии указателя с картинкой
  * @author Phileas, ZX_Lost_Soul
  *
  * @command assign
@@ -790,7 +791,6 @@ const Phileas_PointerPictureTrigger = {};
         const pictureTrigger = picture.phileasPictureTrigger || {};
         const globalTrigger = globalPhileasPictureTrigger || {};
 
-
         const enterAct = pictureTrigger.Enter;
         const exitAct = pictureTrigger.Exit;
         const pressAct = pictureTrigger.Press;
@@ -813,46 +813,54 @@ const Phileas_PointerPictureTrigger = {};
         if (!this.isClickEnabled()) {
             this._hovered = false;
             this._pressed = false;
+            delete this._prevEnterArea;
             delete this._prevExitArea;
             return;
         }
 
         const isInside        = this.isBeingTouched();
         const nowOverEnter    = isInside
-            && ((enterAct   && checkPixel(this, enterAct))
-            || (globalEnterAct && checkPixel(this, globalEnterAct))
+            && ((!!enterAct      && checkPixel(this, enterAct))
+            || (!!globalEnterAct && checkPixel(this, globalEnterAct))
         );
-        const nowOverExitArea = isInside && (
-            (exitAct        && checkPixel(this, exitAct))
-            || (globalExitAct  && checkPixel(this, globalExitAct))
+        const nowOverExitArea = isInside
+            && ((!!exitAct      && checkPixel(this, exitAct))
+            || (!!globalExitAct && checkPixel(this, globalExitAct))
         );
 
-        if (!this._hovered && anyEnter && nowOverEnter && TouchInput.isHovered()) {
+        if (this._prevEnterArea === undefined) {
+            this._prevEnterArea = nowOverEnter;
+        }
+
+        if (!this._prevEnterArea && anyEnter && nowOverEnter) {
             this._hovered = true;
             this.onMouseEnter();
         }
 
-        if (this._prevExitArea === undefined) {
-            this._prevExitArea = nowOverExitArea;
-        } else if (this._prevExitArea && anyExit && !nowOverExitArea) {
+        this._prevEnterArea = nowOverEnter;
+
+        if (this._prevExitArea && anyExit && !nowOverExitArea) {
             this._hovered = false;
             this.onMouseExit();
         }
 
         this._prevExitArea = nowOverExitArea;
 
-        if (TouchInput.isTriggered() && anyPress
-            && ((pressAct   && checkPixel(this, pressAct))
-            || (globalPressAct && checkPixel(this, globalPressAct))
-        )) {
+        const hitPressArea = (!!pressAct && checkPixel(this, pressAct))
+                    || (!!globalPressAct && checkPixel(this, globalPressAct));
+
+        const hitClickArea = (!!clickAct && checkPixel(this, clickAct))
+                      || (!!globalClickAct  && checkPixel(this, globalClickAct));
+
+        if (TouchInput.isTriggered() && ((anyPress && hitPressArea) || (anyClick && hitClickArea))) {
             this._pressed = true;
-            this.onPress();
+
+            if (hitPressArea) {
+                this.onPress();
+            }
         }
 
-        if (this._pressed && TouchInput.isReleased() && anyClick
-            && ((clickAct   && checkPixel(this, clickAct))
-            || (globalClickAct && checkPixel(this, globalClickAct))
-        )) {
+        if (this._pressed && TouchInput.isReleased() && anyClick && hitClickArea) {
             this._pressed = false;
             this.onClick();
         }
