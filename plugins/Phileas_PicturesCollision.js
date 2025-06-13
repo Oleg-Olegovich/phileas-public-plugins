@@ -3,10 +3,11 @@
 //=============================================================================
 // [Update History]
 // 2024.March.10 Ver1.0.0 First Release
+// 2025.June.13 Ver1.1.0 Added a collision check with ignoring transparent pixels
 
 /*:
  * @target MZ
- * @plugindesc v1.0.0 Picture collision search
+ * @plugindesc v1.1.0 Picture collision search
  * @author Phileas
  *
  * @command isColliding
@@ -24,6 +25,11 @@
  * @arg resultSwitchId
  * @text Result switch ID
  * @type switch
+ * 
+ * @arg ignoreTransparentPixels
+ * @text Ignore transparent pixels
+ * @type boolean
+ * @default true
  * 
  * @help
  * Allows you to determine if 2 pictures intersect.
@@ -49,7 +55,7 @@
  
 /*:ru
  * @target MZ
- * @plugindesc v1.0.0 Поиск коллизии картинок
+ * @plugindesc v1.1.0 Поиск коллизии картинок
  * @author Phileas
  *
  * @command isColliding
@@ -67,6 +73,11 @@
  * @arg resultSwitchId
  * @text ID переключателя результата
  * @type switch
+ * 
+ * @arg ignoreTransparentPixels
+ * @text Игнорировать прозрачные пиксели
+ * @type boolean
+ * @default true
  * 
  * @help
  * Позволяет определить пересекаются ли 2 картинки.
@@ -118,18 +129,132 @@
           return true;
     }
 
-    function isColliding(params) {
-        const firstPictureId = Number(params["firstPictureId"]);
-        const secondPictureId = Number(params["secondPictureId"]);
-        const resultSwitchId = Number(params["resultSwitchId"]);
-        
+    function isRegularPicturesColliding(firstPictureId, secondPictureId) {
         const firstBounds = phileasCollisionPictures[firstPictureId]._bounds;
         const secondBounds = phileasCollisionPictures[secondPictureId]._bounds;
         
         const rect1 = makeRect(firstBounds.minX, firstBounds.minY, firstBounds.maxX, firstBounds.maxY);
         const rect2 = makeRect(secondBounds.minX, secondBounds.minY, secondBounds.maxX, secondBounds.maxY);
         
-        const result = isRectColliding(rect1, rect2);
+        return isRectColliding(rect1, rect2);
+    }
+
+    function ensureContext(bitmap) {
+        if (!bitmap._context) {
+            const canvas = document.createElement('canvas');
+            canvas.width  = bitmap.width;
+            canvas.height = bitmap.height;
+            const context = canvas.getContext('2d');
+
+            const src = bitmap._image
+                || (bitmap.baseTexture
+                    && bitmap.baseTexture.resource 
+                    && bitmap.baseTexture.resource.source);
+            if (src) {
+                context.drawImage(src, 0, 0);
+            }
+
+            bitmap._canvas  = canvas;
+            bitmap._context = context;
+        }
+        return bitmap._context;
+    }
+
+    function isPixelColliding(firstSprite, secondSprite) {
+        const firstBitmap = firstSprite.bitmap;
+        const secondBitmap = secondSprite.bitmap;
+        if (!firstBitmap || !firstBitmap.isReady() || !secondBitmap || !secondBitmap.isReady()) {
+            return false;
+        }
+
+        const b1 = firstSprite.getBounds();
+        const b2 = secondSprite.getBounds();
+
+        const left   = Math.max(b1.x, b2.x);
+        const right  = Math.min(b1.x + b1.width, b2.x + b2.width);
+        const top    = Math.max(b1.y, b2.y);
+        const bottom = Math.min(b1.y + b1.height, b2.y + b2.height);
+
+        const startX = Math.floor(left);
+        const endX   = Math.ceil(right);
+        const startY = Math.floor(top);
+        const endY   = Math.ceil(bottom);
+
+        if (endX <= startX || endY <= startY) {
+            return false;
+        }
+
+        const ax1 = firstSprite.anchor.x * firstBitmap.width;
+        const ay1 = firstSprite.anchor.y * firstBitmap.height;
+        const ax2 = secondSprite.anchor.x * secondBitmap.width;
+        const ay2 = secondSprite.anchor.y * secondBitmap.height;
+
+        const inv1   = new PIXI.Point();
+        const inv2   = new PIXI.Point();
+        const global = new PIXI.Point();
+
+        const ctx1 = ensureContext(firstBitmap);
+        const ctx2 = ensureContext(secondBitmap);
+
+        const sampleStep = 0.5;
+
+        for (let x = startX; x < endX; x += sampleStep) {
+            for (let y = startY; y < endY; y += sampleStep) {
+                global.set(x, y);
+
+                firstSprite.worldTransform.applyInverse(global, inv1);
+                const px1 = Math.floor(inv1.x + ax1);
+                const py1 = Math.floor(inv1.y + ay1);
+                
+                if (px1 < 0 || py1 < 0 || px1 >= firstBitmap.width || py1 >= firstBitmap.height) {
+                    continue;
+                }
+                
+                const pixel1 = ctx1.getImageData(px1, py1, 1, 1).data;
+                if (pixel1[3] < 128) {
+                    continue;
+                }
+
+                secondSprite.worldTransform.applyInverse(global, inv2);
+                const px2 = Math.floor(inv2.x + ax2);
+                const py2 = Math.floor(inv2.y + ay2);
+                
+                if (px2 < 0 || py2 < 0 || px2 >= secondBitmap.width || py2 >= secondBitmap.height) {
+                    continue;
+                }
+                
+                const pixel2 = ctx2.getImageData(px2, py2, 1, 1).data;
+                if (pixel2[3] < 128) {
+                    continue;
+                }
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    function isIrregularPicturesColliding(firstPictureId, secondPictureId) {
+        if (!isRegularPicturesColliding(firstPictureId, secondPictureId)) {
+            return false;
+        }
+
+        const firstSprite = phileasCollisionPictures[firstPictureId];
+        const secondSprite = phileasCollisionPictures[secondPictureId];
+
+        return isPixelColliding(firstSprite, secondSprite);
+    }
+
+    function isColliding(params) {
+        const firstPictureId = Number(params["firstPictureId"]);
+        const secondPictureId = Number(params["secondPictureId"]);
+        const resultSwitchId = Number(params["resultSwitchId"]);
+        const ignoreTransparentPixels = params["ignoreTransparentPixels"] == "true";
+        
+        const result = ignoreTransparentPixels
+            ? isIrregularPicturesColliding(firstPictureId, secondPictureId)
+            : isRegularPicturesColliding(firstPictureId, secondPictureId);
         
         $gameSwitches.setValue(resultSwitchId, result);
     }
