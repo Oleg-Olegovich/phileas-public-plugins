@@ -20,6 +20,7 @@
 // 2025.June.10 Ver1.7.0 Fixed the Exit trigger when ignoring transparent pixels
 // 2025.June.11 Ver1.7.1 Fixed touch processing for global triggers
 // 2025.June.12 Ver1.7.2 Fixed click trigger
+// 2025.June.13 Ver1.7.3 Fixed touch processing
 
 /*:
  * @target MZ
@@ -819,14 +820,14 @@ const Phileas_PointerPictureTrigger = {};
         }
 
         const isInside        = this.isBeingTouched();
-        const nowOverEnter    = isInside
-            && ((!!enterAct      && checkPixel(this, enterAct))
-            || (!!globalEnterAct && checkPixel(this, globalEnterAct))
-        );
-        const nowOverExitArea = isInside
-            && ((!!exitAct      && checkPixel(this, exitAct))
-            || (!!globalExitAct && checkPixel(this, globalExitAct))
-        );
+        const nowOverEnter = !anyEnter
+            ? isInside
+            : isInside && ((!!enterAct && checkPixel(this, enterAct))
+                || (!!globalEnterAct && checkPixel(this, globalEnterAct)));
+        const nowOverExitArea = !anyExit
+            ? isInside
+            : isInside && ((!!exitAct && checkPixel(this, exitAct))
+                || (!!globalExitAct && checkPixel(this, globalExitAct)));
 
         if (this._prevEnterArea === undefined) {
             this._prevEnterArea = nowOverEnter;
