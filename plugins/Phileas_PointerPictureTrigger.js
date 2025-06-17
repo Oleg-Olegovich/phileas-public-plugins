@@ -21,10 +21,11 @@
 // 2025.June.11 Ver1.7.1 Fixed touch processing for global triggers
 // 2025.June.12 Ver1.7.2 Fixed click trigger
 // 2025.June.13 Ver1.7.3 Fixed touch processing
+// 2025.June.16 Ver1.7.4 Fixed touch processing (again)
 
 /*:
  * @target MZ
- * @plugindesc v1.7.2 Triggering of the switch/variable/common event when the pointer acts with the picture
+ * @plugindesc v1.7.4 Triggering of the switch/variable/common event when the pointer acts with the picture
  * @author Phileas, ZX_Lost_Soul
  *
  * @command assign
@@ -275,7 +276,7 @@
 
 /*:ru
  * @target MZ
- * @plugindesc v1.7.2 Срабатывание переключателя/переменной/общего события при действии указателя с картинкой
+ * @plugindesc v1.7.4 Срабатывание переключателя/переменной/общего события при действии указателя с картинкой
  * @author Phileas, ZX_Lost_Soul
  *
  * @command assign
@@ -715,11 +716,7 @@ const Phileas_PointerPictureTrigger = {};
         tryAct(globalPhileasPictureTrigger[action], pictureId);
     }
 
-    function checkPixel(sprite, act) {
-        if (!act || !act.ignoreTransparentPixels) {
-            return true;
-        }
-
+    function checkPixel(sprite) {
         const touchPos = new Point(TouchInput.x, TouchInput.y);
         const localPos = sprite.worldTransform.applyInverse(touchPos);
         const bitmap = sprite._bitmap;
@@ -735,6 +732,10 @@ const Phileas_PointerPictureTrigger = {};
         const alpha = bitmap.getAlphaPixel(x, y);
 
         return alpha !== 0;
+    }
+
+    function checkPixelByAct(isPixelOpaque, act) {
+        return !!act && (!act.ignoreTransparentPixels || isPixelOpaque);
     }
 
     //-----------------------------------------------------------------------------
@@ -819,51 +820,63 @@ const Phileas_PointerPictureTrigger = {};
             return;
         }
 
-        const isInside        = this.isBeingTouched();
+        const isInside = this.isBeingTouched();
+        const isPixelOpaque = isInside && checkPixel(this);
+        const isTriggered = TouchInput.isTriggered();
+        const isReleased = TouchInput.isReleased();
+     
         const nowOverEnter = !anyEnter
             ? isInside
-            : isInside && ((!!enterAct && checkPixel(this, enterAct))
-                || (!!globalEnterAct && checkPixel(this, globalEnterAct)));
+            : isInside && (checkPixelByAct(isPixelOpaque, enterAct) || checkPixelByAct(isPixelOpaque, globalEnterAct));
         const nowOverExitArea = !anyExit
             ? isInside
-            : isInside && ((!!exitAct && checkPixel(this, exitAct))
-                || (!!globalExitAct && checkPixel(this, globalExitAct)));
+            : isInside && (checkPixelByAct(isPixelOpaque, exitAct) || checkPixelByAct(isPixelOpaque, globalExitAct));
 
         if (this._prevEnterArea === undefined) {
             this._prevEnterArea = nowOverEnter;
         }
 
-        if (!this._prevEnterArea && anyEnter && nowOverEnter) {
+        if (!this._prevEnterArea && nowOverEnter) {
             this._hovered = true;
-            this.onMouseEnter();
+
+            if (anyEnter) {
+                this.onMouseEnter();
+            }
         }
 
         this._prevEnterArea = nowOverEnter;
 
-        if (this._prevExitArea && anyExit && !nowOverExitArea) {
+        if (this._prevExitArea && !nowOverExitArea) {
             this._hovered = false;
-            this.onMouseExit();
+
+            if (anyExit) {
+                this.onMouseExit();
+            }
         }
 
         this._prevExitArea = nowOverExitArea;
 
-        const hitPressArea = (!!pressAct && checkPixel(this, pressAct))
-                    || (!!globalPressAct && checkPixel(this, globalPressAct));
+        const hitPressArea = !anyPress
+            ? isInside
+            : isInside && (checkPixelByAct(isPixelOpaque, pressAct) || checkPixelByAct(isPixelOpaque, globalPressAct));
+        const hitClickArea = !anyClick
+            ? isInside
+            : isInside && (checkPixelByAct(isPixelOpaque, clickAct) || checkPixelByAct(isPixelOpaque, globalClickAct));
 
-        const hitClickArea = (!!clickAct && checkPixel(this, clickAct))
-                      || (!!globalClickAct  && checkPixel(this, globalClickAct));
-
-        if (TouchInput.isTriggered() && ((anyPress && hitPressArea) || (anyClick && hitClickArea))) {
+        if (isTriggered && (hitPressArea || hitClickArea)) {
             this._pressed = true;
 
-            if (hitPressArea) {
+            if (hitPressArea && anyPress) {
                 this.onPress();
             }
         }
 
-        if (this._pressed && TouchInput.isReleased() && anyClick && hitClickArea) {
+        if (this._pressed && isReleased && hitClickArea) {
             this._pressed = false;
-            this.onClick();
+
+            if (anyClick) {
+                this.onClick();
+            }
         }
 
         if (!TouchInput.isPressed()) {
