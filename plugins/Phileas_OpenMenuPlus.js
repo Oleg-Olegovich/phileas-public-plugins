@@ -3,6 +3,7 @@
 //=============================================================================
 // [Update History]
 // 2025.May.11 Ver1.0.0 First Release
+// 2025.July.12 Ver1.0.1 Fixed checking for third-party plugins
 
 /*:
  * @target MZ
@@ -79,7 +80,9 @@
 
 //--------MY CODE:
 
-    var $savedStates = {};
+    let $savedStates = {};
+    const isImportedDefined = typeof Imported !== "undefined";
+    
 
     function extract(interpreter) {
         if (!interpreter) {
@@ -273,7 +276,7 @@
         }
     }
 
-    if (Imported && Imported.Galv_VisualNovelChoices) {
+    if (isImportedDefined && Imported.Galv_VisualNovelChoices) {
         const Origin_Window_ChoiceList_drawItem = Window_ChoiceList.prototype.drawItem 
         Window_ChoiceList.prototype.drawItem = function(index) {
             if (!this.choice_background){
@@ -284,7 +287,7 @@
         };
     }
     
-    if (Imported && Imported["SumRndmDde Title Command Customizer"]) {
+    if (isImportedDefined && Imported["SumRndmDde Title Command Customizer"]) {
         const Origin_Scene_Title_createMessageWindow = Scene_Title.prototype.createMessageWindow
         Scene_Title.prototype.createMessageWindow = function() {
             $gameMessage.clear();
