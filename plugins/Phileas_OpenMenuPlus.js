@@ -7,7 +7,7 @@
 
 /*:
  * @target MZ
- * @plugindesc v1.0.0 Open the menu during event processing (messages&choices)
+ * @plugindesc v1.0.1 Open the menu during event processing (messages&choices)
  * @author Phileas
  *
  * 
@@ -41,7 +41,7 @@
  
 /*:ru
  * @target MZ
- * @plugindesc v1.0.0 Открывает меню во время обработки событий (сообщения&выборы)
+ * @plugindesc v1.0.1 Открывает меню во время обработки событий (сообщения&выборы)
  * @author Phileas
  * 
  *
