@@ -5,6 +5,7 @@
 // 2025.January.12 Ver1.0.0 First Release
 // 2025.January.16 Ver1.0.1 Added command with blacklist
 // 2025.January.19 Ver1.0.2 Fixed command with blacklist
+// 2025.July.18 Ver1.1.0 Added confirmation window
 
 /*:
  * @target MZ
@@ -26,6 +27,12 @@
  * @option mp4
  * @default webm
  * 
+ * @arg isConfirmationRequired
+ * @text Is confirmation required?
+ * @desc Request confirmation of skipping a video?
+ * @type boolean
+ * @default false
+ * 
  *
  * @command playMovieSpecificKey
  * @text Play Movie (specific skip key)
@@ -41,6 +48,12 @@
  * @option webm
  * @option mp4
  * @default webm
+ * 
+ * @arg isConfirmationRequired
+ * @text Is confirmation required?
+ * @desc Request confirmation of skipping a video?
+ * @type boolean
+ * @default false
  *
  * @arg keyboardNumbers
  * @text Keyboard key numbers
@@ -90,6 +103,12 @@
  * @option webm
  * @option mp4
  * @default webm
+ * 
+ * @arg isConfirmationRequired
+ * @text Is confirmation required?
+ * @desc Request confirmation of skipping a video?
+ * @type boolean
+ * @default false
  *
  * @arg keyboardNumbers
  * @text Except keyboard key numbers
@@ -179,6 +198,12 @@
  * @option mp4
  * @default webm
  * 
+ * @arg isConfirmationRequired
+ * @text Требуется подтверждение?
+ * @desc Запросить подтверждение о пропуске видео?
+ * @type boolean
+ * @default false
+ * 
  *
  * @command playMovieSpecificKey
  * @text Воспроизвести видео (конкретная клавиша пропуска)
@@ -194,6 +219,12 @@
  * @option webm
  * @option mp4
  * @default webm
+ * 
+ * @arg isConfirmationRequired
+ * @text Требуется подтверждение?
+ * @desc Запросить подтверждение о пропуске видео?
+ * @type boolean
+ * @default false
  *
  * @arg keyboardNumbers
  * @text Номера клавиш клавиатуры
@@ -243,6 +274,12 @@
  * @option webm
  * @option mp4
  * @default webm
+ * 
+ * @arg isConfirmationRequired
+ * @text Требуется подтверждение?
+ * @desc Запросить подтверждение о пропуске видео?
+ * @type boolean
+ * @default false
  *
  * @arg keyboardNumbers
  * @text Кроме номеров клавиш клавиатуры
@@ -318,6 +355,175 @@
 
 //--------MY CODE:
 
+//-----------------------------------------------------------------------------
+// Confirmation scene
+
+    function Scene_SkipConfirmation() {
+        this.initialize(...arguments);
+    }
+
+    Scene_SkipConfirmation.prototype = Object.create(Scene_Base.prototype);
+    Scene_SkipConfirmation.prototype.constructor = Scene_SkipConfirmation;
+
+    Scene_SkipConfirmation.prototype.initialize = function() {
+        Scene_Base.prototype.initialize.call(this);
+    };
+
+    Scene_SkipConfirmation.prototype.create = function() {
+        Scene_Base.prototype.create.call(this);
+        this.createBackground();
+        this.createWindowLayer();
+        this.createHelpWindow();
+        this.createCommandWindow();
+
+        Video._element.pause();
+        Video._updateVisibility(false);
+        try {
+            PluginManager.callCommand(this, "Phileas_Cursor", "show");
+        } catch {};
+    };
+
+    Scene_SkipConfirmation.prototype.getBitmapFromCurrentVideoFrame = function() {
+        const video = Video._element;
+        if (!video || video.readyState < 2) {
+            return null;
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const dataURL = canvas.toDataURL();
+        return Bitmap.load(dataURL);
+    }
+
+    Scene_SkipConfirmation.prototype.createBackground = function() {
+        this._backgroundSprite = new Sprite();
+        this._backgroundSprite.bitmap = this.getBitmapFromCurrentVideoFrame();
+        this.addChild(this._backgroundSprite);
+        this.setBackgroundOpacity(192);
+    };
+
+    Scene_SkipConfirmation.prototype.setBackgroundOpacity = function(opacity) {
+        this._backgroundSprite.opacity = opacity;
+    };
+
+    Scene_SkipConfirmation.prototype.update = function() {
+        if (!this.isBusy()) {
+            this._commandWindow.open();
+        }
+
+        Scene_Base.prototype.update.call(this);
+    };
+
+    Scene_SkipConfirmation.prototype.isBusy = function() {
+        return (
+            this._commandWindow.isClosing() ||
+            Scene_Base.prototype.isBusy.call(this)
+        );
+    };
+
+    Scene_SkipConfirmation.prototype.helpWindowRect = function() {
+        const ww = this.mainCommandWidth() * 2;
+        const wh = this.calcWindowHeight(1, true);
+        const wx = (Graphics.boxWidth - ww) / 2;
+        const wy = Graphics.boxHeight / 2 - wh;
+        return new Rectangle(wx, wy, ww, wh);
+    };
+
+    Scene_SkipConfirmation.prototype.createHelpWindow = function() {
+        const rect = this.helpWindowRect();
+        this._helpWindow = new Window_Help(rect);
+        this._helpWindow.setText("Пропустить видео?");
+        this.addWindow(this._helpWindow);
+    };
+
+    Scene_SkipConfirmation.prototype.commandWindowRect = function() {
+        const ww = this._helpWindow.width;
+        const wh = this._helpWindow.height;
+        const wx = this._helpWindow.x;
+        const wy = this._helpWindow.y + wh;
+        return new Rectangle(wx, wy, ww, wh);
+    };
+
+    Scene_SkipConfirmation.prototype.maxLabelWidth = function() {
+        const calcWindow = new Window_Base(new Rectangle(0, 0, Graphics.boxWidth, Graphics.boxHeight));
+        let maxWidth = 0;
+
+        for (const language of $languages) {
+            const textWidth = calcWindow.textSizeEx(language.label).width;
+            const choiceWidth = Math.ceil(textWidth) + $languageSelectionTextPadding;
+
+            if (maxWidth < choiceWidth) {
+                maxWidth = choiceWidth;
+            }
+        }
+
+        return maxWidth;
+    };
+
+    Scene_SkipConfirmation.prototype.createCommandWindow = function() {
+        const rect = this.commandWindowRect();
+        this._commandWindow = new Window_SkipCommand(rect);
+        this._commandWindow.setHandler("ok", this.okHandler.bind(this));
+        this._commandWindow.setHandler("cancel", this.cancelHandler.bind(this));
+        this.addWindow(this._commandWindow);
+    };
+
+    Scene_SkipConfirmation.prototype.okHandler = function() {
+        this.closeScene();
+        stopMovie();
+        removeAllHandlers();
+    };
+
+    Scene_SkipConfirmation.prototype.cancelHandler = function() {
+        Video._updateVisibility(true);
+        this.closeScene();
+        Video._element.play();
+    };
+
+    Scene_SkipConfirmation.prototype.closeScene = function() {
+        this._commandWindow.close();
+        this.popScene();
+    };
+
+
+    function Window_SkipCommand() {
+        this.initialize(...arguments);
+    }
+    
+    Window_SkipCommand.prototype = Object.create(Window_Command.prototype);
+    Window_SkipCommand.prototype.constructor = Window_SkipCommand;
+    
+    Window_SkipCommand.prototype.initialize = function(rect) {
+        Window_Command.prototype.initialize.call(this, rect);
+        this.openness = 0;
+        this._lastCommandSymbol = 0;
+    };
+
+    Window_SkipCommand.initCommandPosition = function() {
+        this._lastCommandSymbol = 0;
+    };
+    
+    Window_SkipCommand.prototype.makeCommandList = function() {
+        this.addCommand("Да", "ok");
+        this.addCommand("Нет", "cancel");
+    };
+
+    Window_SkipCommand.prototype.processOk = function() {
+        Window_SkipCommand._lastCommandSymbol = this.currentSymbol();
+        Window_Command.prototype.processOk.call(this);
+    };
+
+    Window_SkipCommand.prototype.maxCols = function() {
+        return 2;
+    };
+
+//-----------------------------------------------------------------------------
+// Commands
+
     PluginManager.registerCommand("Phileas_MovieSkipping", "playMovie", playMovieByCommand);
     PluginManager.registerCommand("Phileas_MovieSkipping", "playMovieSpecificKey", playMovieByCommandWithSpecificKey);
     PluginManager.registerCommand("Phileas_MovieSkipping", "playMovieExceptKey", playMovieByCommandExceptKey);
@@ -330,16 +536,19 @@
         2: "right"
     }
 
-    var keyboardKeyCodes = null;
-    var mouseKeyCodes = null;
-    var gamepadKeyCodes = null;
-    var exceptKeyboardKeyCodes = null;
-    var exceptMouseKeyCodes = null;
-    var exceptGamepadKeyCodes = null;
+    let keyboardKeyCodes = null;
+    let mouseKeyCodes = null;
+    let gamepadKeyCodes = null;
+    let exceptKeyboardKeyCodes = null;
+    let exceptMouseKeyCodes = null;
+    let exceptGamepadKeyCodes = null;
+    let isConfirmationRequired = false;
 
     function playMovieByCommand(params) {
         stopMovie();
         Video._onLoad = Video.phileasLoadMovieAnySkip;
+        isConfirmationRequired = params["isConfirmationRequired"] == "true";
+
         playMovie(params["movie"], params["ext"] || "webm");
     }
 
@@ -387,6 +596,8 @@
         
         stopMovie();
         Video._onLoad = Video.phileasLoadMovieSpecificSkip;
+        isConfirmationRequired = params["isConfirmationRequired"] == "true";
+
         playMovie(params["movie"], params["ext"] || "webm");
     }
 
@@ -434,6 +645,8 @@
         
         stopMovie();
         Video._onLoad = Video.phileasLoadMovieExceptSkip;
+        isConfirmationRequired = params["isConfirmationRequired"] == "true";
+
         playMovie(params["movie"], params["ext"] || "webm");
     }
 
@@ -455,61 +668,107 @@
     }
 
     function stopMovie() {
-        if (Video.isPlaying()) {
-            Video._element.pause();
-            Video._element.currentTime = 0;
-            Video._onEnd();
+        if (!Video.isPlaying()) {
+            return;
         }
+
+        Video._element.pause();
+        Video._element.currentTime = 0;
+        Video._onEnd();
     }
 
-    function skipMovie() {
-        stopMovie();
-
+    function removeAllHandlers() {
         removeEventListener("keydown", skipMovie);
         removeEventListener("mousedown", skipMovie);
-        Input._updateGamepadState = Origin_updateGamepadState;
-        Video._onLoad = Origin_Video_onLoad;
-    }
-
-    function skipMovieWithSpecificKey() {
-        stopMovie();
-
         removeEventListener("keydown", skipMovieByKeydown);
         removeEventListener("mousedown", skipMovieByMousedown);
-        Input._updateGamepadState = Origin_updateGamepadState;
-        Video._onLoad = Origin_Video_onLoad;
-    }
-
-    function skipMovieExceptKey() {
-        stopMovie();
-
         removeEventListener("keydown", skipMovieByKeydownExcept);
         removeEventListener("mousedown", skipMovieByMousedownExcept);
         Input._updateGamepadState = Origin_updateGamepadState;
         Video._onLoad = Origin_Video_onLoad;
     }
 
+    function skipMovie() {
+        if (!Video.isPlaying()) {
+            return;
+        }
+
+        if (isConfirmationRequired) {
+            SceneManager.push(Scene_SkipConfirmation);
+            return;
+        }
+
+        stopMovie();
+        removeAllHandlers();
+    }
+
+    function skipMovieWithConfirmation() {
+        Video._element.pause();
+
+        const dialog = document.createElement("div");
+        dialog.style.position = "absolute";
+        dialog.style.top = "50%";
+        dialog.style.left = "50%";
+        dialog.style.transform = "translate(-50%, -50%)";
+        dialog.style.background = "rgba(0, 0, 0, 0.8)";
+        dialog.style.color = "white";
+        dialog.style.padding = "20px";
+        dialog.style.zIndex = 1000;
+        dialog.style.border = "2px solid white";
+        dialog.style.borderRadius = "5px";
+        dialog.style.fontFamily = "GameFont, Arial";
+        dialog.style.textAlign = "center";
+
+        const message = document.createElement("p");
+        message.textContent = "Пропустить видео?";
+        dialog.appendChild(message);
+
+        const yesButton = document.createElement("button");
+        yesButton.textContent = "Да";
+        yesButton.style.margin = "5px";
+        yesButton.style.padding = "5px 10px";
+        yesButton.style.cursor = "pointer";
+        yesButton.onclick = () => {
+            stopMovie();
+            removeAllHandlers();
+        };
+        dialog.appendChild(yesButton);
+
+        const noButton = document.createElement('button');
+        noButton.textContent = 'Нет';
+        noButton.style.margin = '5px';
+        noButton.style.padding = '5px 10px';
+        noButton.style.cursor = 'pointer';
+        noButton.onclick = () => {
+            document.body.removeChild(dialog);
+            Video._element.play();
+        };
+        dialog.appendChild(noButton);
+
+        document.body.appendChild(dialog);
+    }
+
     function skipMovieByKeydown(event) {
         if (keyboardKeyCodes.has(event.keyCode)) {
-            skipMovieWithSpecificKey();
+            skipMovie();
         }
     }
 
     function skipMovieByMousedown(event) {
         if (mouseKeyCodes.has(event.button)) {
-            skipMovieWithSpecificKey();
+            skipMovie();
         }
     }
 
     function skipMovieByKeydownExcept(event) {
         if (!exceptKeyboardKeyCodes.has(event.keyCode)) {
-            skipMovieExceptKey();
+            skipMovie();
         }
     }
 
     function skipMovieByMousedownExcept(event) {
         if (!exceptMouseKeyCodes.has(event.button)) {
-            skipMovieExceptKey();
+            skipMovie();
         }
     }
 
@@ -579,7 +838,7 @@
         for (const value of gamepadKeyCodes) {
             oldValues[value] = state[value];
             if (!oldValues[value] && state[value]) {
-                skipMovieWithSpecificKey();
+                skipMovie();
                 return;
             }
         }
@@ -598,7 +857,7 @@
             }
 
             if (!oldValues[i] && state[i]) {
-                skipMovieExceptKey();
+                skipMovie();
                 return;
             }
         }
