@@ -9,9 +9,28 @@
 
 /*:
  * @target MZ
- * @plugindesc v1.0.2 Movie playback with skip function
+ * @plugindesc v1.1.0 Movie playback with skip function
  * @author Phileas
  *
+ * @param confirmationWindow
+ * @text Confirmation window
+ * 
+ * @param confirmHelp
+ * @parent confirmationWindow
+ * @text Question text
+ * @default Skip video?
+ * 
+ * @param confirmationOk
+ * @parent confirmationWindow
+ * @text Confirm text
+ * @default Yes
+ * 
+ * @param confirmCancel
+ * @parent confirmationWindow
+ * @text Cancel text
+ * @default No 
+ *  
+ * 
  * @command playMovie
  * @text Play Movie (any key to skip)
  *
@@ -180,8 +199,27 @@
  
 /*:ru
  * @target MZ
- * @plugindesc v1.0.2 Воспроизведение видео с опцией пропуска
+ * @plugindesc v1.1.0 Воспроизведение видео с опцией пропуска
  * @author Phileas
+ *
+ * @param confirmationWindow
+ * @text Окно подтверждения
+ * 
+ * @param confirmHelp
+ * @parent confirmationWindow
+ * @text Текст вопроса
+ * @default Пропустить видео?
+ * 
+ * @param confirmationOk
+ * @parent confirmationWindow
+ * @text Текст подтверждения
+ * @default Да
+ * 
+ * @param confirmCancel
+ * @parent confirmationWindow
+ * @text Текст отмены
+ * @default Нет
+ *  
  *
  * @command playMovie
  * @text Воспроизвести видео (пропуск любой клавишей)
@@ -356,6 +394,14 @@
 //--------MY CODE:
 
 //-----------------------------------------------------------------------------
+// Data
+
+    const $parameters = PluginManager.parameters("Phileas_MovieSkipping");
+    const $confirmHelp = $parameters["confirmHelp"] || "Skip video?";
+    const $confirmationOk = $parameters["confirmationOk"] || "Yes";
+    const $confirmCancel = $parameters["confirmCancel"] || "No";
+
+//-----------------------------------------------------------------------------
 // Confirmation scene
 
     function Scene_SkipConfirmation() {
@@ -436,7 +482,7 @@
     Scene_SkipConfirmation.prototype.createHelpWindow = function() {
         const rect = this.helpWindowRect();
         this._helpWindow = new Window_Help(rect);
-        this._helpWindow.setText("Пропустить видео?");
+        this._helpWindow.setText($confirmHelp);
         this.addWindow(this._helpWindow);
     };
 
@@ -508,8 +554,8 @@
     };
     
     Window_SkipCommand.prototype.makeCommandList = function() {
-        this.addCommand("Да", "ok");
-        this.addCommand("Нет", "cancel");
+        this.addCommand($confirmationOk, "ok");
+        this.addCommand($confirmCancel, "cancel");
     };
 
     Window_SkipCommand.prototype.processOk = function() {
