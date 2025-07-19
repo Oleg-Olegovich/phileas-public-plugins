@@ -748,52 +748,6 @@
         removeAllHandlers();
     }
 
-    function skipMovieWithConfirmation() {
-        Video._element.pause();
-
-        const dialog = document.createElement("div");
-        dialog.style.position = "absolute";
-        dialog.style.top = "50%";
-        dialog.style.left = "50%";
-        dialog.style.transform = "translate(-50%, -50%)";
-        dialog.style.background = "rgba(0, 0, 0, 0.8)";
-        dialog.style.color = "white";
-        dialog.style.padding = "20px";
-        dialog.style.zIndex = 1000;
-        dialog.style.border = "2px solid white";
-        dialog.style.borderRadius = "5px";
-        dialog.style.fontFamily = "GameFont, Arial";
-        dialog.style.textAlign = "center";
-
-        const message = document.createElement("p");
-        message.textContent = "Пропустить видео?";
-        dialog.appendChild(message);
-
-        const yesButton = document.createElement("button");
-        yesButton.textContent = "Да";
-        yesButton.style.margin = "5px";
-        yesButton.style.padding = "5px 10px";
-        yesButton.style.cursor = "pointer";
-        yesButton.onclick = () => {
-            stopMovie();
-            removeAllHandlers();
-        };
-        dialog.appendChild(yesButton);
-
-        const noButton = document.createElement('button');
-        noButton.textContent = 'Нет';
-        noButton.style.margin = '5px';
-        noButton.style.padding = '5px 10px';
-        noButton.style.cursor = 'pointer';
-        noButton.onclick = () => {
-            document.body.removeChild(dialog);
-            Video._element.play();
-        };
-        dialog.appendChild(noButton);
-
-        document.body.appendChild(dialog);
-    }
-
     function skipMovieByKeydown(event) {
         if (keyboardKeyCodes.has(event.keyCode)) {
             skipMovie();
