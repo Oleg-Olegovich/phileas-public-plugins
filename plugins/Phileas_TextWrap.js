@@ -12,6 +12,7 @@
 // 2025.April.23 Ver1.1.4 Fixed text wrapping
 // 2025.May.12 Ver1.1.5 Fixed text size step tag
 // 2025.May.13 Ver1.1.6 Fixed num lines calculation
+// 2025.July.27 Ver1.1.7 Fixed choices
 
 /*:
  * @target MZ
@@ -323,12 +324,20 @@
         const maxWidth = this.width - this.phileasGetWindowMessageMargin();
         const wrappedText = getWrappedText(text, maxWidth, this, $gameMessage._numLines).split("\n");
 
-
         $gameMessage._texts.length = 0;
         $gameMessage._texts = wrappedText.slice(0, $gameMessage._numLines);
         $gameMessage._nextTexts = $gameMessage._nextTexts.concat(wrappedText.slice($gameMessage._numLines));
 
         Origin_startMessage.call(this);
+    };
+
+    const Origin_Window_Message_startInput = Window_Message.prototype.startInput;
+    Window_Message.prototype.startInput = function() {
+        if ($gameMessage._nextTexts.length > 0) {
+            return false;
+        }
+
+        return Origin_Window_Message_startInput.call(this);
     };
     
     if (typeof Window_BookText != "undefined") {
