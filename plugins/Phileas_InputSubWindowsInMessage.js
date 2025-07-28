@@ -3,6 +3,7 @@
 //=============================================================================
 // [Update History]
 // 2025.March.12 Ver1.0.0 First Release
+// 2025.July.28 Ver1.1.0 Added a mode for displaying a limited number of choices
 
 /*:
  * @target MZ
@@ -14,6 +15,29 @@
  * @type number
  * @default 4
  * @min 1
+ * 
+ * 
+ * @param choicesDisplay
+ * @text Choices display
+ * 
+ * @param choicesDisplayMode
+ * @parent choicesDisplay
+ * @text Mode
+ * @type select
+ * @option All at once
+ * @value all
+ * @option Limited number
+ * @value limited
+ * @default all
+ * 
+ * @param choicesMaxVisible
+ * @parent choicesDisplay
+ * @text Max number of visible options
+ * @desc If the "Limited number" display mode is selected
+ * @type number
+ * @min 1
+ * @default 4
+ * 
  * 
  * @help
  * 
@@ -38,6 +62,29 @@
  * @default 4
  * @min 1
  * 
+ * 
+ * @param choicesDisplay
+ * @text Отображение выборов
+ * 
+ * @param choicesDisplayMode
+ * @parent choicesDisplay
+ * @text Режим
+ * @type select
+ * @option Все сразу
+ * @value all
+ * @option С ограничением
+ * @value limited
+ * @default all
+ * 
+ * @param choicesMaxVisible
+ * @parent choicesDisplay
+ * @text Макс. кол-во отображаемых опций
+ * @desc Если выбран режим отбражения "С ограничением"
+ * @type number
+ * @min 1
+ * @default 4
+ * 
+ * 
  * @help
  * 
  * Этот плагин отображает окна выбора и ввода числа в окне сообщения.
@@ -61,6 +108,8 @@
 
     const $parameters = PluginManager.parameters("Phileas_InputSubWindowsInMessage");
     const $numVisibleRows = Number($parameters["numVisibleRows"] || 4);
+    const $choicesDisplayMode = $parameters["choicesDisplayMode"];
+    const $choicesMaxVisible = Number($parameters["choicesMaxVisible"] || 4);
 
 //-----------------------------------------------------------------------------
 // Objects
@@ -114,7 +163,7 @@
 
         if ($gameMessage.isChoice()) {
             const height = $gameMessage.phileasMessageLines() * this.itemHeight()
-                + this._choiceListWindow.windowHeight() - 8;
+                + this._choiceListWindow.windowHeight();
 
             if (height > this.height) {
                 this.height = height;
@@ -207,7 +256,7 @@
 
     Window_ChoiceList.prototype.windowY = function() {
         return this._messageWindow
-            ? this._messageWindow.y + this._messageWindow.phileasGetTextStateHeight()
+            ? this._messageWindow.y + this._messageWindow.phileasGetTextStateHeight() + $gameSystem.windowPadding()
             : 0;
     };
 
@@ -244,7 +293,10 @@
     };
 
     Window_ChoiceList.prototype.maxLines = function() {
-        return 8;
+        const total = $gameMessage.choices().length;
+        return $choicesDisplayMode === "limited"
+            ? Math.min($choicesMaxVisible, total)
+            : total;
     };
 
     const Origin_Window_NumberInput_start = Window_NumberInput.prototype.start;
@@ -261,7 +313,7 @@
         this.setBackgroundType(2);
 
         this.x = this.phileasWindowX();
-        this.y = this._messageWindow.y + this._messageWindow.phileasGetTextStateHeight();
+        this.y = this._messageWindow.y + this._messageWindow.phileasGetTextStateHeight() + $gameSystem.windowPadding();
     };
 
     Window_NumberInput.prototype.windowWidth = function() {
