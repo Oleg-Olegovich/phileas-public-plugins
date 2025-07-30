@@ -7,7 +7,7 @@
 
 /*:
  * @target MZ
- * @plugindesc v1.0.0
+ * @plugindesc v1.1.0
  * @author Phileas
  * 
  * @command playLoopingSe
@@ -337,7 +337,7 @@
 
 /*:ru
  * @target MZ
- * @plugindesc v1.0.0
+ * @plugindesc v1.1.0
  * @author Phileas
  * 
  * @command playLoopingSe

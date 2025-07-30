@@ -7,7 +7,7 @@
 
 /*:
  * @target MZ
- * @plugindesc v1.0.0 Choices and number input windows in message window
+ * @plugindesc v1.1.0 Choices and number input windows in message window
  * @author Phileas
  * 
  * @param numVisibleRows
@@ -53,7 +53,7 @@
 
 /*:ru
  * @target MZ
- * @plugindesc v1.0.0 Окна выбора и ввода числа в окне сообщения
+ * @plugindesc v1.1.0 Окна выбора и ввода числа в окне сообщения
  * @author Phileas
  * 
  * @param numVisibleRows
