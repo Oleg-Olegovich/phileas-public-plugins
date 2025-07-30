@@ -3,6 +3,7 @@
 //=============================================================================
 // [Update History]
 // 2025.May.16 Ver1.0.0 First Release
+// 2025.July.30 Ver1.1.0 Added Playlist Features
 
 /*:
  * @target MZ
@@ -114,6 +115,76 @@
  * @min 1
  * @default 60
  * 
+ * @command launchPlaylist
+ * @text Launch a playlist
+ * @desc Reproduces the specified files one after the other
+ * @arg files
+ * @type file[]
+ * @dir audio/bgm/
+ * @arg random
+ * @text Shuffle the list?
+ * @type boolean
+ * @default false
+ * @arg loop
+ * @text Loop the list?
+ * @desc If the list has been shuffled, it will be shuffled again before a new cycle
+ * @type boolean
+ * @default false
+ * @arg volume
+ * @text Volume
+ * @type number
+ * @min 0
+ * @max 100
+ * @default 100
+ * @arg pitch
+ * @text Pitch
+ * @type number
+ * @min 0
+ * @max 100
+ * @default 100
+ * @arg pan
+ * @text Pan
+ * @type number
+ * @min -100
+ * @max 100
+ * @default 0
+ * 
+ * @command launchPlaylistFromDir
+ * @text Launch a playlist (from dir)
+ * @desc Plays files from the specified audio/bgm/ subfolder one after the other
+ * @arg dir
+ * @default subdir
+ * @arg random
+ * @text Shuffle the list?
+ * @type boolean
+ * @default false
+ * @arg loop
+ * @text Loop the list?
+ * @desc If the list has been shuffled, it will be shuffled again before a new cycle
+ * @type boolean
+ * @default false
+ * @arg volume
+ * @text Volume
+ * @type number
+ * @min 0
+ * @max 100
+ * @default 100
+ * @arg pitch
+ * @text Pitch
+ * @type number
+ * @min 0
+ * @max 100
+ * @default 100
+ * @arg pan
+ * @text Pan
+ * @type number
+ * @min -100
+ * @max 100
+ * @default 0
+ * 
+ * @command stopPlaylist
+ * @text Stop the playlist
+ * 
  * 
  * @help
  * 
@@ -206,6 +277,48 @@
  *     Same as "Modify BGM gradually" command,
  *     but for BGS.
  * 
+ * Command:
+ *     Launch a playlist
+ * Script:
+ *     $gameSystem.launchPlaylist(files, random, loop, volume, pitch, pan);
+ * Script arguments:
+ *     files - an array of files in the audio/bgm/ folder without extension
+ *     random - whether to shuffle the list: true or false
+ *     loop - whether to loop the list: true or false
+ *     volume - volume from 0 to 100. Optional argument.
+ *              Default value - 100.
+ *     pitch - tempo from 0 to 100. Optional argument.
+ *              Default value - 100.
+ *     pan - pan from -100 to 100. Optional argument.
+ *              Default value - 0.
+ * Description:
+ *     Reproduces the specified files one after the other.
+ * 
+ * Command:
+ *     Launch a playlist (from dir)
+ * Script:
+ *     $gameSystem.launchPlaylistFromDir(dir, random, loop, volume, pitch, pan);
+ * Script arguments:
+ *     dir - the path to the subfolder in audio/bgm/
+ *     random - whether to shuffle the list: true or false
+ *     loop - whether to loop the list: true or false
+ *     volume - volume from 0 to 100. Optional argument.
+ *              Default value - 100.
+ *     pitch - tempo from 0 to 100. Optional argument.
+ *              Default value - 100.
+ *     pan - pan from -100 to 100. Optional argument.
+ *              Default value - 0.
+ * Description:
+ *     Plays files from the specified audio/bgm/ subfolder one after the other.
+ *     The Phileas_FileManager plugin is required to execute this command!
+ * 
+ * Command:
+ *     Stop the playlist
+ * Script:
+ *     $gameSystem.stopPlaylist();
+ * Description:
+ *     Stops the current playlist.
+ * 
  * You can always write to the author if you need other features or even plugins.
  * Boosty: https://boosty.to/phileas
  * RPG Maker Web: https://forums.rpgmakerweb.com/index.php?members/phileas.176075/
@@ -230,7 +343,7 @@
  * @command playLoopingSe
  * @text Проигрывать зацикленный SE
  * @arg name
- * @text Audiofile
+ * @text Аудиофайл
  * @type file
  * @dir audio/se/
  * @require 1
@@ -256,7 +369,7 @@
  * @command playLoopingSeSafe
  * @text Проигрывать зацикленный SE безопасно
  * @arg name
- * @text Audiofile
+ * @text Аудиофайл
  * @type file
  * @dir audio/se/
  * @require 1
@@ -331,6 +444,76 @@
  * @type number
  * @min 1
  * @default 60
+ * 
+ * @command launchPlaylist
+ * @text Запустить плейлист
+ * @desc Воспроизводит указанные файлы друг за другом
+ * @arg files
+ * @type file[]
+ * @dir audio/bgm/
+ * @arg random
+ * @text Перемешать список?
+ * @type boolean
+ * @default false
+ * @arg loop
+ * @text Зациклить список?
+ * @desc Если список был перемешан, то перед новым циклом он перемешается заново.
+ * @type boolean
+ * @default false
+ * @arg volume
+ * @text Громкость
+ * @type number
+ * @min 0
+ * @max 100
+ * @default 100
+ * @arg pitch
+ * @text Темп
+ * @type number
+ * @min 0
+ * @max 100
+ * @default 100
+ * @arg pan
+ * @text Панорама
+ * @type number
+ * @min -100
+ * @max 100
+ * @default 0
+ * 
+ * @command launchPlaylistFromDir
+ * @text Запустить плейлист (из папки)
+ * @desc Воспроизводит файлы из указанной подпапки audio/bgm/ друг за другом
+ * @arg dir
+ * @default subdir
+ * @arg random
+ * @text Перемешать список?
+ * @type boolean
+ * @default false
+ * @arg loop
+ * @text Зациклить список?
+ * @desc Если список был перемешан, то перед новым циклом он перемешается заново.
+ * @type boolean
+ * @default false
+ * @arg volume
+ * @text Громкость
+ * @type number
+ * @min 0
+ * @max 100
+ * @default 100
+ * @arg pitch
+ * @text Темп
+ * @type number
+ * @min 0
+ * @max 100
+ * @default 100
+ * @arg pan
+ * @text Панорама
+ * @type number
+ * @min -100
+ * @max 100
+ * @default 0
+ * 
+ * @command stopPlaylist
+ * @text Остановить плейлист
  * 
  * 
  * @help
@@ -424,6 +607,50 @@
  *     Аналогично команде "Модифицировать BGM постепенно",
  *     но для BGS.
  * 
+ * Команда:
+ *     Запустить плейлист
+ * Скрипт:
+ *     $gameSystem.launchPlaylist(files, random, loop, volume, pitch, pan);
+ * Аргументы скрипта:
+ *     files - массив файлов в папке audio/bgm/ без расширения
+ *     random - перемешать ли список: true или false
+ *     loop - зациклить ли список: true или false
+ *     volume - громкость от 0 до 100. Необязательный аргумент.
+ *              Значение по умолчанию - 100.
+ *     pitch - темп от 0 до 100. Необязательный аргумент.
+ *             Значение по умолчанию - 100.
+ *     pan - панорама от -100 до 100. Необязательный аргумент.
+ *           Значение по умолчанию - 0.
+ * Описание:
+ *     Воспроизводит указанные файлы друг за другом.
+ * 
+ * Команда:
+ *     Запустить плейлист (из папки)
+ * Скрипт:
+ *     $gameSystem.launchPlaylistFromDir(dir, random, loop, volume, pitch, pan);
+ * Аргументы скрипта:
+ *     dir - путь к подпапке в audio/bgm/
+ *     random - перемешать ли список: true или false
+ *     loop - зациклить ли список: true или false
+ *     volume - громкость от 0 до 100. Необязательный аргумент.
+ *              Значение по умолчанию - 100.
+ *     pitch - темп от 0 до 100. Необязательный аргумент.
+ *             Значение по умолчанию - 100.
+ *     pan - панорама от -100 до 100. Необязательный аргумент.
+ *           Значение по умолчанию - 0.
+ * Описание:
+ *     Воспроизводит файлы из указанной подпапки audio/bgm/ друг за другом.
+ *     Для выполнения этой команды необходим плагин Phileas_FileManager!
+ * 
+ * Команда:
+ *     Остановить плейлист
+ * Скрипт:
+ *     $gameSystem.stopPlaylist();
+ * Описание:
+ *     Останавливает текущий плейлист.
+ * 
+ * 
+ * 
  * 
  * Вы всегда можете написать автору, если вам нужны другие функции или даже плагины.
  * Boosty: https://boosty.to/phileas
@@ -455,6 +682,9 @@
     PluginManager.registerCommand("Phileas_AudioManager", "modifyBgs", modifyBgsByCommand);
     PluginManager.registerCommand("Phileas_AudioManager", "modifyBgmGradually", modifyBgmGraduallyByCommand);
     PluginManager.registerCommand("Phileas_AudioManager", "modifyBgsGradually", modifyBgsGraduallyByCommand);
+    PluginManager.registerCommand("Phileas_AudioManager", "launchPlaylist", launchPlaylistByCommand);
+    PluginManager.registerCommand("Phileas_AudioManager", "launchPlaylistFromDir", launchPlaylistFromDirByCommand);
+    PluginManager.registerCommand("Phileas_AudioManager", "stopPlaylist", stopPlaylistByCommand);
 
     function playLoopingSeByCommand(params) {
         const name = params["name"];
@@ -496,6 +726,35 @@
         const value = Number(params["value"]);
         const frames = Number(params["frames"]);
         $gameSystem.modifyBgsGradually(value, frames);
+    }
+
+    function launchPlaylistByCommand(params) {
+        const files = JSON.parse(params["files"] || "[]");
+        const random = params["random"] === "true";
+        const loop = params["loop"] === "true";
+        const volume = Number(params["volume"] || 100);
+        const pitch = Number(params["pitch"] || 100);
+        const pan = Number(params["pan"] || 0);
+
+        if (files.length === 0) {
+            return;
+        }
+
+        $gameSystem.launchPlaylist(files, random, loop, volume, pitch, pan);
+    }
+
+    function launchPlaylistFromDirByCommand(params) {
+        const dir = "audio/bgm/" + (params["dir"] || "");
+        const random = params["random"] === "true";
+        const loop = params["loop"] === "true";
+        const volume = Number(params["volume"] || 100);
+        const pitch = Number(params["pitch"] || 100);
+        const pan = Number(params["pan"] || 0);
+        $gameSystem.launchPlaylistFromDir(dir, random, loop, volume, pitch, pan);
+    }
+
+    function stopPlaylistByCommand() {
+        $gameSystem.stopPlaylist();
     }
 
 //-----------------------------------------------------------------------------
@@ -551,8 +810,70 @@
         this._bgsModifierStep = (value - this._bgsModifier) / frames;
     };
 
+    Game_System.prototype.launchPlaylist = function(files, random, loop, volume, pitch, pan) {
+        $gameSystem.stopPlaylist();
+
+        if (random) {
+            shuffleArray(files);
+        }
+
+        this._playlist = {
+            files: files,
+            volume: volume,
+            pitch: pitch,
+            pan: pan,
+            random: random,
+            loop: loop,
+            id: 0
+        };
+
+        $gameSystem.launchPlaylistTrack();
+    };
+
+    Game_System.prototype.launchPlaylistFromDir = function(dir, random, loop, volume, pitch, pan) {
+        const files = Phileas_FileManager.getFilesInDirectory(dir);
+
+        for (let i = 0; i < files.length; ++i) {
+            files[i] = files[i].split('.').slice(0, -1).join('.');
+        }
+
+        $gameSystem.launchPlaylist(files, random, loop, volume, pitch, pan);
+    };
+
+    Game_System.prototype.stopPlaylist = function() {
+        if (!this._playlist) {
+            return;
+        }
+
+        AudioManager.stopBgm();
+
+        if (this._playlist.timeout) {
+            clearTimeout(this._playlist.timeout);
+        }
+
+        this._playlist = null;
+    };
+
 //-----------------------------------------------------------------------------
 // New code
+
+    function addStep(value, target, step) {
+        value += step;
+        return step > 0
+            ? Math.min(value, target)
+            : Math.max(value, target);
+    }
+
+    function getRandomInt(max) {
+        return Math.floor(Math.random() * max);
+    }
+
+    function shuffleArray(arr) {
+        for (let i = 0; i < arr.length; ++i) {
+            const j = getRandomInt(arr.length);
+            [arr[0], arr[j]] = [arr[j], arr[0]];
+        }
+    }
 
     AudioManager.updateBgmParameters = function(bgm) {
         this.updateBufferParameters(this._bgmBuffer, this._bgmVolume * $gameSystem._bgmModifier, bgm);
@@ -579,13 +900,6 @@
         }
     };
 
-    function addStep(value, target, step) {
-        value += step;
-        return step > 0
-            ? Math.min(value, target)
-            : Math.max(value, target);
-    }
-
     Game_System.prototype.update = function() {
         if (this._targetBgmModifier != this._bgmModifier) {
             this._bgmModifier = addStep(this._bgmModifier, this._targetBgmModifier, this._bgmModifierStep);
@@ -600,6 +914,50 @@
 
     Game_System.prototype.isLoopingSePlaying = function() {
         return $gameSystem._loopingSE && $gameSystem._loopingSE.isPlaying;
+    };
+
+    Game_System.prototype.launchPlaylistTrack = function() {
+        if (!this._playlist || this._playlist.id >= this._playlist.files.length) {
+            return;
+        }
+
+        const fileName = this._playlist.files[this._playlist.id];
+        const bgm = {
+            name: fileName,
+            volume: this._playlist.volume,
+            pitch: this._playlist.pitch,
+            pan: this._playlist.pan,
+            loop: false
+        };
+
+        ++this._playlist.id;
+
+        if (this._playlist.id === this._playlist.files.length) {
+            if (!this._playlist.loop) {
+                $gameSystem.stopPlaylist();
+                return;
+            }
+
+            
+            this._playlist.id = 0;
+
+            if (this._playlist.random) {
+                shuffleArray(this._playlist.files);
+            }
+        }
+
+        const buffer = AudioManager.createBuffer("bgm/", fileName);
+        buffer.addLoadListener(() => {
+            if (buffer._totalTime) {
+                const duration = buffer._totalTime;
+                AudioManager.playBgm(bgm);
+                this._playlist.timeout = setTimeout(() => {
+                    $gameSystem.launchPlaylistTrack();
+                }, Math.floor(duration * 1000));
+            } else {
+                console.warn("Couldn't determine audiofile length:", fileName);
+            }
+        });
     };
 
 //-----------------------------------------------------------------------------
