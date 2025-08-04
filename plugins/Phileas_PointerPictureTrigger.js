@@ -26,7 +26,7 @@
 
 /*:
  * @target MZ
- * @plugindesc v1.7.4 Triggering of the switch/variable/common event when the pointer acts with the picture
+ * @plugindesc v1.8.0 Triggering of the switch/variable/common event when the pointer acts with the picture
  * @author Phileas, ZX_Lost_Soul
  *
  * @command assign
@@ -301,7 +301,7 @@
 
 /*:ru
  * @target MZ
- * @plugindesc v1.7.4 Срабатывание переключателя/переменной/общего события при действии указателя с картинкой
+ * @plugindesc v1.8.0 Срабатывание переключателя/переменной/общего события при действии указателя с картинкой
  * @author Phileas, ZX_Lost_Soul
  *
  * @command assign
