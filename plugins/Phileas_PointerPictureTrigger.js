@@ -22,6 +22,7 @@
 // 2025.June.12 Ver1.7.2 Fixed click trigger
 // 2025.June.13 Ver1.7.3 Fixed touch processing
 // 2025.June.16 Ver1.7.4 Fixed touch processing (again)
+// 2025.August.04 Ver1.8.0 Added input ID variable
 
 /*:
  * @target MZ
@@ -36,6 +37,12 @@
  * @text Picture ID
  * @type number
  * @default 1
+ *
+ * @arg pictureInputIdVariable
+ * @text Input ID variable
+ * @desc If it is specified, the picture ID will be taken from it, otherwise from the "Picture ID"
+ * @type variable
+ * @default 0
  *
  * @arg switch
  * @text Switch
@@ -78,14 +85,23 @@
  * @option Press
  * @option Click
  * @default Enter
+ * 
  *
  * @command eraseAction
  * @text Erase action
  * @desc Remove the binding to a single picture action.
+ * 
  * @arg pictureId
  * @text Picture ID
  * @type number
  * @default 1
+ *
+ * @arg pictureInputIdVariable
+ * @text Input ID variable
+ * @desc If it is specified, the picture ID will be taken from it, otherwise from the "Picture ID"
+ * @type variable
+ * @default 0
+ * 
  * @arg action
  * @text Action
  * @type combo
@@ -94,14 +110,23 @@
  * @option Press
  * @option Click
  * @default Enter
+ * 
  *
  * @command eraseAllAction
  * @text Erase all actions
  * @desc Removes bindings to all actions of the picture.
+ * 
  * @arg pictureId
  * @text Picture ID
  * @type number
  * @default 1
+ *
+ * @arg pictureInputIdVariable
+ * @text Input ID variable
+ * @desc If it is specified, the picture ID will be taken from it, otherwise from the "Picture ID"
+ * @type variable
+ * @default 0
+ * 
  *
  * @command assignGlobal
  * @text Assign global action
@@ -288,6 +313,12 @@
  * @type number
  * @default 1
  *
+ * @arg pictureInputIdVariable
+ * @text Переменная с ID на вход
+ * @desc Если указана, ID картинки будет взят из неё, иначе из "ID картинки"
+ * @type variable
+ * @default 0
+ *
  * @arg switch
  * @text Переключатель
  * @type struct<SwitchDataStruct>
@@ -329,14 +360,23 @@
  * @option Press
  * @option Click
  * @default Enter
+ * 
  *
  * @command eraseAction
  * @text Удалить действие
  * @desc Удалить привязку к одному действию картинки.
+ * 
  * @arg pictureId
  * @text ID картинки
  * @type number
  * @default 1
+ *
+ * @arg pictureInputIdVariable
+ * @text Переменная с ID на вход
+ * @desc Если указана, ID картинки будет взят из неё, иначе из "ID картинки"
+ * @type variable
+ * @default 0
+ * 
  * @arg action
  * @text Действие
  * @type combo
@@ -345,14 +385,23 @@
  * @option Press
  * @option Click
  * @default Enter
+ * 
  *
  * @command eraseAllAction
  * @text Удалить все действия
  * @desc Удаляет привязки ко всем действиям картинки.
+ * 
  * @arg pictureId
  * @text ID картинки
  * @type number
  * @default 1
+ *
+ * @arg pictureInputIdVariable
+ * @text Переменная с ID на вход
+ * @desc Если указана, ID картинки будет взят из неё, иначе из "ID картинки"
+ * @type variable
+ * @default 0
+ * 
  * 
  * @command assignGlobal
  * @text Назначить глобально
@@ -602,8 +651,15 @@ const Phileas_PointerPictureTrigger = {};
         return act;
     }
 
+    function getPictureId(params) {
+        const pictureInputIdVariable = Number(params["pictureInputIdVariable"] || 0);
+        return pictureInputIdVariable === 0
+            ? Number(params["pictureId"] || 1)
+            : $gameVariables.value(pictureInputIdVariable);
+    }
+
     function assignAction(params) {
-        const pictureId = Number(params["pictureId"]) || 1;
+        const pictureId = getPictureId(params);
         const picture = $gameScreen.picture(pictureId);
         if (picture) {
             if (picture.phileasPictureTrigger == undefined) {
@@ -616,7 +672,7 @@ const Phileas_PointerPictureTrigger = {};
     }
 
     function eraseAction(params) {
-        const pictureId = Number(params["pictureId"]) || 1;
+        const pictureId = getPictureId(params);
         const action = params["action"];
         const picture = $gameScreen.picture(pictureId);
         if (picture) {
@@ -629,7 +685,7 @@ const Phileas_PointerPictureTrigger = {};
     }
 
     function eraseAllAction(params) {
-        const pictureId = Number(params["pictureId"]) || 1;
+        const pictureId = getPictureId(params);
         const picture = $gameScreen.picture(pictureId);
         if (picture) {
             picture.phileasPictureTrigger = {};
