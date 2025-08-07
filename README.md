@@ -1,4 +1,4 @@
-# Phileas's public plugins
+# Phileas' public plugins
 
 | [Boosty](https://boosty.to/phileas) | [Patreon](https://www.patreon.com/treeverse_games) | [Telegram](https://t.me/olekolegovich) | 
 | :---: | :---: | :---: |

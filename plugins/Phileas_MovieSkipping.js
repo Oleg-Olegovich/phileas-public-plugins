@@ -637,7 +637,7 @@
         }
         
         if (keyboardKeyCodes.size == 0 && mouseKeyCodes.size == 0 && gamepadKeyCodes.size == 0) {
-            throw new Error("Phileas's movie skipping: a skip key is required!");
+            throw new Error("Phileas' movie skipping: a skip key is required!");
         }
         
         stopMovie();
@@ -686,7 +686,7 @@
         }
         
         if (exceptKeyboardKeyCodes.size == 0 && exceptMouseKeyCodes.size == 0 && exceptGamepadKeyCodes.size == 0) {
-            throw new Error("Phileas's movie skipping: a skip key is required!");
+            throw new Error("Phileas' movie skipping: a skip key is required!");
         }
         
         stopMovie();

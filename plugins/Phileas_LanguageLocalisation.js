@@ -103,7 +103,7 @@
  *-----------------------------------------------------------------------------
  * INSTALLATION
  * 
- * For the plugin to work, you need to install Phileas's File Manager:
+ * For the plugin to work, you need to install Phileas' File Manager:
  * https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_FileManager.js
  * 
  * If you need commands to export and import language data to XLSX, then install the XLSX library:
@@ -257,14 +257,14 @@
  * 
  *-----------------------------------------------------------------------------
  * COMPATIBILITY WITH OTHER PLUGINS
- * The plugin is compatible with "Phileas's Text Wrap".
- * Place this plugin under "Phileas's Text Wrap" in the Plugin Manager.
+ * The plugin is compatible with "Phileas' Text Wrap".
+ * Place this plugin under "Phileas' Text Wrap" in the Plugin Manager.
  * 
  * The plugin is compatible with "TAA_BookMenu".
  * Place this plugin under "TAA_BookMenu" in the Plugin Manager.
  * 
- * If you are using "Phileas's Language Localization",
- * "Phileas's Text Wrap" and "TAA_BookMenu" at the same time,
+ * If you are using "Phileas' Language Localization",
+ * "Phileas' Text Wrap" and "TAA_BookMenu" at the same time,
  * arrange them exactly in this order in the Plugin Manager:
  * 1. TAA_BookMenu
  * 2. Phileas_TextWrap
@@ -584,14 +584,14 @@
  * 
  *-----------------------------------------------------------------------------
  * СОВМЕСТИМОСТЬ С ДРУГИМИ ПЛАГИНАМИ
- * Плагин совместим с "Phileas's Text Wrap". Располагайте этот плагин под
- * "Phileas's Text Wrap" в меню плагинов.
+ * Плагин совместим с "Phileas' Text Wrap". Располагайте этот плагин под
+ * "Phileas' Text Wrap" в меню плагинов.
  * 
  * Плагин совместим с "TAA_BookMenu". Располагайте этот плагин под
  * "TAA_BookMenu" в меню плагинов.
  * 
- * Если вы одновременно используете "Phileas's Language Localisation",
- * "Phileas's Text Wrap" и "TAA_BookMenu", располагайте их точно в
+ * Если вы одновременно используете "Phileas' Language Localisation",
+ * "Phileas' Text Wrap" и "TAA_BookMenu", располагайте их точно в
  * таком порядке в меню плагинов:
  * 1. TAA_BookMenu
  * 2. Phileas_TextWrap

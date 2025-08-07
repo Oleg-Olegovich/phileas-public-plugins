@@ -108,10 +108,10 @@
  *-----------------------------------------------------------------------------
  * INSTALLATION
  * 
- * For the plugin to work, you need to install Phileas's File Manager:
+ * For the plugin to work, you need to install Phileas' File Manager:
  * https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_FileManager.js
  * This plugin is required to save and upload screenshots.
- * In the plugin manager, place Phileas's File Manager above Phileas's Novel Style Save Window.
+ * In the plugin manager, place Phileas' File Manager above Phileas' Novel Style Save Window.
  * 
  *-----------------------------------------------------------------------------
  * 

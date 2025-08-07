@@ -29,10 +29,10 @@
  * 
  * Use the plugin commands!
  * 
- * The plugin is compatible with Phileas's Skipping Messages:
+ * The plugin is compatible with Phileas' Skipping Messages:
  * https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_SkippingMessages.js
- * If you are using the Phileas's Options Manager plugin,
- * then place Phileas's Action Button Settings above in the plugins menu:
+ * If you are using the Phileas' Options Manager plugin,
+ * then place Phileas' Action Button Settings above in the plugins menu:
  * https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_OptionsManager.js
  * 
  * You can always write to the author if you need other features or even plugins.
@@ -77,10 +77,10 @@
  * 
  * Используйте команды плагина!
  * 
- * Плагин совместим с Phileas's Skipping Messages:
+ * Плагин совместим с Phileas' Skipping Messages:
  * https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_SkippingMessages.js
- * Если вы используете плагин Phileas's Options Manager, 
- * то в меню плагинов расположите Phileas's Action Button Settings выше:
+ * Если вы используете плагин Phileas' Options Manager, 
+ * то в меню плагинов расположите Phileas' Action Button Settings выше:
  * https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_OptionsManager.js
  *
  * Вы всегда можете написать автору, если вам нужны другие функции или даже плагины.

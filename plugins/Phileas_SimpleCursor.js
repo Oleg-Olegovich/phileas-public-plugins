@@ -129,7 +129,7 @@
  *
  * 
  * @help
- * This is a simplified version of the Phileas's Cursor plugin for those
+ * This is a simplified version of the Phileas' Cursor plugin for those
  * who do not need animated cursors and cursor changes when hovering over an event:
  * https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_Cursor.js
  * 
@@ -327,7 +327,7 @@
  *
  * 
  * @help
- * Это упрощённая версия плагина Phileas's Cursor для тех,
+ * Это упрощённая версия плагина Phileas' Cursor для тех,
  * кому не нужны анимированные курсоры и смена курсора при наведении на событие:
  * https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_Cursor.js
  * 
