@@ -23,6 +23,7 @@
 // 2025.June.13 Ver1.7.3 Fixed touch processing
 // 2025.June.16 Ver1.7.4 Fixed touch processing (again)
 // 2025.August.04 Ver1.8.0 Added input ID variable
+// 2025.August.10 Ver1.8.1 Added command for erasing all actions from all pictures
 
 /*:
  * @target MZ
@@ -113,7 +114,7 @@
  * 
  *
  * @command eraseAllAction
- * @text Erase all actions
+ * @text Erase all pictures actions
  * @desc Removes bindings to all actions of the picture.
  * 
  * @arg pictureId
@@ -126,6 +127,10 @@
  * @desc If it is specified, the picture ID will be taken from it, otherwise from the "Picture ID"
  * @type variable
  * @default 0
+ * 
+ * 
+ * @command eraseAllActionsFromAllPictures
+ * @text Erase all actions from all pictures
  * 
  *
  * @command assignGlobal
@@ -217,6 +222,7 @@
  * Phileas_PointerPictureTrigger.assign(params)
  * Phileas_PointerPictureTrigger.eraseAction(params)
  * Phileas_PointerPictureTrigger.eraseAllAction(params)
+ * Phileas_PointerPictureTrigger.eraseAllActionsFromAllPictures()
  * Phileas_PointerPictureTrigger.assignGlobal(params)
  * Phileas_PointerPictureTrigger.eraseGlobal(params)
  * Phileas_PointerPictureTrigger.eraseAllGlobal()
@@ -388,7 +394,7 @@
  * 
  *
  * @command eraseAllAction
- * @text Удалить все действия
+ * @text Удалить все действия картинки
  * @desc Удаляет привязки ко всем действиям картинки.
  * 
  * @arg pictureId
@@ -401,6 +407,10 @@
  * @desc Если указана, ID картинки будет взят из неё, иначе из "ID картинки"
  * @type variable
  * @default 0
+ * 
+ * 
+ * @command eraseAllActionsFromAllPictures
+ * @text Удалить все действия у всех картинок
  * 
  * 
  * @command assignGlobal
@@ -492,6 +502,7 @@
  * Phileas_PointerPictureTrigger.assign(params)
  * Phileas_PointerPictureTrigger.eraseAction(params)
  * Phileas_PointerPictureTrigger.eraseAllAction(params)
+ * Phileas_PointerPictureTrigger.eraseAllActionsFromAllPictures()
  * Phileas_PointerPictureTrigger.assignGlobal(params)
  * Phileas_PointerPictureTrigger.eraseGlobal(params)
  * Phileas_PointerPictureTrigger.eraseAllGlobal()
@@ -584,7 +595,8 @@ const Phileas_PointerPictureTrigger = {};
 
     PluginManager.registerCommand("Phileas_PointerPictureTrigger", "assign", assignAction);
     PluginManager.registerCommand("Phileas_PointerPictureTrigger", "eraseAction", eraseAction);
-    PluginManager.registerCommand("Phileas_PointerPictureTrigger", "eraseAllAction", eraseAllAction);
+    PluginManager.registerCommand("Phileas_PointerPictureTrigger", "eraseAllAction", eraseAllActions);
+    PluginManager.registerCommand("Phileas_PointerPictureTrigger", "eraseAllActionsFromAllPictures", eraseAllActionsFromAllPictures);
     PluginManager.registerCommand("Phileas_PointerPictureTrigger", "assignGlobal", assignGlobal);
     PluginManager.registerCommand("Phileas_PointerPictureTrigger", "eraseGlobal", eraseGlobal);
     PluginManager.registerCommand("Phileas_PointerPictureTrigger", "eraseAllGlobal", eraseAllGlobal);
@@ -684,11 +696,22 @@ const Phileas_PointerPictureTrigger = {};
         }
     }
 
-    function eraseAllAction(params) {
+    function eraseAllActions(params) {
         const pictureId = getPictureId(params);
         const picture = $gameScreen.picture(pictureId);
         if (picture) {
             picture.phileasPictureTrigger = {};
+        }
+    }
+
+    function eraseAllActionsFromAllPictures() {
+        const max = $gameScreen.maxPictures() + 1;
+
+        for (let i = 1; i < max; ++i) {
+            const picture = $gameScreen.picture(pictureId);
+            if (picture) {
+                picture.phileasPictureTrigger = {};
+            }
         }
     }
 
@@ -799,7 +822,8 @@ const Phileas_PointerPictureTrigger = {};
 
     Phileas_PointerPictureTrigger.assign = assignAction;
     Phileas_PointerPictureTrigger.eraseAction = eraseAction;
-    Phileas_PointerPictureTrigger.eraseAllAction = eraseAllAction;
+    Phileas_PointerPictureTrigger.eraseAllAction = eraseAllActions;
+    Phileas_PointerPictureTrigger.eraseAllActionsFromAllPictures = eraseAllActionsFromAllPictures;
     Phileas_PointerPictureTrigger.assignGlobal = assignGlobal;
     Phileas_PointerPictureTrigger.eraseGlobal = eraseGlobal;
     Phileas_PointerPictureTrigger.eraseAllGlobal = eraseAllGlobal;
