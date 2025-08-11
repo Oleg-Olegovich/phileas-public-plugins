@@ -708,7 +708,7 @@ const Phileas_PointerPictureTrigger = {};
         const max = $gameScreen.maxPictures() + 1;
 
         for (let i = 1; i < max; ++i) {
-            const picture = $gameScreen.picture(pictureId);
+            const picture = $gameScreen.picture(i);
             if (picture) {
                 picture.phileasPictureTrigger = {};
             }
