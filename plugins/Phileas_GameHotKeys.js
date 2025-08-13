@@ -9,10 +9,11 @@
 // 2024.January.29 Ver1.1.2 Common events are set via the common events menu
 // 2025.January.01 Ver1.2.0 Removed unused event listeners
 // 2025.January.01 Ver1.2.1 Added cache cleanup when starting a new game
+// 2025.August.13 Ver1.2.2 Fixed gamepad handling
 
 /*:
  * @target MZ
- * @plugindesc v1.2.1 Assigns common events and switches to keyboard, gamepad, and mouse keys
+ * @plugindesc v1.2.2 Assigns common events and switches to keyboard, gamepad, and mouse keys
  * @author Phileas
  *
  * @param Common events
@@ -159,7 +160,7 @@
  
 /*:ru
  * @target MZ
- * @plugindesc v1.2.1 Назначает общие события и переключатели на клавиши клавиатуры, геймпада и мыши
+ * @plugindesc v1.2.2 Назначает общие события и переключатели на клавиши клавиатуры, геймпада и мыши
  * @author Phileas
  *
  * @param Common events
@@ -479,14 +480,15 @@
     
     const Origin_updateGamepadState = Input._updateGamepadState;
     Input._updateGamepadState = function(gamepad) {
-        Origin_updateGamepadState.call(this, gamepad);
-
         if (disableHotKeys == true) {
+            Origin_updateGamepadState.call(this, gamepad);
             return;
         }
 
-        const lastState = this._gamepadStates[gamepad.index] || [];
+        const lastState = (this._gamepadStates[gamepad.index] || []).slice(0);
+        Origin_updateGamepadState.call(this, gamepad);
         let state = this._gamepadStates[gamepad.index];
+
         for (let i = 0; i < state.length; ++i) {
             if (state[i] == true && lastState[i] != true) {
                 triggerPhileasGamepad(i);
