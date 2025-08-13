@@ -7,10 +7,11 @@
 //                       Added commands that allow to change the text skip key and skip speed during the game
 // 2024.February.05 Ver1.2.0 Added mouse support
 // 2024.October.15 Ver1.3.0 Added skip only seen feature
+// 2025.August.13 Ver1.3.1 Added skip disabling feature
 
 /*:
  * @target MZ
- * @plugindesc v1.3.0 The plugin allows to skip messages by pressing any key
+ * @plugindesc v1.3.1 The plugin allows to skip messages by pressing any key
  * @author Phileas
  *
  * @param Default skip key
@@ -70,6 +71,18 @@
  * 
  * @command dontSkipUnseen
  * @text Don`t skip unseen
+ * 
+ * @command enableSkip
+ * @text Allow skipping
+ * 
+ * @command disableSkip
+ * @text Prohibit skipping
+ *
+ * @command enableFastForward
+ * @text Allow default fast forward
+ *
+ * @command disableFastForward
+ * @text Prohibit default fast forward
  *
  * @help
  * To assign a keyboard key, use a unique string identifier. If you haven't redefined them, then they look like this:
@@ -130,7 +143,7 @@
  
 /*:ru
  * @target MZ
- * @plugindesc v1.3.0 Плагин позволяет пропускать сообщения нажатием любой клавиши
+ * @plugindesc v1.3.1 Плагин позволяет пропускать сообщения нажатием любой клавиши
  * @author Phileas
  *
  * @param Default skip key
@@ -193,6 +206,18 @@
  * 
  * @command dontSkipUnseen
  * @text Не пропускать непрочитанное
+ * 
+ * @command enableSkip
+ * @text Разрешить пропуск
+ * 
+ * @command disableSkip
+ * @text Запретить пропуск
+ *
+ * @command enableFastForward
+ * @text Разрешить стандартную перемотку
+ *
+ * @command disableFastForward
+ * @text Запретить стандартную перемотку
  *
  * @help
  * Чтобы назначить клавишу клавиатуры, используйте её уникальный строковый идентификатор. Если вы не переопределили их, то они выглядят так:
@@ -251,41 +276,50 @@
  * Но обязательно укажите меня в титрах!
  */
 
+"use strict";
+
 (function() {
 
 //--------MY CODE:
-    const seenCashFileName = "seenMsgCash";
+    const $seenCashFileName = "seenMsgCash";
 
-    var parameters = PluginManager.parameters("Phileas_SkippingMessages");
-    var skipKeyName = String(parameters["Default skip key"] || "control");
-    var defaultFastMode = parameters["Default skip speed"] == "Fast";
-    var skipUnseenFeatureEnabled = parameters["skipUnseenFeatureEnabled"] == "true";
-    var defaultSkipUnseen = parameters["defaultSkipUnseen"] == "true";
-    var skipUnseenSwitch = Number(parameters["skipUnseenSwitch"]);
+    const $parameters = PluginManager.parameters("Phileas_SkippingMessages");
+    const $skipKeyName = String($parameters["Default skip key"] || "control");
+    const $defaultFastMode = $parameters["Default skip speed"] == "Fast";
+    const $skipUnseenFeatureEnabled = $parameters["skipUnseenFeatureEnabled"] == "true";
+    const $defaultSkipUnseen = $parameters["defaultSkipUnseen"] == "true";
+    const $skipUnseenSwitch = Number($parameters["skipUnseenSwitch"]);
     
-    var skipFlag = false;
-    var isFastMode = false;
-    var skipUnseenOn = false;
+    let $skipEnabled = true;
+    let $fastForwardEnabled = true;
+
+    let $skipFlag = false;
+    let $isFastMode = false;
+    let $skipUnseenOn = false;
 
     // { mapId: { eventId: Set { commandId } } }
-    var seenCash = new Map();
+    let seenCash = new Map();
     
     PluginManager.registerCommand("Phileas_SkippingMessages", "setSkipKey", setSkipKey);
     PluginManager.registerCommand("Phileas_SkippingMessages", "setSkipSpeed", setSkipSpeed);
     PluginManager.registerCommand("Phileas_SkippingMessages", "skipUnseen", skipUnseen);
     PluginManager.registerCommand("Phileas_SkippingMessages", "dontSkipUnseen", dontSkipUnseen);
+    PluginManager.registerCommand("Phileas_SkippingMessages", "enableSkip", enableSkip);
+    PluginManager.registerCommand("Phileas_SkippingMessages", "disableSkip", disableSkip);
+    PluginManager.registerCommand("Phileas_SkippingMessages", "enableFastForward", enableFastForward);
+    PluginManager.registerCommand("Phileas_SkippingMessages", "disableFastForward", disableFastForward);
     
     setSkipOnCancel();
     
     function setSkipKey(params) {
         let keyName = params['keyName'];
-        skipKeyName = keyName;
+        $skipKeyName = keyName;
         setSkipOnCancel();
     }
     
     function setSkipSpeed(params) {
         let skipSpeed = params['skipSpeed'];
-        isFastMode = skipSpeed == "Fast";
+        $isFastMode = skipSpeed == "Fast";
     }
 
     function skipUnseen() {
@@ -295,9 +329,25 @@
     function dontSkipUnseen() {
         skipUnseen = false;
     }
+
+    function enableSkip() {
+        $skipEnabled = true;
+    }
+
+    function disableSkip() {
+        $skipEnabled = false;
+    }
+
+    function enableFastForward() {
+        $fastForwardEnabled = true;
+    }
+
+    function disableFastForward() {
+        $fastForwardEnabled = false;
+    }
     
     function setSkipOnCancel() {
-        if (skipKeyName !== "escape") {
+        if ($skipKeyName !== "escape") {
             document.removeEventListener("mousedown", skippingMouseDownHandler);
             document.removeEventListener("mouseup", skippingMouseUpHandler);
             return;
@@ -309,32 +359,36 @@
     
     function skippingMouseDownHandler(event) {
         if (event.button == 2) {
-            skipFlag = true;
+            $skipFlag = true;
         }
     };
     
     function skippingMouseUpHandler(event) {
         if (event.button == 2) {
-            skipFlag = false;
+            $skipFlag = false;
         }
     };
     
     function isSkipKeyPressed() {
-        return Input.isPressed(skipKeyName)
-            || skipKeyName === "ok" && TouchInput.isLongPressed()
-            || skipFlag;
-    }
-
-    function isSkipUnseenEnabled() {
-        if (!skipUnseenFeatureEnabled || skipUnseenOn) {
-            return true;
-        }
-
-        if (skipUnseenSwitch == 0) {
+        if (!$skipEnabled) {
             return false;
         }
 
-        return $gameSwitches.value(skipUnseenSwitch);
+        return Input.isPressed($skipKeyName)
+            || $skipKeyName === "ok" && TouchInput.isLongPressed()
+            || $skipFlag;
+    }
+
+    function isSkipUnseenEnabled() {
+        if (!$skipUnseenFeatureEnabled || $skipUnseenOn) {
+            return true;
+        }
+
+        if ($skipUnseenSwitch == 0) {
+            return false;
+        }
+
+        return $gameSwitches.value($skipUnseenSwitch);
     }
 
     // tag: [mapId, eventId, commandId]
@@ -390,11 +444,11 @@
         }
 
         const json = JSON.stringify(serialized);
-        StorageManager.saveObject(seenCashFileName, json);
+        StorageManager.saveObject($seenCashFileName, json);
     }
 
     function loadSeenCash() {
-        StorageManager.loadObject(seenCashFileName).then(json => {
+        StorageManager.loadObject($seenCashFileName).then(json => {
             parsed = JSON.parse(json);
             seenCash = new Map();
 
@@ -417,7 +471,7 @@
 
 //--------MODIFIED CODE:
 
-    if (skipUnseenFeatureEnabled) {
+    if ($skipUnseenFeatureEnabled) {
         const Origin_SceneManager_terminate = SceneManager.terminate;
         SceneManager.terminate = function() {
             saveSeenCash();
@@ -451,7 +505,7 @@
             if (isSkipKeyPressed()) {
                 const isMsgSeen = checkSeenCash(this.phileasGetTag());
                 if (isMsgSeen || isSkipUnseenEnabled()) {
-                    this._pauseSkip = isFastMode;
+                    this._pauseSkip = $isFastMode;
                     return true;
                 }
             }
@@ -468,7 +522,7 @@
         const Original_isTriggered = Window_Message.prototype.isTriggered;
         Window_Message.prototype.isTriggered = function() {
             if (isSkipKeyPressed()) {
-                this._pauseSkip = isFastMode;
+                this._pauseSkip = $isFastMode;
                 return true;
             }
 
@@ -476,13 +530,19 @@
         };
     }
 
+    Window_Message.prototype.updateShowFast = function() {
+        if (this.isTriggered() && $fastForwardEnabled) {
+            this._showFast = true;
+        }
+    };
+
     const Origin_setupNewGame = DataManager.setupNewGame;
     DataManager.setupNewGame = function () {
         Origin_setupNewGame.call(this);
-        isFastMode = defaultFastMode;
-        skipUnseenOn = defaultSkipUnseen;
+        $isFastMode = $defaultFastMode;
+        $skipUnseenOn = $defaultSkipUnseen;
 
-        if (skipUnseenFeatureEnabled) {
+        if ($skipUnseenFeatureEnabled) {
             loadSeenCash();
         }
     };
@@ -490,10 +550,12 @@
     const Origin_makeSaveContents = DataManager.makeSaveContents;
     DataManager.makeSaveContents = function () {
         let contents = Origin_makeSaveContents.call(this);
-        contents.phileasSkippingMessages_isFastMode = isFastMode;
-        contents.phileasSkippingMessages_skipUnseenOn = skipUnseenOn;
+        contents.phileasSkippingMessages_skipEnabled = $skipEnabled;
+        contents.phileasSkippingMessages_fastForwardEnabled = $fastForwardEnabled;
+        contents.phileasSkippingMessages_isFastMode = $isFastMode;
+        contents.phileasSkippingMessages_skipUnseenOn = $skipUnseenOn;
 
-        if (skipUnseenFeatureEnabled) {
+        if ($skipUnseenFeatureEnabled) {
             saveSeenCash();
         }
 
@@ -503,7 +565,17 @@
     const Origin_extractSaveContents = DataManager.extractSaveContents;
     DataManager.extractSaveContents = function (contents) {
         Origin_extractSaveContents.call(this, contents);
-        isFastMode = contents.phileasSkippingMessages_isFastMode;
-        skipUnseenOn = contents.phileasSkippingMessages_skipUnseenOn;
+        $skipEnabled = contents.phileasSkippingMessages_skipEnabled === false
+            ? false
+            : true;
+        $fastForwardEnabled = contents.phileasSkippingMessages_fastForwardEnabled === false
+            ? false
+            : true;
+        $isFastMode = contents.phileasSkippingMessages_isFastMode === undefined
+            ? $defaultFastMode
+            : contents.phileasSkippingMessages_isFastMode;
+        $skipUnseenOn = contents.phileasSkippingMessages_skipUnseenOn === undefined
+            ? $defaultSkipUnseen
+            : contents.phileasSkippingMessages_isFastMode;
     };
 }());
