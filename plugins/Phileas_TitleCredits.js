@@ -55,16 +55,10 @@
  * @desc The text shown on the new button in the title screen.
  *
  * @help
- * The plugin adds one extra command to the title menu. When pressed, it opens a
+ * The plugin adds an extra command to the title menu. When pressed, it opens a
  * simple scrollable window containing your acknowledgements text.
  *
- * Parameters:
- *  - "Credits Command Name": the label of the new button.
- *  - "Credits Text": the content of the credits window (supports \n and \c[x], \I[x], etc).
- *
- * Controls:
- *  - Arrow/Page keys or mouse wheel to scroll.
- *  - Esc/Right click/Cancel to return to the title screen.
+ * You can also add an exit button.
  *
  * 
  * You can always write to the author if you need other features or even plugins.
@@ -137,16 +131,10 @@
  * 
  *
  * @help
- * Плагин добавляет одну кнопку на титульном экране. По нажатию открывается простое
+ * Плагин добавляет кнопку на титульном экране. По нажатию открывается простое
  * прокручиваемое окно с текстом благодарностей из параметров.
- *
- * Параметры:
- *  - "Текст кнопки" - надпись на новой кнопке.
- *  - "Текст благодарностей" - содержимое окна (поддерживает \n, \c[x], \I[x] и др.).
- *
- * Управление:
- *  - Стрелки/страничные клавиши или колесо мыши для прокрутки.
- *  - Esc/ПКМ/Отмена - возврат на титульный экран.
+ * 
+ * Также можно добавить кнопку выхода из игры.
  *
  * 
  * Вы всегда можете написать автору, если вам нужны другие функции или даже плагины.
