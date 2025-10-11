@@ -31,6 +31,7 @@
 | **Phileas' Options Manager** | Кастомизация меню опций | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_OptionsManager.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-options-manager.333) |
 | **Phileas' Party Formation Controller** | Управление перестановкой героев | [MV](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_PartyFormationController_MV.js)<br/> [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_PartyFormationController.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-party-formation-controller.727) |
 | **Phileas' Simple Input Window** | Минималистичное окно ввода имён и переменных | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_SimpleInputWindow.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-simple-input-window.604) |
+| **Phileas' Title Credits** | Добавляет на титульный экран кнопку "Благодарности" | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_TitleCredits.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-title-credits.1818) |
 
 #### Сообщения
 | Название | Описание | Код | Форум |

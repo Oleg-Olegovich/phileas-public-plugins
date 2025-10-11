@@ -31,6 +31,7 @@ Some of the plugins for MZ can work on MV. But I haven't tested it. Write to [me
 | **Phileas' Options Manager** | Customizing the Options Menu | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_OptionsManager.js) | [Thread](https://forums.rpgmakerweb.com/index.php?threads/phileass-options-manager-mz-options-menu-customizer.159642/) |
 | **Phileas' Party Formation Controller** | Managing the swap of actors | [MV](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_PartyFormationController_MV.js)<br/> [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_PartyFormationController.js) | [Thread](https://forums.rpgmakerweb.com/index.php?threads/mz-phileass-party-formation-controller.167709/) |
 | **Phileas' Simple Input Window** | Minimalistic input of names and variables | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_SimpleInputWindow.js) | [Thread](https://forums.rpgmakerweb.com/index.php?threads/phileass-simple-input-window.165542/) |
+| **Phileas' Title Credits** | Adds a "Credits" command to the title screen | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_TitleCredits.js) | [Thread](https://forums.rpgmakerweb.com/index.php?threads/phileass-title-credits-adds-a-credits-command-to-the-title-screen.179961/) |
 
 #### Messages
 | Name | Description | Code | Forum |

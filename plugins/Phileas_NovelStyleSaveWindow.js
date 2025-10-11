@@ -7,10 +7,11 @@
 // 2025.June.07 Ver1.0.2 Fixed compatibility with the web environment
 // 2025.June.09 Ver1.0.3 Fixed bitmap loading in the web environment
 // 2025.June.09 Ver1.0.4 Added bitmap compression
+// 2025.October.11 Ver1.0.5 Fixed screenshot loading in a project with encrypted images
 
 /*:
  * @target MZ
- * @plugindesc v1.0.4 A novel-style save menu
+ * @plugindesc v1.0.5 A novel-style save menu
  * @author Phileas
  * 
  * @param screenshotSettings
@@ -132,7 +133,7 @@
  
 /*:ru
  * @target MZ
- * @plugindesc v1.0.4 Меню сохранений в стиле новеллы
+ * @plugindesc v1.0.5 Меню сохранений в стиле новеллы
  * @author Phileas
  *
  * @param screenshotSettings
@@ -615,7 +616,17 @@
         }
 
         if (Utils.isNwjs()) {
-            Origin_Bitmap_startLoading.call(this);
+            this._image = new Image();
+            this._image.onload = this._onLoad.bind(this);
+            this._image.onerror = this._onError.bind(this);
+            this._destroyCanvas();
+            this._loadingState = "loading";
+            this._image.src = this._url;
+            if (this._image.width > 0) {
+                this._image.onload = null;
+                this._onLoad();
+            }
+
             return;
         }
 
