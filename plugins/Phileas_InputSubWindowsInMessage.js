@@ -4,10 +4,11 @@
 // [Update History]
 // 2025.March.12 Ver1.0.0 First Release
 // 2025.July.28 Ver1.1.0 Added a mode for displaying a limited number of choices
+// 2025.November.08 Ver1.1.1 Fixed compability with Phileas_ChoicesManager
 
 /*:
  * @target MZ
- * @plugindesc v1.1.0 Choices and number input windows in message window
+ * @plugindesc v1.1.1 Choices and number input windows in message window
  * @author Phileas
  * 
  * @param numVisibleRows
@@ -53,7 +54,7 @@
 
 /*:ru
  * @target MZ
- * @plugindesc v1.1.0 Окна выбора и ввода числа в окне сообщения
+ * @plugindesc v1.1.1 Окна выбора и ввода числа в окне сообщения
  * @author Phileas
  * 
  * @param numVisibleRows
@@ -119,7 +120,7 @@
     };
 
     Game_Message.prototype.phileasChoiceLines = function() {
-        return this._choices.length;
+        return this.choices().length;
     };
 
     Game_Message.prototype.phileasIsChoiceOrInput = function() {
