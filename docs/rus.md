@@ -7,6 +7,7 @@
 | Название | Описание | Код | Форум |
 | --- | --- | --- | --- |
 | **Phileas' Action Button Settings** | Кастомизация функций кнопки действия (OK) | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_ActionButtonSettings.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-action-button-settings.970) |
+| **Phileas' Choices Manager** | Расширенное управление окном выборов | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_ChoicesManager.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-choices-manager.1928) |
 | **Phileas' Cursor** | Плагин курсора (мыши, указателя) | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_Cursor.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-cursor.377) |
 | **Phileas' Game Hot Keys** | Горячие клавиши: назначение общих событий и переключателей на клавиши клавиатуры, геймпада и мыши | [MV](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_GameHotKeys_MV.js) [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_GameHotKeys.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-game-hot-keys.327) |
 | **Phileas' Input Sub Windows in Message** | Окна выбора и ввода числа в окне сообщения | [MZ](https://github.com/Oleg-Olegovich/phileas-public-plugins/blob/master/plugins/Phileas_InputSubWindowsInMessage.js) | [Тема](https://rpgmakerunion.ru/thread/mz-phileass-input-sub-windows-in-message.1477) |

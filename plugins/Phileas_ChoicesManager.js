@@ -6,7 +6,7 @@
 
 /*:
  * @target MZ
- * @plugindesc v1.0.0 
+ * @plugindesc v1.0.0 Advanced choices window management
  * @author Phileas
  * 
  * @param combineChoices
@@ -59,7 +59,7 @@
  * Parameters:
  * 1) "Combine Choices"
  *    If there are several "Show Choices" commands
- *    in the event one after the other, their choices will be combined.
+ *    in the event one after the other, their choices will be combined
  *    in one list, which will be reflected in one choices window.
  * 
  * Commands:
