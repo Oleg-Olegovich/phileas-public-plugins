@@ -36,13 +36,13 @@
  * @parent quickSaveButton
  * @text The X coordinate
  * @type number
- * @default 720
+ * @default 672
  * 
  * @param quickSaveButtonY
  * @parent quickSaveButton
  * @text The Y coordinate
  * @type number
- * @default 576
+ * @default 2
  * 
  * 
  * @param quickLoadButton
@@ -66,13 +66,13 @@
  * @parent quickLoadButton
  * @text The X coordinate
  * @type number
- * @default 768
+ * @default 720
  * 
  * @param quickLoadButtonY
  * @parent quickLoadButton
  * @text The Y coordinate
  * @type number
- * @default 576
+ * @default 2
  * 
  * 
  * @param hotkeys
@@ -363,7 +363,7 @@
         this.initialize(...arguments);
     }
 
-    Sprite_PhilesMenuButton.prototype = Object.create(Sprite_Clickable.prototype);
+    Sprite_PhilesMenuButton.prototype = Object.create(Sprite_Button.prototype);
     Sprite_PhilesMenuButton.prototype.constructor = Sprite_PhilesMenuButton;
 
     Sprite_PhilesMenuButton.prototype.initialize = function(file, filePressed) {
