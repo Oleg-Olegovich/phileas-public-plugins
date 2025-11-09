@@ -104,7 +104,8 @@
 
 (function() {
 
-//--------MY CODE:
+//-----------------------------------------------------------------------------
+// MY CODE
     const phileasCollisionPictures = {};
 
     PluginManager.registerCommand("Phileas_PicturesCollision", "isColliding", isColliding);

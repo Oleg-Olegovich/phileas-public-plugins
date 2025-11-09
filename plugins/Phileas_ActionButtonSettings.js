@@ -101,7 +101,8 @@
 
 (function() {
 
-//--------MY CODE:
+//-----------------------------------------------------------------------------
+// MY CODE:
 
 //-----------------------------------------------------------------------------
 // Data
@@ -114,7 +115,7 @@
     var fastForwardMode = 0;
 
 //-----------------------------------------------------------------------------
-// My code
+// Main
 
     function enableFastForward() {
         fastForwardMode = 0;
@@ -129,7 +130,7 @@
     }
 
 //-----------------------------------------------------------------------------
-// Changed code
+// MODIFIED CODE
 
     const Origin_makeSaveContents = DataManager.makeSaveContents;
     DataManager.makeSaveContents = function() {

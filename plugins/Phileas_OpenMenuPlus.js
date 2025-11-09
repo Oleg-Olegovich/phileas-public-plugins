@@ -80,7 +80,8 @@
 
  (function() {
 
-//--------MY CODE:
+//-----------------------------------------------------------------------------
+// MY CODE:
 
     let $savedStates = {};
     const isImportedDefined = typeof Imported !== "undefined";
@@ -148,7 +149,8 @@
         restoreByKey(this, stateKey);
     };
 
-//--------MODIFIED CODE:
+//-----------------------------------------------------------------------------
+// MODIFIED CODE
 
     const Origin_Game_Temp_initialize = Game_Temp.prototype.initialize;
     Game_Temp.prototype.initialize = function() {

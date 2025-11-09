@@ -132,7 +132,9 @@
 
 (function() {
 
-//--------MY CODE:
+//-----------------------------------------------------------------------------
+// MY CODE
+
     var parameters = PluginManager.parameters("Phileas_PartyFormationController");
     var enableSwitch = parameters["enableSwitch"] || 0;
     var saveState = parameters["saveState"] == "true";

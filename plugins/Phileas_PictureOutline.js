@@ -328,7 +328,8 @@
  
 (function() {
 
-//--------MY CODE:
+//-----------------------------------------------------------------------------
+// MY CODE
 
 //-----------------------------------------------------------------------------
 // Data
@@ -617,7 +618,7 @@
     };
         
 //-----------------------------------------------------------------------------
-// Changed code
+// MODIFIED CODE
     
     const Origin_Sprite_Picture_loadBitmap = Sprite_Picture.prototype.loadBitmap;
     Sprite_Picture.prototype.loadBitmap = function() {

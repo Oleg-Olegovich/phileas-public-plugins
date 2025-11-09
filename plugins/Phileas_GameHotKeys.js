@@ -339,7 +339,8 @@
 
     PluginManager.registerCommand("Phileas_GameHotKeys", "setHotKeysState", setHotKeysStateByCommand);
 
-//--------MY CODE:
+//-----------------------------------------------------------------------------
+// MY CODE
     function parsePluginParam(data) {
         if (data == undefined) {
             return undefined;

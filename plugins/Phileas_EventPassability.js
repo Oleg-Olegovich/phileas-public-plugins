@@ -183,7 +183,8 @@
     PluginManager.registerCommand("Phileas_EventPassability", "setEventPassabilityLocal", setEventPassabilityLocal);
     PluginManager.registerCommand("Phileas_EventPassability", "setEventPassabilityGlobal", setEventPassabilityGlobal);
 
-//--------MY CODE:
+//-----------------------------------------------------------------------------
+// MY CODE
 
     function getMeta(data) {
         const regExp = /<([^<>:]+)(:?)([^>]*)>/g;

@@ -86,7 +86,8 @@
 
 (function() {
 
-//--------MY CODE:
+//-----------------------------------------------------------------------------
+// MY CODE
     var parameters = PluginManager.parameters("Phileas_PlayerMovementInversion");
     var saveState = parameters["saveState"] == "true";
     var horizontalInversion = false;

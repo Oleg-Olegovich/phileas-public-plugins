@@ -677,7 +677,8 @@
     
     setCustomOptionsDictionaries();
 
-//--------MY CODE:
+//-----------------------------------------------------------------------------
+// MY CODE
 
     function getClamp(number, min, max) {
         return Math.min(Math.max(number, min), max);

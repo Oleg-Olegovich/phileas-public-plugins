@@ -550,7 +550,8 @@ const PHILEAD_EN_RU_MAP = {
     PluginManager.registerCommand("Phileas_SimpleInputWindow", "nameInput", nameInput);
     PluginManager.registerCommand("Phileas_SimpleInputWindow", "variableInput", variableInput);
 
-    //--------MY CODE:
+    //-----------------------------------------------------------------------------
+// MY CODE
 
     function handleInputCommand(actorId, showFace, variableId, params) {
         const language = params["language"];

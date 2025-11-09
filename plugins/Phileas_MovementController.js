@@ -173,7 +173,8 @@
 
 (function() {
 
-//--------MY CODE:
+//-----------------------------------------------------------------------------
+// MY CODE
     var parameters = PluginManager.parameters("Phileas_MovementController");
     var playerMovementSwitch = parameters["playerMovementSwitch"] || 0;
     var eventsMovementSwitch = parameters["eventsMovementSwitch"] || 0;

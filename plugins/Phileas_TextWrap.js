@@ -87,7 +87,8 @@
 
 (function() {
 
-//--------MY CODE:    
+//-----------------------------------------------------------------------------
+// MY CODE    
     PluginManager.registerCommand("Phileas_TextWrap", "getWrappedText", getWrappedTextByCommand);
     
     function getColor(word) {

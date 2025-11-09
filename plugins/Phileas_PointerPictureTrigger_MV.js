@@ -360,7 +360,8 @@ Phileas_PointerPictureTrigger.checkPixel = function(sprite, act) {
 }
 
 
-// Changed code
+//-----------------------------------------------------------------------------
+// MODIFIED CODE
 
 Scene_Map.prototype.processMapTouch = function() {
     if (TouchInput.isTriggered() || this._touchCount > 0) {

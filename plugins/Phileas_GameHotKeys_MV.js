@@ -325,7 +325,8 @@
     var blockedEvents = new Set();
     var disableHotKeys = false;
 
-//--------MY CODE:
+//-----------------------------------------------------------------------------
+// MY CODE
     function parsePluginParam(data) {
         if (data == undefined) {
             return undefined;

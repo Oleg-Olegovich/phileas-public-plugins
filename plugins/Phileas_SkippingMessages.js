@@ -280,7 +280,8 @@
 
 (function() {
 
-//--------MY CODE:
+//-----------------------------------------------------------------------------
+// MY CODE
     const $seenCashFileName = "seenMsgCash";
 
     const $parameters = PluginManager.parameters("Phileas_SkippingMessages");

@@ -251,7 +251,8 @@
 
 (function() {
 
-//--------MY CODE:
+//-----------------------------------------------------------------------------
+// MY CODE
 
     const parameters = PluginManager.parameters("Phileas_DestinationSprite");
     const type = parameters["type"] || "square";

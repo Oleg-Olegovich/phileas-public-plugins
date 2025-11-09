@@ -64,7 +64,8 @@
 
 (function() {
 
-//--------MY CODE:
+//-----------------------------------------------------------------------------
+// MY CODE
     var parameters = PluginManager.parameters("Phileas_PlayerImmobilizer_MV");
     var movementSwitch = parameters["Movement switch"] || 0;
 

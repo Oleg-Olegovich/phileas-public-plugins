@@ -133,7 +133,8 @@
 
 (function() {
 
-//--------MY CODE:  
+//-----------------------------------------------------------------------------
+// MY CODE  
     PluginManager.registerCommand("Phileas_EventLabel", "showAllLabels", showPhileasEventLabels);
     PluginManager.registerCommand("Phileas_EventLabel", "hideAllLabels", hidePhileasEventLabels);
     PluginManager.registerCommand("Phileas_EventLabel", "redrawAllLabels", redrawPhileasEventLabels);

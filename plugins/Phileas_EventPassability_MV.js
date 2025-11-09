@@ -67,7 +67,8 @@
     // {mapId:{eventId:optionsArray}}
     var optionsCash = {};
 
-//--------MY CODE:
+//-----------------------------------------------------------------------------
+// MY CODE
 
     function getMeta(data) {
         const regExp = /<([^<>:]+)(:?)([^>]*)>/g;
