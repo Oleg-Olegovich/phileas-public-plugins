@@ -4,6 +4,7 @@
 // [Update History]
 // 2025.May.11 Ver1.0.0 First Release
 // 2025.July.12 Ver1.0.1 Fixed checking for third-party plugins
+// 2025.November.09 Ver1.0.2 Enabled menu button visibility
 
 /*:
  * @target MZ
@@ -166,7 +167,13 @@
         Origin_Game_Interpreter_update.call(this);
     };
 
-    Window_Message.prototype.isTriggered = function () {
+    Window_Message.prototype.isTriggered = function() {
+        const scene = SceneManager._scene;
+
+        if (scene instanceof Scene_Message && scene.isAnyButtonPressed()) {
+            return false;
+        }
+
         return Input.isRepeated("ok") || TouchInput.isRepeated();
     };
 
@@ -219,6 +226,10 @@
         if (isTriggered && isEnabled) {
             this.callMenu();
         }
+    };
+
+    Scene_Map.prototype.isMenuEnabled = function() {
+        return $gameSystem.isMenuEnabled();
     };
 
     const Origin_DataManager_makeSaveContents = DataManager.makeSaveContents;
