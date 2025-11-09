@@ -109,7 +109,7 @@
  * @text Скрыть опцию выбора
  *
  * @arg id
- * @text Choice ID
+ * @text ID выбора
  * @type number
  * @desc Нумерация выборов начинается с 1
  * @min 1
@@ -125,7 +125,7 @@
  * @text Отключить опцию выбора
  *
  * @arg id
- * @text Choice ID
+ * @text ID выбора
  * @type number
  * @desc Нумерация выборов начинается с 1
  * @min 1
