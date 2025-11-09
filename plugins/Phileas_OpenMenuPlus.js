@@ -8,7 +8,7 @@
 
 /*:
  * @target MZ
- * @plugindesc v1.0.1 Open the menu during event processing (messages&choices)
+ * @plugindesc v1.0.2 Open the menu during event processing (messages&choices)
  * @author Phileas
  *
  * 
@@ -22,6 +22,7 @@
  * Plugin features:
  * - Correct processing of saves during a parallel event.
  * - Restore the position of the choices window after loading.
+ * - Menu button is visible during event processing.
  * 
  *-----------------------------------------------------------------------------
  * 
@@ -42,9 +43,8 @@
  
 /*:ru
  * @target MZ
- * @plugindesc v1.0.1 Открывает меню во время обработки событий (сообщения&выборы)
+ * @plugindesc v1.0.2 Открывает меню во время обработки событий (сообщения&выборы)
  * @author Phileas
- * 
  *
  * 
  * @help
@@ -57,6 +57,7 @@
  * Особенности плагина:
  * - Корректная обработка сохранений во время параллельного события.
  * - Восстановление положения окна выбора после загрузки.
+ * - Кнопка меню видна при обработке события.
  * 
  *-----------------------------------------------------------------------------
  *
