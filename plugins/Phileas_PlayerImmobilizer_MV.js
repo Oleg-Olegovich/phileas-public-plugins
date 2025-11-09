@@ -69,7 +69,8 @@
     var parameters = PluginManager.parameters("Phileas_PlayerImmobilizer_MV");
     var movementSwitch = parameters["Movement switch"] || 0;
 
-//--------MODIFIED CODE:
+//-----------------------------------------------------------------------------
+// MODIFIED CODE
     const Origin_move = Game_Player.prototype.moveByInput;
     Game_Player.prototype.moveByInput = function() {
         if (movementSwitch > 0 && $gameSwitches.value(movementSwitch) == true) {

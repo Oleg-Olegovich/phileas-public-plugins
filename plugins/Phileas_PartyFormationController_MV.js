@@ -107,7 +107,8 @@
     var lockedPositions = JSON.parse(parameters["defaultLock"]).map(element => parseInt(element, 10));
     var enable = false;
 
-//--------MODIFIED CODE:
+//-----------------------------------------------------------------------------
+// MODIFIED CODE
     const Origin_setupNewGame = DataManager.setupNewGame;
     DataManager.setupNewGame = function() {
         Origin_setupNewGame.call(this);

@@ -26,7 +26,8 @@
     var parameters = PluginManager.parameters('Phileas_FullscreenOption');
     var optionName = parameters['Option name'] || "Fullscreen";
 
-//--------MODIFIED CODE:
+//-----------------------------------------------------------------------------
+// MODIFIED CODE
 
     Origin_addOptions = Window_Options.prototype.addGeneralOptions;
     Window_Options.prototype.addGeneralOptions = function() {

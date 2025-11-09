@@ -352,7 +352,8 @@
     var dimColor1 = setDimColor(parameters["dimColor1"]);
     var dimColor2 = setDimColor(parameters["dimColor2"]);
 
-//--------MODIFIED CODE:
+//-----------------------------------------------------------------------------
+// MODIFIED CODE
 
     PluginManager.registerCommand("Phileas_MessageWindowRectSettings", "nextMessageWindowSettings", setNextMessageWindowSettings);
     PluginManager.registerCommand("Phileas_MessageWindowRectSettings", "defaultMessageWindowSettings", setDefaultMessageWindowSettings);

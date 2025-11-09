@@ -115,7 +115,8 @@
     var windowX = Number(parameters["windowX"] || 0);
     var windowY = Number(parameters["windowY"] || 0);
 
-//--------MODIFIED CODE:
+//-----------------------------------------------------------------------------
+// MODIFIED CODE
 
     function calculateSize(defaultValue, plaginValue) {
         if (plaginValue < 1) {

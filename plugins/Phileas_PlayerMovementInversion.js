@@ -100,7 +100,8 @@
         verticalInversion = params["verticalInversion"] == "true";
     }
 
-//--------MODIFIED CODE:
+//-----------------------------------------------------------------------------
+// MODIFIED CODE
 
     const Origin_move = Game_Player.prototype.moveByInput;
     Game_Player.prototype.moveByInput = function() {

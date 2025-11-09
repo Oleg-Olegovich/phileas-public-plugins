@@ -326,7 +326,8 @@
         return bitmap;
     }
 
-//--------MODIFIED CODE:
+//-----------------------------------------------------------------------------
+// MODIFIED CODE
 
     Sprite_Destination.prototype.createBitmap = function () {
         if (type == "invisible") {

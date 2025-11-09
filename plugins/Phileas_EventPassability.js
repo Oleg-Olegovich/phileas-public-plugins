@@ -308,7 +308,8 @@
         return passabilityType == 2 || passabilityType == 3;
     };
 
-//--------MODIFIED CODE:
+//-----------------------------------------------------------------------------
+// MODIFIED CODE
     
     const Origin_onMapLoaded = Scene_Map.prototype.onMapLoaded;
     Scene_Map.prototype.onMapLoaded = function() {

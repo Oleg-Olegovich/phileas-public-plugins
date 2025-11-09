@@ -773,7 +773,8 @@
         }
     }
 
-//--------MODIFIED CODE:
+//-----------------------------------------------------------------------------
+// MODIFIED CODE
 
     Video.phileasLoadMovieAnySkip = function() {
         Origin_Video_onLoad.call(this);

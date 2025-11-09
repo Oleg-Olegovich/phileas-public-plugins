@@ -601,7 +601,8 @@
     };
 
  
- //--------MODIFIED CODE:
+ //-----------------------------------------------------------------------------
+// MODIFIED CODE
 
     const Origin_Scene_Boot_adjustBoxSize = Scene_Boot.prototype.adjustBoxSize;
     Scene_Boot.prototype.adjustBoxSize = function() {
