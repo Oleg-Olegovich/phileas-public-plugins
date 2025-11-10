@@ -160,7 +160,7 @@
  * @parent quickSaveButton
  * @text Координата X
  * @type number
- * @default 720
+ * @default 672
  * 
  * @param quickSaveButtonY
  * @parent quickSaveButton
@@ -190,7 +190,7 @@
  * @parent quickLoadButton
  * @text Координата X
  * @type number
- * @default 768
+ * @default 720
  * 
  * @param quickLoadButtonY
  * @parent quickLoadButton

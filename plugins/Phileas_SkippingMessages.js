@@ -8,25 +8,40 @@
 // 2024.February.05 Ver1.2.0 Added mouse support
 // 2024.October.15 Ver1.3.0 Added skip only seen feature
 // 2025.August.13 Ver1.3.1 Added skip disabling feature
+// 2025.November.10 Ver1.4.0 Added the ability to assign a key by numeric code
 
 /*:
  * @target MZ
- * @plugindesc v1.3.1 The plugin allows to skip messages by pressing any key
+ * @plugindesc v1.4.0 The plugin allows to skip messages by pressing any key
  * @author Phileas
+ * 
+ * @param fastForward
+ * @text Fast Forward
  *
- * @param Default skip key
+ * @param defaultSkipKey
+ * @parent fastForward
+ * @text Default Skip Key
  * @type string
  * @desc String identifier of the key
  * @default control
  *
- * @param Default skip speed
+ * @param defaultSkipKeyCode
+ * @parent fastForward
+ * @text Skip Key Numeric Code
+ * @desc If it is greater than 0, the parameter with the name is ignored
+ * @type number
+ * @default 0
+ *
+ * @param defaultSkipSpeed
+ * @parent fastForward
+ * @text Default Skip Speed
  * @type combo
  * @option Slow
  * @option Fast
  * @default Slow
  * 
  * @param skipUnseenSection
- * @text Skip unseen
+ * @text Skip Unseen
  * 
  * @param skipUnseenFeatureEnabled
  * @parent skipUnseenSection
@@ -55,6 +70,11 @@
  * @text Key name
  * @type string
  * @default control
+ * @arg keyCode
+ * @text Key Numeric Code
+ * @desc ЕIf it is greater than 0, the argument with the name is ignored
+ * @type number
+ * @default 0
  *
  * @command setSkipSpeed
  * @text Set the skip speed
@@ -64,7 +84,7 @@
  * @type combo
  * @option Slow
  * @option Fast
- * @default Slow
+ * @default Fast
  * 
  * @command skipUnseen
  * @text Skip unseen
@@ -85,7 +105,8 @@
  * @text Prohibit default fast forward
  *
  * @help
- * To assign a keyboard key, use a unique string identifier. If you haven't redefined them, then they look like this:
+ * To assign a keyboard key, use a unique string identifier.
+ * If you haven't redefined them, then they look like this:
  *     9: "tab", // tab
  *     13: "ok", // enter
  *     16: "shift", // shift
@@ -110,6 +131,8 @@
  *     102: "right", // numpad 6
  *     104: "up", // numpad 8
  *     120: "debug" // F9
+ * Alternatively, you can specify a numeric key code,
+ * if the desired key is not in the default dictionary of the engine.
  *
  * You can also choose the speed of text skipping: slow or fast.
  * 
@@ -143,22 +166,34 @@
  
 /*:ru
  * @target MZ
- * @plugindesc v1.3.1 Плагин позволяет пропускать сообщения нажатием любой клавиши
+ * @plugindesc v1.4.0 Плагин позволяет пропускать сообщения нажатием любой клавиши
  * @author Phileas
+ * 
+ * @param fastForward
+ * @text Быстрая промотка
  *
- * @param Default skip key
+ * @param defaultSkipKey
+ * @parent fastForward
  * @text Клавиша пропуска по умолчанию
  * @type string
- * @desc String identifier of the key
+ * @desc Строковый идентификатор 
  * @default control
  *
- * @param Default skip speed
+ * @param defaultSkipKeyCode
+ * @parent fastForward
+ * @text Числовой код клавишы пропуска
+ * @desc Если больше 0, то параметр с названием игнорируется
+ * @type number
+ * @default 0
+ *
+ * @param defaultSkipSpeed
+ * @parent fastForward
  * @text Скорость пропуска по умолчанию
  * @desc Slow - медленно, Fast - быстро.
  * @type combo
  * @option Slow
  * @option Fast
- * @default Slow
+ * @default Fast
  * 
  * @param skipUnseenSection
  * @text Пропуск непрочитанного
@@ -185,11 +220,16 @@
  *
  * @command setSkipKey
  * @text Установить клавишу пропуска
- * @desc Назначает новую клавишу пропуска сообщений.
+ * @desc Назначает новую клавишу пропуска сообщений, используйте имя или код.
  * @arg keyName
  * @text Название клавиши
  * @type string
  * @default control
+ * @arg keyCode
+ * @text Числовой код клавиши
+ * @desc Если больше 0, то аргумент с названием игнорируется
+ * @type number
+ * @default 0
  *
  * @command setSkipSpeed
  * @text Установить скорость пропуска
@@ -220,7 +260,9 @@
  * @text Запретить стандартную перемотку
  *
  * @help
- * Чтобы назначить клавишу клавиатуры, используйте её уникальный строковый идентификатор. Если вы не переопределили их, то они выглядят так:
+ * Чтобы назначить клавишу клавиатуры,
+ * используйте её уникальный строковый идентификатор.
+ * Если вы не переопределили их, то они выглядят так:
  *     9: "tab", // tab
  *     13: "ok", // enter
  *     16: "shift", // shift
@@ -245,6 +287,8 @@
  *     102: "right", // numpad 6
  *     104: "up", // numpad 8
  *     120: "debug" // F9
+ * Либо вы можете указать числовой код клавиши,
+ * если нужной клавиши нет в стандартном словаре движка.
  *
  * Вы также можете выбрать скорость пропуска текста: медленную или быструю.
  * 
@@ -285,8 +329,9 @@
     const $seenCashFileName = "seenMsgCash";
 
     const $parameters = PluginManager.parameters("Phileas_SkippingMessages");
-    const $skipKeyName = String($parameters["Default skip key"] || "control");
-    const $defaultFastMode = $parameters["Default skip speed"] == "Fast";
+    let $skipKeyName = null;
+    setSkipKey($parameters["defaultSkipKey"], $parameters["defaultSkipKeyCode"]);
+    const $defaultFastMode = $parameters["defaultSkipSpeed"] == "Fast";
     const $skipUnseenFeatureEnabled = $parameters["skipUnseenFeatureEnabled"] == "true";
     const $defaultSkipUnseen = $parameters["defaultSkipUnseen"] == "true";
     const $skipUnseenSwitch = Number($parameters["skipUnseenSwitch"]);
@@ -301,7 +346,7 @@
     // { mapId: { eventId: Set { commandId } } }
     let seenCash = new Map();
     
-    PluginManager.registerCommand("Phileas_SkippingMessages", "setSkipKey", setSkipKey);
+    PluginManager.registerCommand("Phileas_SkippingMessages", "setSkipKey", setSkipKeyByCommand);
     PluginManager.registerCommand("Phileas_SkippingMessages", "setSkipSpeed", setSkipSpeed);
     PluginManager.registerCommand("Phileas_SkippingMessages", "skipUnseen", skipUnseen);
     PluginManager.registerCommand("Phileas_SkippingMessages", "dontSkipUnseen", dontSkipUnseen);
@@ -312,14 +357,32 @@
     
     setSkipOnCancel();
     
-    function setSkipKey(params) {
-        let keyName = params['keyName'];
-        $skipKeyName = keyName;
+    function setSkipKey(name, code) {
+        name = String($parameters["defaultSkipKey"] || "control");
+        code = Number(code || "0");
+
+        if (code === 0) {
+            $skipKeyName = name;
+        } else {
+            if (Input.keyMapper[code]) {
+                $skipKeyName = Input.keyMapper[code];
+            } else {
+                $skipKeyName = "phileasFastForward";
+                Input.keyMapper[code] = $skipKeyName;
+            }
+        }
+        
         setSkipOnCancel();
     }
     
+    function setSkipKeyByCommand(params) {
+        const keyName = params["keyName"];
+        const keyCode = params["keyCode"];
+        setSkipKey(keyName, keyCode);
+    }
+    
     function setSkipSpeed(params) {
-        let skipSpeed = params['skipSpeed'];
+        const skipSpeed = params["skipSpeed"];
         $isFastMode = skipSpeed == "Fast";
     }
 
@@ -580,4 +643,5 @@
             ? $defaultSkipUnseen
             : contents.phileasSkippingMessages_isFastMode;
     };
+
 }());
