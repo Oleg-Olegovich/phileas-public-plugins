@@ -10,11 +10,14 @@
 // 2025.August.13 Ver1.3.1 Added skip disabling feature
 // 2025.November.10 Ver1.4.0 Added the ability to assign a key by numeric code
 //                           Added menu button
+//                           Fixed "skip only seen text" feature for parallel events
+//                           Added "skip to input" feature
 
 /*:
  * @target MZ
  * @plugindesc v1.4.0 The plugin allows to skip messages by pressing any key
  * @author Phileas
+ * 
  * 
  * @param fastForward
  * @text Fast Forward
@@ -39,7 +42,7 @@
  * @type combo
  * @option Slow
  * @option Fast
- * @default Slow
+ * @default Fast
  * 
  * 
  * @param fastForwardButton
@@ -72,6 +75,53 @@
  * @default 2
  * 
  * 
+ * @param skipToChoices
+ * @text Skip To Input
+ *
+ * @param defaultSkipToChoicesKey
+ * @parent skipToChoices
+ * @text Default Skip Key
+ * @type string
+ * @desc String identifier of the key
+ *
+ * @param defaultSkipToChoicesKeyCode
+ * @parent skipToChoices
+ * @text Skip Key Numeric Code
+ * @desc If it is greater than 0, the parameter with the name is ignored
+ * @type number
+ * @default 0
+ * 
+ * 
+ * @param skipToChoicesButton
+ * @text Skip To Input Button
+ * 
+ * @param skipToChoicesButtonFile
+ * @parent skipToChoicesButton
+ * @text Button Picture
+ * @desc If the picture is not specified, the button will not be displayed
+ * @type file
+ * @dir /img/system/
+ * 
+ * @param skipToChoicesButtonFilePressed
+ * @parent skipToChoicesButton
+ * @text Button Picture (pressed)
+ * @desc If the picture is not specified, the default picture will be used
+ * @type file
+ * @dir /img/system/
+ * 
+ * @param skipToChoicesButtonX
+ * @parent skipToChoicesButton
+ * @text The X coordinate
+ * @type number
+ * @default 624
+ * 
+ * @param skipToChoicesButtonY
+ * @parent skipToChoicesButton
+ * @text The Y coordinate
+ * @type number
+ * @default 2
+ * 
+ * 
  * @param skipUnseenSection
  * @text Skip Unseen
  * 
@@ -94,6 +144,7 @@
  * @type switch
  * @default 0
  * @desc If the switch is on, unseen text will be skipped.
+ * 
  *
  * @command setSkipKey
  * @text Set the skip key
@@ -135,6 +186,7 @@
  *
  * @command disableFastForward
  * @text Prohibit default fast forward
+ * 
  *
  * @help
  * To assign a keyboard key, use a unique string identifier.
@@ -169,10 +221,14 @@
  * You can also choose the speed of text skipping: slow or fast.
  * 
  * The plugin provides 4 commands:
- * 0) Set the skip key - assigns a new messages skip key.
- * 1) Set the skip speed - assigns a new messages skip speed.
- * 2) Skip unseen.
- * 3) Don`t skip unseen.
+ * 1) Set the skip key - assigns a new messages skip key.
+ * 2) Set the skip speed - assigns a new messages skip speed.
+ * 3) Skip unseen.
+ * 4) Don`t skip unseen.
+ * 5) Allow skipping.
+ * 6) Prohibit skipping.
+ * 7) Allow default fast forward.
+ * 8) Prohibit default fast forward.
  * 
  * The plugin allows you to allow only read text to be skipped
  * (unread text will not be skipped).
@@ -180,6 +236,11 @@
  * configure the skip read/unread text option.
  * 
  * You can add an option to the settings menu using the Phileas_OptionsManager plugin!
+ * 
+ * In version 1.4.0, the function of skipping to the nearest input window was added:
+ * срщшсуы, number input, or item selection. The function can be assigned
+ * to a keyboard key or a button on the screen.
+ * 
  *
  * You can always write to the author if you need other features or even plugins.
  * Boosty: https://boosty.to/phileas
@@ -200,6 +261,7 @@
  * @target MZ
  * @plugindesc v1.4.0 Плагин позволяет пропускать сообщения нажатием любой клавиши
  * @author Phileas
+ * 
  * 
  * @param fastForward
  * @text Быстрая промотка
@@ -258,6 +320,53 @@
  * @default 2
  * 
  * 
+ * @param skipToChoices
+ * @text Пропуск до ввода
+ *
+ * @param defaultSkipToChoicesKey
+ * @parent skipToChoices
+ * @text Клавиша пропуска по умолчанию
+ * @type string
+ * @desc Строковый идентификатор 
+ *
+ * @param defaultSkipToChoicesKeyCode
+ * @parent skipToChoices
+ * @text Числовой код клавишы пропуска
+ * @desc Если больше 0, то параметр с названием игнорируется
+ * @type number
+ * @default 0
+ * 
+ * 
+ * @param skipToChoicesButton
+ * @text Кнопка пропуска до ввода
+ * 
+ * @param skipToChoicesButtonFile
+ * @parent skipToChoicesButton
+ * @text Картинка кнопки
+ * @desc Если картинка не указана, то кнопка не будет отображаться
+ * @type file
+ * @dir /img/system/
+ * 
+ * @param skipToChoicesButtonFilePressed
+ * @parent skipToChoicesButton
+ * @text Картинка кнопки (при нажатии)
+ * @desc Если картинка не указана, то будет использоваться стандартная картинка
+ * @type file
+ * @dir /img/system/
+ * 
+ * @param skipToChoicesButtonX
+ * @parent skipToChoicesButton
+ * @text Координата X
+ * @type number
+ * @default 624
+ * 
+ * @param skipToChoicesButtonY
+ * @parent skipToChoicesButton
+ * @text Координата Y
+ * @type number
+ * @default 2
+ * 
+ * 
  * @param skipUnseenSection
  * @text Пропуск непрочитанного
  * 
@@ -280,6 +389,7 @@
  * @type switch
  * @default 0
  * @desc Если переключатель включён, будет пропускаться непрочитанный текст.
+ * 
  *
  * @command setSkipKey
  * @text Установить клавишу пропуска
@@ -302,7 +412,7 @@
  * @type combo
  * @option Slow
  * @option Fast
- * @default Slow
+ * @default Fast
  * 
  * @command skipUnseen
  * @text Пропускать непрочитанное
@@ -321,6 +431,7 @@
  *
  * @command disableFastForward
  * @text Запретить стандартную перемотку
+ * 
  *
  * @help
  * Чтобы назначить клавишу клавиатуры,
@@ -356,10 +467,14 @@
  * Вы также можете выбрать скорость пропуска текста: медленную или быструю.
  * 
  * Плагин предоставляет 4 команды:
- * 0) Установить клавишу пропуска - назначает новую клавишу пропуска сообщений.
- * 1) Установить скорость пропуска - назначает новую скорость пропуска сообщений.
- * 2) Пропускать непрочитанное.
- * 3) Не пропускать непрочитанное.
+ * 1) Установить клавишу пропуска - назначает новую клавишу пропуска сообщений.
+ * 2) Установить скорость пропуска - назначает новую скорость пропуска сообщений.
+ * 3) Пропускать непрочитанное.
+ * 4) Не пропускать непрочитанное.
+ * 5) Разрешить пропуск.
+ * 6) Запретить пропуск.
+ * 7) Разрешить стандартную перемотку.
+ * 8) Запретить стандартную перемотку.
  * 
  * Плагин позволяет разрешить пропускать только прочитанный текст
  * (непрочитанный нельзя будет пропустить).
@@ -367,6 +482,11 @@
  * настроить опцию пропуска прочитанного/непрочитанного текста.
  * 
  * Вы можете добавить опцию в меню настроек с помощью плагина Phileas_OptionsManager!
+ * 
+ * В версии 1.4.0 была добавлена функция пропуска до ближайшего окна ввода:
+ * выборы, ввод числа или выбор предмета. Функцию можно назначить
+ * на клавишу клавиатуры или кнопку на экране.
+ * 
  *
  * Вы всегда можете написать автору, если вам нужны другие функции или даже плагины.
  * Boosty: https://boosty.to/phileas
@@ -397,7 +517,9 @@
 
     const $parameters = PluginManager.parameters("Phileas_SkippingMessages");
     let $skipKeyName = null;
+    let $skipToChoicesKeyCode = null;
     setSkipKey($parameters["defaultSkipKey"], $parameters["defaultSkipKeyCode"]);
+    setSkipToChoicesKey($parameters["defaultSkipToChoicesKey"], $parameters["defaultSkipToChoicesKeyCode"]);
     const $defaultFastMode = $parameters["defaultSkipSpeed"] == "Fast";
     const $skipUnseenFeatureEnabled = $parameters["skipUnseenFeatureEnabled"] == "true";
     const $defaultSkipUnseen = $parameters["defaultSkipUnseen"] == "true";
@@ -416,6 +538,9 @@
     let $skipFlag = false;
     let $isFastMode = false;
     let $skipUnseenOn = false;
+
+    let $skipToChoices = false;
+    let currentMessageInterpreter = null;
 
     // { mapId: { eventId: Set { commandId } } }
     let seenCash = new Map();
@@ -475,7 +600,7 @@
 // Main
     
     function setSkipKey(name, code) {
-        name = String($parameters["defaultSkipKey"] || "control");
+        name = String(name || "control");
         code = Number(code || "0");
 
         if (code === 0) {
@@ -490,6 +615,26 @@
         }
         
         setSkipOnCancel();
+    }
+
+    function setSkipToChoicesKey(name, code) {
+        name = String(name || "");
+        code = Number(code || "0");
+
+        if (!name && code === 0) {
+            return;
+        }
+
+        if (code !== 0) {
+            $skipToChoicesKeyCode = code;
+            return;
+        }
+
+        code = Object.keys(Input.keyMapper).find(key => Input.keyMapper[key] === name);
+
+        if (code) {
+            $skipToChoicesKeyCode = Number(code);
+        }
     }
     
     function setSkipOnCancel() {
@@ -518,6 +663,10 @@
     function isSkipKeyPressed() {
         if (!$skipEnabled) {
             return false;
+        }
+
+        if ($skipToChoices) {
+            return true;
         }
 
         const scene = SceneManager._scene;
@@ -620,6 +769,37 @@
 
 
 //-----------------------------------------------------------------------------
+// Objects
+
+    Game_Temp.prototype.phileasSaveMessageInterpreter = function(interpreter) {
+        this._phileasMessageInterpreter = interpreter;
+    };
+
+    Game_Temp.prototype.phileasGetMessageInterpreter = function() {
+        return this._phileasMessageInterpreter;
+    };
+
+    Game_Interpreter.prototype.phileasGetCurrentTag = function() {
+        const eventId = this._eventId;
+
+        if (this === $gameMap._interpreter) {
+            return `map:${$gameMap._mapId}`;
+        }
+        
+        if (!eventId) {
+            return `common:${eventId}:${this._depth}`;
+        }
+
+        const pageId = $gameMap.event(eventId)._pageIndex;
+        return `event:${$gameMap._mapId}:${eventId}:${this._depth}:${pageId || 0}`;
+    };
+
+    Game_Interpreter.prototype.phileasStopSkipCommands = function() {
+        return [102, 103, 104];
+    }
+
+
+//-----------------------------------------------------------------------------
 // Sprites
 
     function Sprite_PhilesSkipButton() {
@@ -651,6 +831,27 @@
         if (this._clickHandler) {
             this._clickHandler();
         }
+    };
+
+
+//-----------------------------------------------------------------------------
+// Windows
+
+    Window_Message.prototype.phileasGetEventId = function() {
+        const interpreter = $gameTemp.phileasGetMessageInterpreter();
+        return interpreter ? interpreter.eventId() : 0;
+    };
+    
+    Window_Message.prototype.phileasGetCommandId = function() {
+        const interpreter = $gameTemp.phileasGetMessageInterpreter();
+        return interpreter ? interpreter._index : 0;
+    };
+
+    Window_Message.prototype.phileasGetTag = function() {
+        const mapId = $gameMap.mapId();
+        const eventId = this.phileasGetEventId();
+        const commandId = this.phileasGetCommandId();
+        return [mapId, eventId, commandId];
     };
 
 
@@ -689,6 +890,47 @@
 // MODIFIED CODE
 
 //-----------------------------------------------------------------------------
+// Objects
+
+    const Game_Interpreter_currentCommand = Game_Interpreter.prototype.currentCommand;
+    Game_Interpreter.prototype.currentCommand = function() {
+        if (!$fastForwardEnabled) {
+            return Game_Interpreter_currentCommand.call(this);
+        }
+
+        const stopCommands = this.phileasStopSkipCommands();
+
+        for (; $skipToChoices && this._index < this._list.length; ++this._index) {
+            let currentCode = this._list[this._index].code;
+            const nextCode = this.nextEventCode();
+
+            if (stopCommands.includes(currentCode) || stopCommands.includes(nextCode)) {
+                if (currentCode === 401) {
+                    while (currentCode != 101) {
+                        --this._index;
+                        currentCode = this._list[this._index].code;
+                    }
+                }
+
+                break;
+            }
+        }
+
+        $skipToChoices = false;
+
+        return Game_Interpreter_currentCommand.call(this);
+    };
+
+    const Game_Interpreter_command101 = Game_Interpreter.prototype.command101;
+    Game_Interpreter.prototype.command101 = function(params) {
+        if (!$gameMessage.isBusy()) {
+            $gameTemp.phileasSaveMessageInterpreter(this);
+        }
+
+        Game_Interpreter_command101.call(this, params);
+    };
+
+//-----------------------------------------------------------------------------
 // Windows
 
     if ($skipUnseenFeatureEnabled) {
@@ -702,26 +944,12 @@
             saveSeenCash();
         };
 
-        Window_Message.prototype.phileasGetEventId = function() {
-            const interpreter = $gameMap._interpreter;
-            return interpreter ? interpreter.eventId() : 0;
-        };
-    
-        Window_Message.prototype.phileasGetCommandId = function() {
-            const interpreter = $gameMap._interpreter;
-            return interpreter ? interpreter._index : 0;
-        };
-
-        Window_Message.prototype.phileasGetTag = function() {
-            const mapId = $gameMap.mapId();
-            const eventId = this.phileasGetEventId();
-            const commandId = this.phileasGetCommandId();
-
-            return [mapId, eventId, commandId];
-        };
-
         const Original_isTriggered = Window_Message.prototype.isTriggered;
         Window_Message.prototype.isTriggered = function() {
+            if ($skipToChoices) {
+                return true;
+            }
+
             if (isSkipKeyPressed()) {
                 const isMsgSeen = checkSeenCash(this.phileasGetTag());
                 if (isMsgSeen || isSkipUnseenEnabled()) {
@@ -783,7 +1011,7 @@
 // Managers
 
     const Origin_setupNewGame = DataManager.setupNewGame;
-    DataManager.setupNewGame = function() {
+    DataManager.setupNewGame = function () {
         Origin_setupNewGame.call(this);
         $isFastMode = $defaultFastMode;
         $skipUnseenOn = $defaultSkipUnseen;
@@ -794,7 +1022,7 @@
     };
 
     const Origin_makeSaveContents = DataManager.makeSaveContents;
-    DataManager.makeSaveContents = function() {
+    DataManager.makeSaveContents = function () {
         let contents = Origin_makeSaveContents.call(this);
         contents.phileasSkippingMessages_skipEnabled = $skipEnabled;
         contents.phileasSkippingMessages_fastForwardEnabled = $fastForwardEnabled;
@@ -809,7 +1037,7 @@
     };
 
     const Origin_extractSaveContents = DataManager.extractSaveContents;
-    DataManager.extractSaveContents = function(contents) {
+    DataManager.extractSaveContents = function (contents) {
         Origin_extractSaveContents.call(this, contents);
         $skipEnabled = contents.phileasSkippingMessages_skipEnabled === false
             ? false
@@ -823,6 +1051,16 @@
         $skipUnseenOn = contents.phileasSkippingMessages_skipUnseenOn === undefined
             ? $defaultSkipUnseen
             : contents.phileasSkippingMessages_isFastMode;
+    };
+
+    const SceneManager_onKeyDown = SceneManager.onKeyDown;
+    SceneManager.onKeyDown = function(event) {
+        SceneManager_onKeyDown.call(this, event);
+        if ($skipEnabled && $skipToChoicesKeyCode) {
+            if (event.keyCode === $skipToChoicesKeyCode) {
+                $skipToChoices = true;
+            }
+        }
     };
 
 }());
