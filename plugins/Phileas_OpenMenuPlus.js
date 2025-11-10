@@ -281,7 +281,7 @@
         });
     };
 
-//--------COMPABILITY:
+//--------COMPATIBILITY:
 
     // HIME_HiddenChoiceConditions
     const Origin_Window_ChoiceList_makeCommandList = Window_ChoiceList.prototype.makeCommandList
