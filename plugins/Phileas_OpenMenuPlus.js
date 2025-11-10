@@ -5,6 +5,7 @@
 // 2025.May.11 Ver1.0.0 First Release
 // 2025.July.12 Ver1.0.1 Fixed checking for third-party plugins
 // 2025.November.09 Ver1.0.2 Enabled menu button visibility
+// 2025.November.10 Ver1.0.3 Fixed compatibility with Phileas_PointerPictureTrigger
 
 /*:
  * @target MZ
@@ -173,7 +174,7 @@
     Window_Message.prototype.isTriggered = function() {
         const scene = SceneManager._scene;
 
-        if (scene instanceof Scene_Message && scene.isAnyButtonPressed()) {
+        if (scene instanceof Scene_Message && scene._menuButton && scene._menuButton.isPressed()) {
             return false;
         }
 
