@@ -171,14 +171,15 @@
         Origin_Game_Interpreter_update.call(this);
     };
 
+    const Origin_Window_Message_isTriggered = Window_Message.prototype.isTriggered;
     Window_Message.prototype.isTriggered = function() {
         const scene = SceneManager._scene;
 
-        if (scene instanceof Scene_Message && scene._menuButton && scene._menuButton.isPressed()) {
+        if (scene instanceof Scene_Message && scene._menuButton && scene._menuButton._hovered) {
             return false;
         }
 
-        return Input.isRepeated("ok") || TouchInput.isRepeated();
+        return Origin_Window_Message_isTriggered.call(this);
     };
 
     const Origin_Window_ChoiceList_callOkHandler = Window_ChoiceList.prototype.callOkHandler

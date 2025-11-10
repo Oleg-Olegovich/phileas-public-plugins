@@ -531,6 +531,12 @@
         x: Number($parameters["fastForwardButtonX"] || 576),
         y: Number($parameters["fastForwardButtonY"] || 2)
     };
+    const $skipToChoicesButton = {
+        file: $parameters["skipToChoicesButtonFile"],
+        filePressed: $parameters["skipToChoicesButtonFilePressed"],
+        x: Number($parameters["skipToChoicesButtonX"] || 576),
+        y: Number($parameters["skipToChoicesButtonY"] || 2)
+    };
     
     let $skipEnabled = true;
     let $fastForwardEnabled = true;
@@ -540,7 +546,6 @@
     let $skipUnseenOn = false;
 
     let $skipToChoices = false;
-    let currentMessageInterpreter = null;
 
     // { mapId: { eventId: Set { commandId } } }
     let seenCash = new Map();
@@ -827,7 +832,7 @@
     Sprite_PhilesSkipButton.prototype.checkBitmap = function() {
     };
 
-    Sprite_Button.prototype.onClick = function() {
+    Sprite_PhilesSkipButton.prototype.onClick = function() {
         if (this._clickHandler) {
             this._clickHandler();
         }
@@ -871,6 +876,20 @@
         this.addWindow(this._fastForwardButton);
     };
 
+    Scene_Map.prototype.createFastForwardButton = function() {
+        if (!$skipToChoicesButton.file) {
+            return;
+        }
+
+        this._skipToChoicesButton = new Sprite_PhilesSkipButton($skipToChoicesButton.file, $skipToChoicesButton.filePressed);
+        this._skipToChoicesButton.x = $skipToChoicesButton.x;
+        this._skipToChoicesButton.y = $skipToChoicesButton.y;
+        this._skipToChoicesButton.visible = false;
+        this._skipToChoicesButton.setClickHandler(() => $skipToChoices = true);
+
+        this.addWindow(this._skipToChoicesButton);
+    };
+
     Scene_Map.prototype.updateSkipButtons = function() {
         if (!this._menuButton) {
             return;
@@ -878,6 +897,10 @@
 
         if (this._fastForwardButton) {
             this._fastForwardButton.visible = this._menuButton.visible;
+        }
+
+        if (this._skipToChoicesButton) {
+            this._skipToChoicesButton.visible = this._menuButton.visible;
         }
     };
 
@@ -894,7 +917,7 @@
 
     const Game_Interpreter_currentCommand = Game_Interpreter.prototype.currentCommand;
     Game_Interpreter.prototype.currentCommand = function() {
-        if (!$fastForwardEnabled) {
+        if (!$fastForwardEnabled || !$skipToChoices) {
             return Game_Interpreter_currentCommand.call(this);
         }
 
