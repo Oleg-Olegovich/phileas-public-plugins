@@ -329,7 +329,7 @@
 //-----------------------------------------------------------------------------
 // MODIFIED CODE
 
-    Sprite_Destination.prototype.createBitmap = function () {
+    Sprite_Destination.prototype.createBitmap = function() {
         if (type == "invisible") {
             return;
         }
@@ -341,13 +341,13 @@
     }
 
     const Origin_updatePosition = Sprite_Destination.prototype.updatePosition;
-    Sprite_Destination.prototype.updatePosition = function () {
+    Sprite_Destination.prototype.updatePosition = function() {
         Origin_updatePosition.call(this);
         this.x += xOffset;
         this.y += yOffset;
     }
 
-    Sprite_Destination.prototype.updateAnimation = function () {
+    Sprite_Destination.prototype.updateAnimation = function() {
         const animScale = (this._frameCount / animation.bounceRate + 0.25).clamp(animation.minScale, animation.maxScale);
         this._frameCount = (this._frameCount + 1) % animation.bounceRate;
         this.opacity = ((animation.bounceRate - this._frameCount) * 10).clamp(animation.minOpacity, animation.maxOpacity);
@@ -355,7 +355,7 @@
     }
 
     const Origin_createDestination = Spriteset_Map.prototype.createDestination;
-    Spriteset_Map.prototype.createDestination = function () {
+    Spriteset_Map.prototype.createDestination = function() {
         Origin_createDestination.call(this);
         if (type == "invisible") {
             if (this._destinationSprite && this._destinationSprite.parent) {

@@ -379,14 +379,14 @@ Scene_Map.prototype.processMapTouch = function() {
 };
 
 const Origin_setupNewGame = DataManager.setupNewGame;
-DataManager.setupNewGame = function () {
+DataManager.setupNewGame = function() {
     Origin_setupNewGame.call(this);
     Phileas_PointerPictureTrigger.isPluginEnabled = true;
     Phileas_PointerPictureTrigger.globalPictureTrigger = {};
 };
 
 const Origin_makeSaveContents = DataManager.makeSaveContents;
-DataManager.makeSaveContents = function () {
+DataManager.makeSaveContents = function() {
     let contents = Origin_makeSaveContents.call(this);
     contents.phileasIsPointerPictureTriggerEnabled = Phileas_PointerPictureTrigger.isPluginEnabled;
     contents.globalPhileasPictureTrigger = Phileas_PointerPictureTrigger.globalPictureTrigger;
@@ -394,7 +394,7 @@ DataManager.makeSaveContents = function () {
 };
 
 const Origin_extractSaveContents = DataManager.extractSaveContents;
-DataManager.extractSaveContents = function (contents) {
+DataManager.extractSaveContents = function(contents) {
     Origin_extractSaveContents.call(this, contents);
     Phileas_PointerPictureTrigger.isPluginEnabled = contents.phileasIsPointerPictureTriggerEnabled == undefined
         ? true

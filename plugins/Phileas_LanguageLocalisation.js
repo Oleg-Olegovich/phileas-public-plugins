@@ -680,7 +680,7 @@
 
 var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
 
-(function () {
+(function() {
 
 //-----------------------------------------------------------------------------
 // MY CODE

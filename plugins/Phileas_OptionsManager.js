@@ -1196,7 +1196,7 @@
     };
     
     const Origin_SceneBoot_start = Scene_Boot.prototype.start;
-    Scene_Boot.prototype.start = function () {
+    Scene_Boot.prototype.start = function() {
         Origin_SceneBoot_start.call(this);
         if (ConfigManager["fullscreen"] == undefined) {
             ConfigManager["fullscreen"] = fullscreenOption[4];

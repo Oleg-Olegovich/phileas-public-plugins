@@ -180,20 +180,20 @@
     };
 
     const Origin_setupNewGame = DataManager.setupNewGame;
-    DataManager.setupNewGame = function () {
+    DataManager.setupNewGame = function() {
         Origin_setupNewGame.call(this);
         optionsCash = {};
     };
 
     const Origin_makeSaveContents = DataManager.makeSaveContents;
-    DataManager.makeSaveContents = function () {
+    DataManager.makeSaveContents = function() {
         let contents = Origin_makeSaveContents.call(this);
         contents.phileasEventPassabilityOptionsCash = optionsCash;
         return contents;
     };
 
     const Origin_extractSaveContents = DataManager.extractSaveContents;
-    DataManager.extractSaveContents = function (contents) {
+    DataManager.extractSaveContents = function(contents) {
         Origin_extractSaveContents.call(this, contents);
         optionsCash = contents.phileasEventPassabilityOptionsCash || {};
     };

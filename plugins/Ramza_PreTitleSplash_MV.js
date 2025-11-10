@@ -835,7 +835,7 @@ Ramza.PTS.createSplashList = function(){
 };
 
 Ramza.PTS._video_on_end = Graphics._onVideoEnd
-Graphics._onVideoEnd = function (){
+Graphics._onVideoEnd = function(){
 	if (SceneManager._scene.constructor.name === "Scene_PretitleSplash"){
 		SceneManager._scene._dummyWindow._waiting = false
 		Ramza.PTS._video_on_end.call(this)

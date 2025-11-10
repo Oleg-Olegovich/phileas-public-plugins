@@ -220,7 +220,7 @@
     };
 
     const Origin_Scene_Map_update = Scene_Map.prototype.update;
-    Scene_Map.prototype.update = function () {
+    Scene_Map.prototype.update = function() {
         Origin_Scene_Map_update.call(this);
 
         const isTriggered = Input.isTriggered("escape") || Input.isTriggered("menu") || TouchInput.isCancelled();
