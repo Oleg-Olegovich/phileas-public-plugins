@@ -437,15 +437,13 @@
     const SceneManager_onKeyDown = SceneManager.onKeyDown;
     SceneManager.onKeyDown = function(event) {
         SceneManager_onKeyDown.call(this, event);
-        if (!event.ctrlKey && !event.altKey) {
-            switch (event.keyCode) {
-                case $hotkeys.save:
-                    DataManager.quickSave();
-                    break;
-                case $hotkeys.load:
-                    DataManager.quickLoad();
-                    break;
-            }
+        switch (event.keyCode) {
+            case $hotkeys.save:
+                DataManager.quickSave();
+                break;
+            case $hotkeys.load:
+                DataManager.quickLoad();
+                break;
         }
     };
 
