@@ -9,6 +9,7 @@
 // 2024.October.15 Ver1.3.0 Added skip only seen feature
 // 2025.August.13 Ver1.3.1 Added skip disabling feature
 // 2025.November.10 Ver1.4.0 Added the ability to assign a key by numeric code
+//                           Added menu button
 
 /*:
  * @target MZ
@@ -39,6 +40,37 @@
  * @option Slow
  * @option Fast
  * @default Slow
+ * 
+ * 
+ * @param fastForwardButton
+ * @text Fast Forward Button
+ * 
+ * @param fastForwardButtonFile
+ * @parent fastForwardButton
+ * @text Button Picture
+ * @desc If the picture is not specified, the button will not be displayed
+ * @type file
+ * @dir /img/system/
+ * 
+ * @param fastForwardButtonFilePressed
+ * @parent fastForwardButton
+ * @text Button Picture (pressed)
+ * @desc If the picture is not specified, the default picture will be used
+ * @type file
+ * @dir /img/system/
+ * 
+ * @param fastForwardButtonX
+ * @parent fastForwardButton
+ * @text The X coordinate
+ * @type number
+ * @default 576
+ * 
+ * @param fastForwardButtonY
+ * @parent fastForwardButton
+ * @text The Y coordinate
+ * @type number
+ * @default 2
+ * 
  * 
  * @param skipUnseenSection
  * @text Skip Unseen
@@ -195,6 +227,37 @@
  * @option Fast
  * @default Fast
  * 
+ * 
+ * @param fastForwardButton
+ * @text Кнопка пропуска
+ * 
+ * @param fastForwardButtonFile
+ * @parent fastForwardButton
+ * @text Картинка кнопки
+ * @desc Если картинка не указана, то кнопка не будет отображаться
+ * @type file
+ * @dir /img/system/
+ * 
+ * @param fastForwardButtonFilePressed
+ * @parent fastForwardButton
+ * @text Картинка кнопки (при нажатии)
+ * @desc Если картинка не указана, то будет использоваться стандартная картинка
+ * @type file
+ * @dir /img/system/
+ * 
+ * @param fastForwardButtonX
+ * @parent fastForwardButton
+ * @text Координата X
+ * @type number
+ * @default 576
+ * 
+ * @param fastForwardButtonY
+ * @parent fastForwardButton
+ * @text Координата Y
+ * @type number
+ * @default 2
+ * 
+ * 
  * @param skipUnseenSection
  * @text Пропуск непрочитанного
  * 
@@ -326,6 +389,10 @@
 
 //-----------------------------------------------------------------------------
 // MY CODE
+
+//-----------------------------------------------------------------------------
+// Data
+
     const $seenCashFileName = "seenMsgCash";
 
     const $parameters = PluginManager.parameters("Phileas_SkippingMessages");
@@ -335,6 +402,13 @@
     const $skipUnseenFeatureEnabled = $parameters["skipUnseenFeatureEnabled"] == "true";
     const $defaultSkipUnseen = $parameters["defaultSkipUnseen"] == "true";
     const $skipUnseenSwitch = Number($parameters["skipUnseenSwitch"]);
+
+    const $fastForwardButton = {
+        file: $parameters["fastForwardButtonFile"],
+        filePressed: $parameters["fastForwardButtonFilePressed"],
+        x: Number($parameters["fastForwardButtonX"] || 576),
+        y: Number($parameters["fastForwardButtonY"] || 2)
+    };
     
     let $skipEnabled = true;
     let $fastForwardEnabled = true;
@@ -345,6 +419,12 @@
 
     // { mapId: { eventId: Set { commandId } } }
     let seenCash = new Map();
+
+    setSkipOnCancel();
+
+
+//-----------------------------------------------------------------------------
+// Commands
     
     PluginManager.registerCommand("Phileas_SkippingMessages", "setSkipKey", setSkipKeyByCommand);
     PluginManager.registerCommand("Phileas_SkippingMessages", "setSkipSpeed", setSkipSpeed);
@@ -354,27 +434,7 @@
     PluginManager.registerCommand("Phileas_SkippingMessages", "disableSkip", disableSkip);
     PluginManager.registerCommand("Phileas_SkippingMessages", "enableFastForward", enableFastForward);
     PluginManager.registerCommand("Phileas_SkippingMessages", "disableFastForward", disableFastForward);
-    
-    setSkipOnCancel();
-    
-    function setSkipKey(name, code) {
-        name = String($parameters["defaultSkipKey"] || "control");
-        code = Number(code || "0");
 
-        if (code === 0) {
-            $skipKeyName = name;
-        } else {
-            if (Input.keyMapper[code]) {
-                $skipKeyName = Input.keyMapper[code];
-            } else {
-                $skipKeyName = "phileasFastForward";
-                Input.keyMapper[code] = $skipKeyName;
-            }
-        }
-        
-        setSkipOnCancel();
-    }
-    
     function setSkipKeyByCommand(params) {
         const keyName = params["keyName"];
         const keyCode = params["keyCode"];
@@ -409,6 +469,28 @@
     function disableFastForward() {
         $fastForwardEnabled = false;
     }
+
+
+//-----------------------------------------------------------------------------
+// Main
+    
+    function setSkipKey(name, code) {
+        name = String($parameters["defaultSkipKey"] || "control");
+        code = Number(code || "0");
+
+        if (code === 0) {
+            $skipKeyName = name;
+        } else {
+            if (Input.keyMapper[code]) {
+                $skipKeyName = Input.keyMapper[code];
+            } else {
+                $skipKeyName = "phileasFastForward";
+                Input.keyMapper[code] = $skipKeyName;
+            }
+        }
+        
+        setSkipOnCancel();
+    }
     
     function setSkipOnCancel() {
         if ($skipKeyName !== "escape") {
@@ -438,7 +520,10 @@
             return false;
         }
 
-        return Input.isPressed($skipKeyName)
+        const scene = SceneManager._scene;
+
+        return scene instanceof Scene_Message && scene.isFastForwardButtonPressed()
+            || Input.isPressed($skipKeyName)
             || $skipKeyName === "ok" && TouchInput.isLongPressed()
             || $skipFlag;
     }
@@ -533,8 +618,78 @@
         });
     }
 
+
+//-----------------------------------------------------------------------------
+// Sprites
+
+    function Sprite_PhilesSkipButton() {
+        this.initialize(...arguments);
+    }
+
+    Sprite_PhilesSkipButton.prototype = Object.create(Sprite_Button.prototype);
+    Sprite_PhilesSkipButton.prototype.constructor = Sprite_PhilesSkipButton;
+
+    Sprite_PhilesSkipButton.prototype.initialize = function(file, filePressed) {
+        Sprite_Clickable.prototype.initialize.call(this);
+
+        this._defaultBitmap = ImageManager.loadSystem(file);
+        this._pressedBitmap = filePressed ? ImageManager.loadSystem(filePressed) : this._defaultBitmap;
+        this._clickHandler = null;
+
+        this.updateFrame();
+        this.updateOpacity();
+    };
+
+    Sprite_PhilesSkipButton.prototype.updateFrame = function() {
+        this.bitmap = this.isPressed() ? this._pressedBitmap : this._defaultBitmap;
+    };
+
+    Sprite_PhilesSkipButton.prototype.checkBitmap = function() {
+    };
+
+    Sprite_Button.prototype.onClick = function() {
+        if (this._clickHandler) {
+            this._clickHandler();
+        }
+    };
+
+
+//-----------------------------------------------------------------------------
+// Scenes
+
+    Scene_Map.prototype.createFastForwardButton = function() {
+        if (!$fastForwardButton.file) {
+            return;
+        }
+
+        this._fastForwardButton = new Sprite_PhilesSkipButton($fastForwardButton.file, $fastForwardButton.filePressed);
+        this._fastForwardButton.x = $fastForwardButton.x;
+        this._fastForwardButton.y = $fastForwardButton.y;
+        this._fastForwardButton.visible = false;
+
+        this.addWindow(this._fastForwardButton);
+    };
+
+    Scene_Map.prototype.updateSkipButtons = function() {
+        if (!this._menuButton) {
+            return;
+        }
+
+        if (this._fastForwardButton) {
+            this._fastForwardButton.visible = this._menuButton.visible;
+        }
+    };
+
+    Scene_Map.prototype.isFastForwardButtonPressed = function() {
+        return this._fastForwardButton && this._fastForwardButton.isPressed();
+    };
+
+
 //-----------------------------------------------------------------------------
 // MODIFIED CODE
+
+//-----------------------------------------------------------------------------
+// Windows
 
     if ($skipUnseenFeatureEnabled) {
         const Origin_SceneManager_terminate = SceneManager.terminate;
@@ -600,6 +755,32 @@
             this._showFast = true;
         }
     };
+
+
+//-----------------------------------------------------------------------------
+// Scenes
+
+    const Scene_Map_createButtons = Scene_Map.prototype.createButtons;
+    Scene_Map.prototype.createButtons = function() {
+        Scene_Map_createButtons.call(this);
+        this.createFastForwardButton();
+    };
+
+    const Scene_Map_updateMenuButton = Scene_Map.prototype.updateMenuButton;
+    Scene_Map.prototype.updateMenuButton = function() {
+        Scene_Map_updateMenuButton.call(this);
+        this.updateSkipButtons();
+    };
+
+    const Scene_Map_hideMenuButton = Scene_Map.prototype.hideMenuButton;
+    Scene_Map.prototype.hideMenuButton = function() {
+        Scene_Map_hideMenuButton.call(this);
+        this.updateSkipButtons();
+    };
+
+
+//-----------------------------------------------------------------------------
+// Managers
 
     const Origin_setupNewGame = DataManager.setupNewGame;
     DataManager.setupNewGame = function () {
