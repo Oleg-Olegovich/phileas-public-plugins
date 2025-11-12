@@ -921,9 +921,10 @@
             return Game_Interpreter_currentCommand.call(this);
         }
 
+        $skipToChoices = false;
         const stopCommands = this.phileasStopSkipCommands();
 
-        for (; $skipToChoices && this._index < this._list.length; ++this._index) {
+        for (; this._index < this._list.length; ++this._index) {
             let currentCode = this._list[this._index].code;
             const nextCode = this.nextEventCode();
 
@@ -939,19 +940,20 @@
             }
         }
 
-        $skipToChoices = false;
-
         return Game_Interpreter_currentCommand.call(this);
     };
 
     const Game_Interpreter_command101 = Game_Interpreter.prototype.command101;
     Game_Interpreter.prototype.command101 = function(params) {
-        if (!$gameMessage.isBusy()) {
+        const result = Game_Interpreter_command101.call(this, params);
+
+        if (result) {
             $gameTemp.phileasSaveMessageInterpreter(this);
         }
 
-        Game_Interpreter_command101.call(this, params);
+        return result;
     };
+
 
 //-----------------------------------------------------------------------------
 // Windows

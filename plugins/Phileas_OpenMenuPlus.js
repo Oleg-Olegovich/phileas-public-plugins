@@ -6,6 +6,7 @@
 // 2025.July.12 Ver1.0.1 Fixed checking for third-party plugins
 // 2025.November.09 Ver1.0.2 Enabled menu button visibility
 // 2025.November.10 Ver1.0.3 Fixed compatibility with Phileas_PointerPictureTrigger
+//                           Fixed opening the menu via Escape
 
 /*:
  * @target MZ
@@ -175,7 +176,8 @@
     Window_Message.prototype.isTriggered = function() {
         const scene = SceneManager._scene;
 
-        if (scene instanceof Scene_Message && scene._menuButton && scene._menuButton._hovered) {
+        if (Input.isRepeated("cancel")
+            || scene instanceof Scene_Message && scene._menuButton && scene._menuButton._hovered) {
             return false;
         }
 
