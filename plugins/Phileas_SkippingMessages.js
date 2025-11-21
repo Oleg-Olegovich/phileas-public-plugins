@@ -876,7 +876,7 @@
         this.addWindow(this._fastForwardButton);
     };
 
-    Scene_Map.prototype.createFastForwardButton = function() {
+    Scene_Map.prototype.createSkipToChoicesButton = function() {
         if (!$skipToChoicesButton.file) {
             return;
         }
@@ -971,7 +971,8 @@
 
         const Original_isTriggered = Window_Message.prototype.isTriggered;
         Window_Message.prototype.isTriggered = function() {
-            if ($skipToChoices) {
+             if ($skipToChoices) {
+                this._pauseSkip = $isFastMode;
                 return true;
             }
 
@@ -1017,6 +1018,7 @@
     Scene_Map.prototype.createButtons = function() {
         Scene_Map_createButtons.call(this);
         this.createFastForwardButton();
+        this.createSkipToChoicesButton();
     };
 
     const Scene_Map_updateMenuButton = Scene_Map.prototype.updateMenuButton;
