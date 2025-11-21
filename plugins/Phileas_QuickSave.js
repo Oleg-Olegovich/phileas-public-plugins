@@ -3,10 +3,11 @@
 //=============================================================================
 // [Update History]
 // 2025.November.11 Ver1.0.0 First Release
+// 2025.November.21 Ver1.1.0 Added regular save and load buttons
 
 /*:
  * @target MZ
- * @plugindesc v1.0.0 Quick save&load
+ * @plugindesc v1.1.0 Quick save&load
  * @author Phileas
  * 
  * 
@@ -14,6 +15,7 @@
  * @text Quick Save File Name
  * @desc file0 is displayed in the save menu and can be used for auto-save when switching to the map
  * @default file0
+ * 
  * 
  * @param quickSaveButton
  * @text Quick Save Button
@@ -46,7 +48,7 @@
  * 
  * 
  * @param quickLoadButton
- * @text Name of the quick load file
+ * @text Quick Load Button
  * 
  * @param quickLoadButtonFile
  * @parent quickLoadButton
@@ -75,6 +77,66 @@
  * @default 2
  * 
  * 
+ * @param regularSaveButton
+ * @text Regular Save Button
+ * 
+ * @param regularSaveButtonFile
+ * @parent regularSaveButton
+ * @text Button Picture
+ * @desc If the picture is not specified, the button will not be displayed
+ * @type file
+ * @dir /img/system/
+ * 
+ * @param regularSaveButtonFilePressed
+ * @parent regularSaveButton
+ * @text Button Picture (pressed)
+ * @desc If the picture is not specified, the default picture will be used
+ * @type file
+ * @dir /img/system/
+ * 
+ * @param regularSaveButtonX
+ * @parent regularSaveButton
+ * @text The X coordinate
+ * @type number
+ * @default 576
+ * 
+ * @param regularSaveButtonY
+ * @parent regularSaveButton
+ * @text The Y coordinate
+ * @type number
+ * @default 2
+ * 
+ * 
+ * @param regularLoadButton
+ * @text Regular Load Button
+ * 
+ * @param regularLoadButtonFile
+ * @parent regularLoadButton
+ * @text Button Picture
+ * @desc If the picture is not specified, the button will not be displayed
+ * @type file
+ * @dir /img/system/
+ * 
+ * @param regularLoadButtonFilePressed
+ * @parent regularLoadButton
+ * @text Button Picture (pressed)
+ * @desc If the picture is not specified, the default picture will be used
+ * @type file
+ * @dir /img/system/
+ * 
+ * @param regularLoadButtonX
+ * @parent regularLoadButton
+ * @text The X coordinate
+ * @type number
+ * @default 624
+ * 
+ * @param regularLoadButtonY
+ * @parent regularLoadButton
+ * @text The Y coordinate
+ * @type number
+ * @default 2
+ * 
+ * 
  * @param hotkeys
  * @text Hot Keys
  * 
@@ -91,6 +153,20 @@
  * @type number
  * @default 118
  * @desc Numeric key code. If 0, the hotkey will not work. 118 is F7
+ * 
+ * @param regularSaveHotKeyNumber
+ * @parent hotkeys
+ * @text Default Save
+ * @desc Numeric key code. If 0, the hotkey will not work
+ * @type number
+ * @default 0
+ * 
+ * @param regularLoadHotKeyNumber
+ * @parent hotkeys
+ * @text Deafult Load
+ * @type number
+ * @default 0
+ * @desc Numeric key code. If 0, the hotkey will not work
  * 
  * 
  * @help
@@ -110,6 +186,8 @@
  * 3) Keyboard shortcuts for quick save and download
  *    Specify the numeric codes of the keyboard keys to be used
  *    for quick saving and loading. For example: 117 and 118 (these are F6 and F7).
+ * 4) Similarly, you can configure the buttons and keys for regular saving and loading.
+ *    Clicking on this button opens a default menu with a file selection.
  * 
  *-----------------------------------------------------------------------------
  * 
@@ -130,7 +208,7 @@
  
 /*:ru
  * @target MZ
- * @plugindesc v1.0.0 Быстрое сохранение и загрузка
+ * @plugindesc v1.1.0 Быстрое сохранение и загрузка
  * @author Phileas
  * 
  * 
@@ -199,6 +277,66 @@
  * @default 2
  * 
  * 
+ * @param regularSaveButton
+ * @text Кнопка обычного сохранения
+ * 
+ * @param regularSaveButtonFile
+ * @parent regularSaveButton
+ * @text Картинка кнопки
+ * @desc Если картинка не указана, то кнопка не будет отображаться
+ * @type file
+ * @dir /img/system/
+ * 
+ * @param regularSaveButtonFilePressed
+ * @parent regularSaveButton
+ * @text Картинка кнопки (при нажатии)
+ * @desc Если картинка не указана, то будет использоваться стандартная картинка
+ * @type file
+ * @dir /img/system/
+ * 
+ * @param regularSaveButtonX
+ * @parent regularSaveButton
+ * @text Координата X
+ * @type number
+ * @default 576
+ * 
+ * @param regularSaveButtonY
+ * @parent regularSaveButton
+ * @text Координата Y
+ * @type number
+ * @default 2
+ * 
+ * 
+ * @param regularLoadButton
+ * @text Кнопка обычной загрузки
+ * 
+ * @param regularLoadButtonFile
+ * @parent regularLoadButton
+ * @text Картинка кнопки
+ * @desc Если картинка не указана, то кнопка не будет отображаться
+ * @type file
+ * @dir /img/system/
+ * 
+ * @param regularLoadButtonFilePressed
+ * @parent regularLoadButton
+ * @text Картинка кнопки (при нажатии)
+ * @desc Если картинка не указана, то будет использоваться стандартная картинка
+ * @type file
+ * @dir /img/system/
+ * 
+ * @param regularLoadButtonX
+ * @parent regularLoadButton
+ * @text Координата X
+ * @type number
+ * @default 624
+ * 
+ * @param regularLoadButtonY
+ * @parent regularLoadButton
+ * @text Координата Y
+ * @type number
+ * @default 2
+ * 
+ * 
  * @param hotkeys
  * @text Горячие клавиши
  * 
@@ -215,6 +353,20 @@
  * @type number
  * @default 118
  * @desc Числовой код клавиши. Если 0, то горячая клавиша не будет работать. 118 - это F7
+ * 
+ * @param regularSaveHotKeyNumber
+ * @parent hotkeys
+ * @text Обычное сохранение
+ * @desc Числовой код клавиши. Если 0, то горячая клавиша не будет работать
+ * @type number
+ * @default 0
+ * 
+ * @param regularLoadHotKeyNumber
+ * @parent hotkeys
+ * @text Обычная загрузка
+ * @type number
+ * @default 0
+ * @desc Числовой код клавиши. Если 0, то горячая клавиша не будет работать
  * 
  * 
  * @help
@@ -234,6 +386,8 @@
  * 3) Горячие клавиши быстрого сохранения и загрузки
  *    Укажите числовые кода клавиш клавиатуры, которые будут использоваться
  *    для быстрого сохранения и загрузки. Например: 117 и 118 (это F6 и F7).
+ * 4) Аналогично можно настроить кнопки и клавиши обычного сохранения и загрузки.
+ *    При нажатии на такую кнопку откроется стандартное меню с выбором файла.
  * 
  *-----------------------------------------------------------------------------
  *
@@ -264,6 +418,7 @@
 
     const $parameters = PluginManager.parameters("Phileas_QuickSave");
     const $saveFileName = $parameters["saveFile"];
+ 
     const $quickSaveButton = {
         file: $parameters["quickSaveButtonFile"],
         filePressed: $parameters["quickSaveButtonFilePressed"],
@@ -276,9 +431,26 @@
         x: Number($parameters["quickLoadButtonX"] || 0),
         y: Number($parameters["quickLoadButtonY"] || 0)
     };
+ 
+    const $regularSaveButton = {
+        file: $parameters["regularSaveButtonFile"],
+        filePressed: $parameters["regularSaveButtonFilePressed"],
+        x: Number($parameters["regularSaveButtonX"] || 0),
+        y: Number($parameters["regularSaveButtonY"] || 0)
+    };
+ 
+    const $regularLoadButton = {
+        file: $parameters["regularLoadButtonFile"],
+        filePressed: $parameters["regularLoadButtonFilePressed"],
+        x: Number($parameters["regularLoadButtonX"] || 0),
+        y: Number($parameters["regularLoadButtonY"] || 0)
+    };
+ 
     const $hotkeys = {
-        save: Number($parameters["quickSaveHotKeyNumber"] || 117),
-        load: Number($parameters["quickLoadHotKeyNumber"] || 118)
+        quickSave: Number($parameters["quickSaveHotKeyNumber"] || 117),
+        quickLoad: Number($parameters["quickLoadHotKeyNumber"] || 118),
+        regularSave: Number($parameters["regularSaveHotKeyNumber"] || 0),
+        regularLoad: Number($parameters["regularLoadHotKeyNumber"] || 0)
     };
 
 
@@ -416,7 +588,35 @@
         this.addWindow(this._quickLoadButton);
     };
 
-    Scene_Map.prototype.updateQuickButtons = function() {
+    Scene_Map.prototype.createRegularSaveButton = function() {
+        if (!$regularSaveButton.file) {
+            return;
+        }
+
+        this._regularSaveButton = new Sprite_PhilesMenuButton($regularSaveButton.file, $regularSaveButton.filePressed);
+        this._regularSaveButton.x = $regularSaveButton.x;
+        this._regularSaveButton.y = $regularSaveButton.y;
+        this._regularSaveButton.visible = false;
+        this._regularSaveButton.setClickHandler(() => SceneManager.push(Scene_Save));
+
+        this.addWindow(this._regularSaveButton);
+    };
+
+    Scene_Map.prototype.createRegularLoadButton = function() {
+        if (!$regularLoadButton.file) {
+            return;
+        }
+
+        this._regularLoadButton = new Sprite_PhilesMenuButton($regularLoadButton.file, $regularLoadButton.filePressed);
+        this._regularLoadButton.x = $regularLoadButton.x;
+        this._regularLoadButton.y = $regularLoadButton.y;
+        this._regularLoadButton.visible = false;
+        this._regularLoadButton.setClickHandler(() => SceneManager.push(Scene_Load));
+
+        this.addWindow(this._regularLoadButton);
+    };
+
+    Scene_Map.prototype.updatePhileasQuickButtons = function() {
         if (!this._menuButton) {
             return;
         }
@@ -428,6 +628,14 @@
         if (this._quickLoadButton) {
             this._quickLoadButton.visible = this._menuButton.visible;
         }
+
+        if (this._regularSaveButton) {
+            this._regularSaveButton.visible = this._menuButton.visible;
+        }
+
+        if (this._regularLoadButton) {
+            this._regularLoadButton.visible = this._menuButton.visible;
+        }
     };
 
 
@@ -438,11 +646,17 @@
     SceneManager.onKeyDown = function(event) {
         SceneManager_onKeyDown.call(this, event);
         switch (event.keyCode) {
-            case $hotkeys.save:
+            case $hotkeys.quickSave:
                 DataManager.quickSave();
                 break;
-            case $hotkeys.load:
+            case $hotkeys.quickLoad:
                 DataManager.quickLoad();
+                break;
+            case $hotkeys.regularSave:
+                SceneManager.push(Scene_Save);
+                break;
+            case $hotkeys.regularLoad:
+                SceneManager.push(Scene_Load);
                 break;
         }
     };
@@ -452,18 +666,43 @@
         Scene_Map_createButtons.call(this);
         this.createQuickSaveButton();
         this.createQuickLoadButton();
+        this.createRegularSaveButton();
+        this.createRegularLoadButton();
     };
 
     const Scene_Map_updateMenuButton = Scene_Map.prototype.updateMenuButton;
     Scene_Map.prototype.updateMenuButton = function() {
         Scene_Map_updateMenuButton.call(this);
-        this.updateQuickButtons();
+        this.updatePhileasQuickButtons();
     };
 
     const Scene_Map_hideMenuButton = Scene_Map.prototype.hideMenuButton;
     Scene_Map.prototype.hideMenuButton = function() {
         Scene_Map_hideMenuButton.call(this);
-        this.updateQuickButtons();
+        this.updatePhileasQuickButtons();
+    };
+
+    const Origin_Window_Message_isTriggered = Window_Message.prototype.isTriggered;
+    Window_Message.prototype.isTriggered = function() {
+        const scene = SceneManager._scene;
+
+        if (scene instanceof Scene_Map) {
+            const buttons = [
+                scene._menuButton,
+                scene._quickSaveButton,
+                scene._quickLoadButton,
+                scene._regularSaveButton,
+                scene._regularLoadButton
+            ];
+
+            for (let i = 0; i < buttons.length; ++i) {
+                if (buttons[i] && buttons[i]._hovered) {
+                    return false;
+                }
+            }
+        }
+
+        return Origin_Window_Message_isTriggered.call(this);
     };
 
 }());
