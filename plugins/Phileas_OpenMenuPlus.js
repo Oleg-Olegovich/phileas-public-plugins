@@ -142,15 +142,16 @@
     };
 
     Game_Interpreter.prototype.getStateKey = function() {
+        const eventId = this._eventId;
+
         if (this === $gameMap._interpreter) {
-            return `map:${$gameMap._mapId}`;
+            return `map:${$gameMap._mapId}:${eventId}`;
         }
         
         if (this._commonEventId != undefined) {
             return `common:${this._commonEventId}:${this._depth}`;
         }
 
-        const eventId = this._eventId;
         const eventObject = $gameMap.event(eventId);
     
         if (!eventObject) {
