@@ -7,10 +7,11 @@
 // 2025.November.09 Ver1.0.2 Enabled menu button visibility
 // 2025.November.10 Ver1.0.3 Fixed compatibility with Phileas_PointerPictureTrigger
 //                           Fixed opening the menu via Escape
+// 2025.November.30 Ver1.0.4 Fixed state restoring
 
 /*:
  * @target MZ
- * @plugindesc v1.0.3 Open the menu during event processing (messages&choices)
+ * @plugindesc v1.0.4 Open the menu during event processing (messages&choices)
  * @author Phileas
  *
  * 
@@ -45,7 +46,7 @@
  
 /*:ru
  * @target MZ
- * @plugindesc v1.0.3 Открывает меню во время обработки событий (сообщения&выборы)
+ * @plugindesc v1.0.4 Открывает меню во время обработки событий (сообщения&выборы)
  * @author Phileas
  *
  * 
@@ -86,7 +87,7 @@
 // MY CODE:
 
     let $savedStates = {};
-    const isImportedDefined = typeof Imported !== "undefined";
+    const $isImportedDefined = typeof Imported !== "undefined";
     
 
     function extract(interpreter) {
@@ -95,13 +96,14 @@
         }
 
         return {
-            index: interpreter._index - 1,
-            _depth: interpreter._depth
+            index: Math.max(interpreter._index - 1, 0),
+            depth: interpreter._depth
         };
     }
 
     function restore(interpreter, state) {
         interpreter._index = state.index;
+        interpreter._depth = state.depth;
     }
 
     function restoreByKey(interpreter, stateKey) {
@@ -119,6 +121,10 @@
         this._lastSelectedChoice = choice;
     };
 
+    Game_Temp.prototype.clearLastSelectedChoice = function() {
+        this._lastSelectedChoice = null;
+    };
+
     Game_Temp.prototype.getLastSelectedChoice = function() {
         return this._lastSelectedChoice;
     };
@@ -127,22 +133,31 @@
         this._savedInterpreter = interpreter;
     };
 
+    Game_Temp.prototype.clearChoicesInterpreter = function() {
+        this._savedInterpreter = null;
+    };
+
     Game_Temp.prototype.getChoicesInterpreter = function() {
         return this._savedInterpreter;
     };
 
     Game_Interpreter.prototype.getStateKey = function() {
-        const eventId = this._eventId;
-
         if (this === $gameMap._interpreter) {
             return `map:${$gameMap._mapId}`;
         }
         
-        if (!eventId) {
-            return `common:${eventId}:${this._depth}`;
+        if (this._commonEventId != undefined) {
+            return `common:${this._commonEventId}:${this._depth}`;
         }
 
-        const pageId = $gameMap.event(eventId)._pageIndex;
+        const eventId = this._eventId;
+        const eventObject = $gameMap.event(eventId);
+    
+        if (!eventObject) {
+            return null;
+        }
+
+        const pageId = eventObject._pageIndex;
         return `event:${$gameMap._mapId}:${eventId}:${this._depth}:${pageId || 0}`;
     };
 
@@ -158,6 +173,7 @@
     Game_Temp.prototype.initialize = function() {
         Origin_Game_Temp_initialize.call(this);
         this._lastSelectedChoice = null;
+        this._savedInterpreter = null;
     };
 
     const Origin_Game_Interpreter_setupChoices = Game_Interpreter.prototype.setupChoices;
@@ -168,8 +184,19 @@
 
     const Origin_Game_Interpreter_update = Game_Interpreter.prototype.update;
     Game_Interpreter.prototype.update = function() {
-        this.restoreState();
+        if (this.isRunning()) {
+            this.restoreState();
+        }
+    
         Origin_Game_Interpreter_update.call(this);
+    };
+
+    const Origin_Game_CommonEvent_refresh = Game_CommonEvent.prototype.refresh;
+    Game_CommonEvent.prototype.refresh = function() {
+        Origin_Game_CommonEvent_refresh.call(this);
+        if (this._interpreter) {
+            this._interpreter._commonEventId = this._commonEventId;
+        }
     };
 
     const Origin_Window_Message_isTriggered = Window_Message.prototype.isTriggered;
@@ -186,19 +213,22 @@
 
     const Origin_Window_ChoiceList_callOkHandler = Window_ChoiceList.prototype.callOkHandler
     Window_ChoiceList.prototype.callOkHandler = function() {
-        $gameTemp.setLastSelectedChoice(null);
+        $gameTemp.clearLastSelectedChoice();
+        $gameTemp.clearChoicesInterpreter();
         Origin_Window_ChoiceList_callOkHandler.call(this);
     };
 
     const Origin_Window_ChoiceList_callCancelHandler = Window_ChoiceList.prototype.callCancelHandler
     Window_ChoiceList.prototype.callCancelHandler = function() {
-        $gameTemp.setLastSelectedChoice(null);
+        $gameTemp.clearLastSelectedChoice();
+        $gameTemp.clearChoicesInterpreter();
         Origin_Window_ChoiceList_callCancelHandler.call(this);
     };
 
     const Origin_Window_ChoiceList_selectDefault = Window_ChoiceList.prototype.selectDefault
     Window_ChoiceList.prototype.selectDefault = function() {
-        if ($gameTemp.getLastSelectedChoice()) {
+        const index = $gameTemp.getLastSelectedChoice();
+        if (index !== null && index !== undefined) {
             this.select($gameTemp.getLastSelectedChoice());
             return;
         }
@@ -265,12 +295,15 @@
     DataManager.extractSaveContents = function(contents) {
         Origin_DataManager_extractSaveContents.call(this, contents);
 
+        $savedStates = {};
+
         if (!contents.interpreters) {
-            $gameMessage = contents.message;
+            if (contents.message) {
+                $gameMessage = contents.message;
+            }
+
             return;
         }
-
-        $savedStates = {};
 
         contents.interpreters.forEach(function(item) {
             const stateKey = item.stateKey;
@@ -287,14 +320,16 @@
 //--------COMPATIBILITY:
 
     // HIME_HiddenChoiceConditions
-    const Origin_Window_ChoiceList_makeCommandList = Window_ChoiceList.prototype.makeCommandList
-    Window_ChoiceList.prototype.makeCommandList = function() {
-        if (SceneManager._scene.isActive()) {
-            Origin_Window_ChoiceList_makeCommandList.call(this);
+    if ($isImportedDefined && Imported.HiddenChoiceConditions) {
+        const Origin_Window_ChoiceList_makeCommandList = Window_ChoiceList.prototype.makeCommandList
+        Window_ChoiceList.prototype.makeCommandList = function() {
+            if (SceneManager._scene.isActive()) {
+                Origin_Window_ChoiceList_makeCommandList.call(this);
+            }
         }
     }
 
-    if (isImportedDefined && Imported.Galv_VisualNovelChoices) {
+    if ($isImportedDefined && Imported.Galv_VisualNovelChoices) {
         const Origin_Window_ChoiceList_drawItem = Window_ChoiceList.prototype.drawItem 
         Window_ChoiceList.prototype.drawItem = function(index) {
             if (!this.choice_background){
@@ -305,7 +340,7 @@
         };
     }
     
-    if (isImportedDefined && Imported["SumRndmDde Title Command Customizer"]) {
+    if ($isImportedDefined && Imported["SumRndmDde Title Command Customizer"]) {
         const Origin_Scene_Title_createMessageWindow = Scene_Title.prototype.createMessageWindow
         Scene_Title.prototype.createMessageWindow = function() {
             $gameMessage.clear();

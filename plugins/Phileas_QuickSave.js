@@ -4,10 +4,11 @@
 // [Update History]
 // 2025.November.11 Ver1.0.0 First Release
 // 2025.November.21 Ver1.1.0 Added regular save and load buttons
+// 2025.November.30 Ver1.1.1 Fixed multiple menu openings
 
 /*:
  * @target MZ
- * @plugindesc v1.1.0 Quick save&load
+ * @plugindesc v1.1.1 Quick save&load
  * @author Phileas
  * 
  * 
@@ -208,7 +209,7 @@
  
 /*:ru
  * @target MZ
- * @plugindesc v1.1.0 Быстрое сохранение и загрузка
+ * @plugindesc v1.1.1 Быстрое сохранение и загрузка
  * @author Phileas
  * 
  * 
@@ -447,8 +448,8 @@
     };
  
     const $hotkeys = {
-        quickSave: Number($parameters["quickSaveHotKeyNumber"] || 117),
-        quickLoad: Number($parameters["quickLoadHotKeyNumber"] || 118),
+        quickSave: Number($parameters["quickSaveHotKeyNumber"] || 0),
+        quickLoad: Number($parameters["quickLoadHotKeyNumber"] || 0),
         regularSave: Number($parameters["regularSaveHotKeyNumber"] || 0),
         regularLoad: Number($parameters["regularLoadHotKeyNumber"] || 0)
     };
@@ -653,10 +654,16 @@
                 DataManager.quickLoad();
                 break;
             case $hotkeys.regularSave:
-                SceneManager.push(Scene_Save);
+                if (!(SceneManager._scene instanceof Scene_Save)) {
+                    SceneManager.push(Scene_Save);
+                }
+
                 break;
             case $hotkeys.regularLoad:
-                SceneManager.push(Scene_Load);
+                if (!(SceneManager._scene instanceof Scene_Load)) {
+                    SceneManager.push(Scene_Load);
+                }
+
                 break;
         }
     };
