@@ -7,7 +7,7 @@
 
 /*:
  * @target MZ
- * @plugindesc v1.1.0
+ * @plugindesc v1.1.0 Extends music and sound control
  * @author Phileas
  * 
  * @command playLoopingSe
@@ -337,7 +337,7 @@
 
 /*:ru
  * @target MZ
- * @plugindesc v1.1.0
+ * @plugindesc v1.1.0 Расширяет управление музыкой и звуками
  * @author Phileas
  * 
  * @command playLoopingSe

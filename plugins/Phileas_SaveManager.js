@@ -6,7 +6,7 @@
 
 /*:
  * @target MZ
- * @plugindesc v1.0.0 
+ * @plugindesc v1.0.0 Extends save control
  * @author Phileas
  *
  * @command enableAutosave
@@ -85,7 +85,7 @@
  
 /*:ru
  * @target MZ
- * @plugindesc v1.0.0
+ * @plugindesc v1.0.0 Расширяет управление сохранениями
  * @author Phileas
  *
  * @command enableAutosave
