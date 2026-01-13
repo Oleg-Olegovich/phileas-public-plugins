@@ -6,7 +6,7 @@
 
 /*:
  * @target MZ
- * @plugindesc v1.0.0 
+ * @plugindesc v1.0.0 Hide&show events
  * @author Phileas
  *
  * @command hideAllEventSprites
@@ -18,7 +18,7 @@
  * 
  * @help
  * 
- * 
+ * The plugin hides and displays event graphics using commands.
  * 
  *-----------------------------------------------------------------------------
  * 
@@ -40,7 +40,7 @@
  
 /*:ru
  * @target MZ
- * @plugindesc v1.0.0
+ * @plugindesc v1.0.0 Скрытие/отображение событий
  * @author Phileas
  *
  * @command hideAllEventSprites
@@ -52,7 +52,7 @@
  * 
  * @help
  * 
- * 
+ * Плагин скрывает и отображает графику событий с помощью команд.
  * 
  *-----------------------------------------------------------------------------
  *
@@ -120,7 +120,9 @@
     const Origin_extractSaveContents = DataManager.extractSaveContents;
     DataManager.extractSaveContents = function(contents) {
         Origin_extractSaveContents.call(this, contents);
-        $eventSpritesVisible = contents.phileasEventSpritesVisible;
+        $eventSpritesVisible = contents.phileasEventSpritesVisible === undefined
+            ? true
+            : contents.phileasEventSpritesVisible;
     };
 
 }());
