@@ -21,6 +21,20 @@
  * @command restoreDefaultAutosaveState
  * @text Restore Default Autosave State
  *
+ * @command save
+ * @text Save The Game To A File
+ * @arg file
+ * @text File (without extension)
+ * @default file0
+ * @desc file0 is an auto-save file.
+ *
+ * @command load
+ * @text Load The Game From A File
+ * @arg file
+ * @text File (without extension)
+ * @default file0
+ * @desc file0 is an auto-save file.
+ *
  * 
  * @help
  * 
@@ -65,6 +79,28 @@
  *     The autosave state is restored to
  *     the value specified in the Database.
  * 
+ * Command:
+ *     Save The Game To A File
+ * Script:
+ *     $gameSystem.saveGame(file);
+ * Arguments:
+ *     file - string, the filename without extension.
+ *            Example: file0
+ * Description:
+ *     The game is saved to the specified file.
+ *     file0 is an auto-save file.
+ * 
+ * Command:
+ *     Load The Game From A File
+ * Script:
+ *     $gameSystem.loadGame(file);
+ * Arguments:
+ *     file - string, the filename without extension.
+ *            Example: file0
+ * Description:
+ *     The game is loaded from the specified file.
+ *     file0 is an auto-save file.
+ * 
  *-----------------------------------------------------------------------------
  * 
  * You can always write to the author if you need other features or even plugins.
@@ -99,6 +135,20 @@
  *
  * @command restoreDefaultAutosaveState
  * @text Восстановить состояние автосохранения по умолчанию
+ *
+ * @command save
+ * @text Сохранить игру в файл
+ * @arg file
+ * @text Файл (без расширения)
+ * @default file0
+ * @desc file0 - файл автосохранения
+ *
+ * @command load
+ * @text Загрузить игру из файла
+ * @arg file
+ * @text Файл (без расширения)
+ * @default file0
+ * @desc file0 - файл автосохранения
  * 
  * 
  * @help
@@ -143,6 +193,28 @@
  * Описание:
  *     Состояние автосохранения восстанавливается до
  *     значения, которое указано в Базе Данных.
+ * 
+ * Команда:
+ *     Сохранить игру в файл
+ * Скрипт:
+ *     $gameSystem.saveGame(file);
+ * Аргументы:
+ *     file - строка, название файла без расширения.
+ *            Пример: file0
+ * Описание:
+ *     Игра сохраняется в указанный файл.
+ *     file0 - файл автосохранения.
+ * 
+ * Команда:
+ *     Загрузить игру из файла
+ * Скрипт:
+ *     $gameSystem.loadGame(file);
+ * Аргументы:
+ *     file - строка, название файла без расширения.
+ *            Пример: file0
+ * Описание:
+ *     Игра загружается из указанного файла.
+ *     file0 - файл автосохранения.
  * 
  *-----------------------------------------------------------------------------
  *
@@ -197,6 +269,14 @@
         $settings.autosave = $defaultSettings.autosave;
     };
 
+    Game_System.prototype.saveGame = function() {
+        
+    };
+
+    Game_System.prototype.loadGame = function() {
+        
+    };
+
 
 //-----------------------------------------------------------------------------
 // Commands
@@ -205,6 +285,8 @@
     PluginManager.registerCommand("Phileas_SaveManager", "disableAutosave", disableAutosaveByCommand);
     PluginManager.registerCommand("Phileas_SaveManager", "restoreDefaultSettings", restoreDefaultSettingsByCommand);
     PluginManager.registerCommand("Phileas_SaveManager", "restoreDefaultAutosaveState", restoreDefaultAutosaveStateByCommand);
+    PluginManager.registerCommand("Phileas_SaveManager", "save", saveByCommand);
+    PluginManager.registerCommand("Phileas_SaveManager", "load", loadByCommand);
 
     function enableAutosaveByCommand() {
         $gameSystem.enableAutosave();
@@ -220,6 +302,14 @@
 
     function restoreDefaultAutosaveStateByCommand() {
         $gameSystem.restoreDefaultAutosaveState();
+    }
+
+    function saveByCommand() {
+        $gameSystem.saveGame();
+    }
+
+    function loadByCommand() {
+        $gameSystem.loadGame();
     }
 
 
