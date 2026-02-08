@@ -12,6 +12,7 @@
 //                           Added menu button
 //                           Fixed "skip only seen text" feature for parallel events
 //                           Added "skip to input" feature
+// 2026.February.2 Ver1.4.1 Fixed message skipping during battle
 
 /*:
  * @target MZ
@@ -904,7 +905,7 @@
         }
     };
 
-    Scene_Map.prototype.isFastForwardButtonPressed = function() {
+    Scene_Message.prototype.isFastForwardButtonPressed = function() {
         return this._fastForwardButton && this._fastForwardButton.isPressed();
     };
 
