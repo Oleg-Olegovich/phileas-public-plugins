@@ -465,7 +465,7 @@
 
         const id = saveName.substring(4);
 
-        if (!Number.isFinite(id)) {
+        if (!isFinite(id)) {
             return null;
         }
 
@@ -478,7 +478,7 @@
         StorageManager.saveObject(saveName, contents).then(() => {
             const savefileId = DataManager.tryGetSavefileId(saveName);
 
-            if (savefileId) {
+            if (Number.isFinite(savefileId)) {
                 this._globalInfo[savefileId] = this.makeSavefileInfo();
             }
 

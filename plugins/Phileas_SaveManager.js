@@ -3,10 +3,11 @@
 //=============================================================================
 // [Update History]
 // 2025.December.1 Ver1.0.0 First Release
+// 2026.February.14 Ver1.1.0 Added save&load to file
 
 /*:
  * @target MZ
- * @plugindesc v1.0.0 Extends save control
+ * @plugindesc v1.1.0 Extends save control
  * @author Phileas
  *
  * @command enableAutosave
@@ -121,7 +122,7 @@
  
 /*:ru
  * @target MZ
- * @plugindesc v1.0.0 Расширяет управление сохранениями
+ * @plugindesc v1.1.0 Расширяет управление сохранениями
  * @author Phileas
  *
  * @command enableAutosave
@@ -269,12 +270,24 @@
         $settings.autosave = $defaultSettings.autosave;
     };
 
-    Game_System.prototype.saveGame = function() {
-        
+    Game_System.prototype.saveGame = function(file) {
+        this.onBeforeSave();
+
+        const contents = DataManager.makeSaveContents();
+        StorageManager.saveObject(file, contents).then(() => {
+            const savefileId = DataManager.saveManagerTryGetSavefileId(file);
+
+            if (Number.isFinite(savefileId)) {
+                DataManager._globalInfo[savefileId] = DataManager.makeSavefileInfo();
+            }
+
+            DataManager.saveGlobalInfo();
+            return 0;
+        });
     };
 
-    Game_System.prototype.loadGame = function() {
-        
+    Game_System.prototype.loadGame = function(file) {
+        DataManager.executeSaveManagerLoad(file).then(() => DataManager.onSaveManagerLoadSuccess());
     };
 
 
@@ -304,12 +317,14 @@
         $gameSystem.restoreDefaultAutosaveState();
     }
 
-    function saveByCommand() {
-        $gameSystem.saveGame();
+    function saveByCommand(params) {
+        const file = params["file"];
+        $gameSystem.saveGame(file);
     }
 
-    function loadByCommand() {
-        $gameSystem.loadGame();
+    function loadByCommand(params) {
+        const file = params["file"];
+        $gameSystem.loadGame(file);
     }
 
 
@@ -321,6 +336,49 @@
             autosave: $dataSystem.optAutosave
         };
     }
+
+    DataManager.saveManagerTryGetSavefileId = function(saveName) {
+        if (!saveName.startsWith("file")) {
+            return null;
+        }
+
+        const id = saveName.substring(4);
+
+        if (!isFinite(id)) {
+            return null;
+        }
+
+        return Number(id);
+    };
+
+    DataManager.executeSaveManagerLoad = function(saveName) {
+        return StorageManager.loadObject(saveName).then(contents => {
+            this.createGameObjects();
+            this.extractSaveContents(contents);
+            this.correctDataErrors();
+            return 0;
+        });
+    };
+
+    DataManager.onSaveManagerLoadSuccess = function() {
+        SoundManager.playLoad();
+        const scene = SceneManager._scene;
+        scene.fadeOutAll();
+        DataManager.saveManagerReloadMapIfUpdated();
+        SceneManager.goto(Scene_Map);
+        $gameSystem.onAfterLoad();        
+    };
+
+    DataManager.saveManagerReloadMapIfUpdated = function() {
+        if ($gameSystem.versionId() !== $dataSystem.versionId) {
+            const mapId = $gameMap.mapId();
+            const x = $gamePlayer.x;
+            const y = $gamePlayer.y;
+            const d = $gamePlayer.direction();
+            $gamePlayer.reserveTransfer(mapId, x, y, d, 0);
+            $gamePlayer.requestMapReload();
+        }
+    };
 
 
 //-----------------------------------------------------------------------------
