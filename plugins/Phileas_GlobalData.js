@@ -502,8 +502,9 @@ GlobalDataManager.saveData = function() {
 
     GlobalDataManager._saveQueue = GlobalDataManager._saveQueue
         .then(() => StorageManager.saveObject(this._globalSaveFileName, content))
-        .catch(e => {
-            console.error(`[Phileas's] Global data saving failed`, e);
+        .catch((e) => {
+            console.warn(`[Phileas's] Global data saving failed`, e);
+            return 0;
         });
 
     return this._saveQueue;
@@ -521,8 +522,8 @@ GlobalDataManager.loadData = function() {
             this.extractGlobalSaveContent();
             return 0;
         })
-        .catch(e => {
-            console.error(`[Phileas's] Global data loading failed`, e);
+        .catch((e) => {
+            console.warn(`[Phileas's] Global data loading failed`, e);
         });
 };
 
@@ -734,20 +735,20 @@ GlobalDataManager._globalSaveFileName = "phileas_global";
 
     const Original_SceneManager_exit = SceneManager.exit;
     SceneManager.exit = function() {
-        GlobalData.saveData();
-        GlobalData.flush().finally(() => Original_SceneManager_exit.call(this));
+        GlobalDataManager.saveData();
+        GlobalDataManager.flush().finally(() => Original_SceneManager_exit.call(this));
     };
 
     const Original_SceneManager_reloadGame = SceneManager.reloadGame;
     SceneManager.reloadGame = function() {
-        GlobalData.saveData();
-        GlobalData.flush().finally(() => Original_SceneManager_reloadGame.call(this));
+        GlobalDataManager.saveData();
+        GlobalDataManager.flush().finally(() => Original_SceneManager_reloadGame.call(this));
     };
 
     const Original_DataManager_saveGame = DataManager.saveGame;
     DataManager.saveGame = function(savefileId) {
-        GlobalData.queueSave();
-        return GlobalData.flush().then(() => Original_DataManager_saveGame.call(this, savefileId));
+        GlobalDataManager.saveData();
+        return GlobalDataManager.flush().then(() => Original_DataManager_saveGame.call(this, savefileId));
     };
 
     const Original_DataManager_loadGlobalInfo = DataManager.loadGlobalInfo;
@@ -773,8 +774,8 @@ GlobalDataManager._globalSaveFileName = "phileas_global";
 
     const Original_Scene_Load_executeLoad = Scene_Load.prototype.executeLoad;
     Scene_Load.prototype.executeLoad = function(savefileId) {
-        GlobalData.saveData();
-        GlobalData.flush().finally(() => Original_Scene_Load_executeLoad.call(this, savefileId));
+        GlobalDataManager.saveData();
+        GlobalDataManager.flush().finally(() => Original_Scene_Load_executeLoad.call(this, savefileId));
     };
 
 }());
