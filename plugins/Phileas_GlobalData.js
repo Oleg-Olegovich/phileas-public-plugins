@@ -115,7 +115,7 @@
  * 
  *
  * @command clearDataByKey
- * @command Clear Data By Key
+ * @text Clear Data By Key
  * @desc Removes a piece of data by key
  *
  * @arg key
@@ -124,7 +124,7 @@
  * 
  *
  * @command clearAllData
- * @command Clear All Data
+ * @text Clear All Data
  * @desc Removes all data, that was added by keys via commands
  *
  * 
@@ -357,7 +357,7 @@
  * 
  *
  * @command clearDataByKey
- * @command Удалить данные по ключу
+ * @text Удалить данные по ключу
  * @desc Удаляет часть данных по ключу
  *
  * @arg key
@@ -366,7 +366,7 @@
  * 
  *
  * @command clearAllData
- * @command Удалить все данные
+ * @text Удалить все данные
  * @desc Удаляет все данные, которые были добавлены по ключам через команды
  * 
  * 
@@ -500,7 +500,7 @@ GlobalDataManager.saveData = function() {
     const content = this.makeGlobalSaveContent();
     this._cachedContent = content;
 
-    GlobalDataManager._saveQueue = GlobalDataManager._saveQueue
+    this._saveQueue = this._saveQueue
         .then(() => StorageManager.saveObject(this._globalSaveFileName, content))
         .catch((e) => {
             console.warn(`[Phileas's] Global data saving failed`, e);
@@ -529,7 +529,7 @@ GlobalDataManager.loadData = function() {
 
 GlobalDataManager.addSwitchData = function(key, switchId) {
     this._data[key] = {
-        type: GlobalDataManager._type.SWITCH,
+        type: this._type.SWITCH,
         id: switchId,
         value: $gameSwitches.value(switchId)
     };
@@ -537,7 +537,7 @@ GlobalDataManager.addSwitchData = function(key, switchId) {
 
 GlobalDataManager.addVariableData = function(key, variableId) {
     this._data[key] = {
-        type: GlobalDataManager._type.VARIABLE,
+        type: this._type.VARIABLE,
         id: variableId,
         value: $gameVariables.value(variableId)
     };
@@ -545,14 +545,14 @@ GlobalDataManager.addVariableData = function(key, variableId) {
 
 GlobalDataManager.addTextData = function(key, text) {
     this._data[key] = {
-        type: GlobalDataManager._type.TEXT,
+        type: this._type.TEXT,
         value: text
     };
 };
 
 GlobalDataManager.addNumberData = function(key, number) {
     this._data[key] = {
-        type: GlobalDataManager._type.NUMBER,
+        type: this._type.NUMBER,
         value: number
     };
 };
@@ -560,7 +560,7 @@ GlobalDataManager.addNumberData = function(key, number) {
 GlobalDataManager.getSwitchDataByKey = function(key, switchId) {
     const obj = this._data[key];
 
-    if (!obj || obj.type !== GlobalDataManager._type.SWITCH) {
+    if (!obj || obj.type !== this._type.SWITCH) {
         console.warn(`[Phileas's] Switch data getting failed. Key: ${key}. Switch ID: ${switchId}`);
         return;
     }
@@ -593,20 +593,20 @@ GlobalDataManager.makeGlobalSaveContent = function() {
     return {
         switches: $gameSwitches._data,
         variables: $gameVariables._date,
-        data: GlobalDataManager._data
+        data: this._data
     };
 };
 
 GlobalDataManager.extractGlobalSaveContent = function() {
     const content = this._cachedContent;
-    GlobalDataManager._data = content.data;
+    this._data = content.data;
 
     if (!$gameSwitches || !$gameVariables || !this._globalSwitchIds || !this._globalVariableIds) {
         return;
     }
 
-    this._globalSwitchIds.forEach((id) => $gameSwitches.setValue(id, content.switch[id]));
-    this._globalVariableIds.forEach((id) => $gameVariables.setValue(id, content.variable[id]));
+    this._globalSwitchIds.forEach((id) => $gameSwitches.setValue(id, content.switches[id]));
+    this._globalVariableIds.forEach((id) => $gameVariables.setValue(id, content.variables[id]));
 };
 
 GlobalDataManager.flush = function() {
