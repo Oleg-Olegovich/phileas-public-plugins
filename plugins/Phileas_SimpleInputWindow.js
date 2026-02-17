@@ -14,10 +14,11 @@
 // 2025.January.06 Ver1.3.1 Fixed window without help message 
 // 2025.June.03 Ver1.3.2 Fixed russian keyboard
 // 2025.June.07 Ver1.3.3 Fixed russian keyboard input
+// 2026.February.17 Ver1.3.4 Fixed bug with fn keys input
 
 /*:
  * @target MZ
- * @plugindesc v1.3.3 Minimalistic input of names and variables
+ * @plugindesc v1.3.4 Minimalistic input of names and variables
  * @author Phileas
  *
  * @command nameInput
@@ -244,7 +245,7 @@
 
 /*:ru
  * @target MZ
- * @plugindesc v1.3.3 Минималистичный ввод имён и переменных
+ * @plugindesc v1.3.4 Минималистичный ввод имён и переменных
  * @author Phileas
  *
  * @command nameInput
@@ -1054,8 +1055,7 @@ Window_PhileasInput.prototype.keyDownHandler = function(event) {
     let letterCode = event.keyCode - 65;
 
     if (this._language == "ru") {
-        const key = String.fromCharCode(event.keyCode).toLocaleLowerCase();
-        const rukey = PHILEAD_EN_RU_MAP[key] || PHILEAD_EN_RU_MAP[event.key] || event.key.toLocaleLowerCase();
+        const rukey = PHILEAD_EN_RU_MAP[event.code.toLowerCase()] || PHILEAD_EN_RU_MAP[event.key.toLowerCase()] || event.key.toLowerCase();
 
         letterCode = rukey.charCodeAt(0) - this._table[0].toLowerCase().charCodeAt(0);
     }
