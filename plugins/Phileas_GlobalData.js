@@ -592,7 +592,7 @@ GlobalDataManager.clearAllData = function() {
 GlobalDataManager.makeGlobalSaveContent = function() {
     return {
         switches: $gameSwitches._data,
-        variables: $gameVariables._date,
+        variables: $gameVariables._data,
         data: this._data
     };
 };
