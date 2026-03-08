@@ -15,10 +15,12 @@
 // 2025.June.03 Ver1.3.2 Fixed russian keyboard
 // 2025.June.07 Ver1.3.3 Fixed russian keyboard input
 // 2026.February.17 Ver1.3.4 Fixed bug with fn keys input
+// 2026.March.08 Ver1.3.5 Fixed digit input
+//                        Added "Blur the background" and "Background Opacity" options
 
 /*:
  * @target MZ
- * @plugindesc v1.3.4 Minimalistic input of names and variables
+ * @plugindesc v1.3.5 Minimalistic input of names and variables
  * @author Phileas
  *
  * @command nameInput
@@ -120,6 +122,17 @@
  * @text Width padding
  * @number 0
  * @desc The value is added to the width of the windows
+ * 
+ * @arg backgroundBlur
+ * @text Blur the background
+ * @desc Blurs the background (as in the default input window)
+ * @type boolean
+ * @default true
+ * 
+ * @arg backgroundOpacity
+ * @text Background Opacity
+ * @type number
+ * @default 192
  *
  *
  * @command variableInput
@@ -215,6 +228,17 @@
  * @number 0
  * @desc The value is added to the width of the windows
  * 
+ * @arg backgroundBlur
+ * @text Blur the background
+ * @desc Blurs the background (as in the default input window)
+ * @type boolean
+ * @default true
+ * 
+ * @arg backgroundOpacity
+ * @text Background Opacity
+ * @type number
+ * @default 192
+ * 
  *
  * @help
  * The plugin allows you to display a minimalistic input window and provides many configuration options.
@@ -245,7 +269,7 @@
 
 /*:ru
  * @target MZ
- * @plugindesc v1.3.4 Минималистичный ввод имён и переменных
+ * @plugindesc v1.3.5 Минималистичный ввод имён и переменных
  * @author Phileas
  *
  * @command nameInput
@@ -345,6 +369,17 @@
  * @text Отступ по ширине
  * @number 0
  * @desc Значение прибавляется к ширине окон
+ * 
+ * @arg backgroundBlur
+ * @text Размыть фон
+ * @desc Делает фон размытым (как в стандартном окне ввода)
+ * @type boolean
+ * @default true
+ * 
+ * @arg backgroundOpacity
+ * @text Непрозрачность фона
+ * @type number
+ * @default 192
  *
  *
  * @command variableInput
@@ -439,6 +474,17 @@
  * @text Отступ по ширине
  * @number 0
  * @desc Значение прибавляется к ширине окон
+ * 
+ * @arg backgroundBlur
+ * @text Размыть фон
+ * @desc Делает фон размытым (как в стандартном окне ввода)
+ * @type boolean
+ * @default true
+ * 
+ * @arg backgroundOpacity
+ * @text Непрозрачность фона
+ * @type number
+ * @default 192
  * 
  *
  * @help
@@ -566,12 +612,14 @@ const PHILEAD_EN_RU_MAP = {
         const firstIsUpper = params["firstIsUpper"] == "true";
         const clear = params["clear"] == "true";
         const message = params["message"] || "";
-        const widthPadding = Number(params["widthPadding"]) || 0;
+        const widthPadding = Number(params["widthPadding"] || 0);
+        const backgroundBlur = !(params["backgroundBlur"] == "false");
+        const backgroundOpacity = Number(params["backgroundOpacity"] || 192);
 
         SceneManager.push(Scene_PhileasInput);
         SceneManager.prepareNextScene(actorId, showFace, variableId, language,
             keyMap, additionalKeyMaps, minLength, maxLength, allowCancel, allowSpace,
-            keyboardInput, firstIsUpper, clear, message, widthPadding);
+            keyboardInput, firstIsUpper, clear, message, widthPadding, backgroundBlur, backgroundOpacity);
     }
 
     function nameInput(params) {
@@ -604,7 +652,7 @@ Scene_PhileasInput.prototype.initialize = function() {
 
 Scene_PhileasInput.prototype.prepare = function(actorId, showFace,
     variableId, language, keyMap, additionalKeyMaps, minLength, maxLength, allowCancel,
-    allowSpace, keyboardInput, firstIsUpper, clear, message, widthPadding) {
+    allowSpace, keyboardInput, firstIsUpper, clear, message, widthPadding, backgroundBlur, backgroundOpacity) {
 
     this._actorId = actorId;
     this._showFace = showFace;
@@ -619,6 +667,8 @@ Scene_PhileasInput.prototype.prepare = function(actorId, showFace,
     this._clear = clear;
     this._message = message == "" ? "" : JSON.parse(message);
     this._widthPadding = widthPadding;
+    this._backgroundBlur = backgroundBlur;
+    this._backgroundOpacity = backgroundOpacity;
 
     this._keyMaps = [keyMap];
     this._keyMaps = this._keyMaps.concat(additionalKeyMaps);
@@ -632,6 +682,18 @@ Scene_PhileasInput.prototype.create = function() {
         ? undefined
         : $gameActors.actor(this._actorId);
     this.createWindows();
+};
+
+Scene_PhileasInput.prototype.createBackground = function() {
+    if (this._backgroundBlur) {
+        Scene_MenuBase.prototype.createBackground.call(this);
+    } else {
+        this._backgroundSprite = new Sprite();
+        this._backgroundSprite.bitmap = SceneManager.backgroundBitmap();
+        this.addChild(this._backgroundSprite);
+    }
+    
+    this.setBackgroundOpacity(this._backgroundOpacity);
 };
 
 Scene_PhileasInput.prototype.createWindows = function() {
@@ -838,6 +900,7 @@ Window_PhileasInput.prototype.initialize
         this._editWindow = null;
         this._index = 0;
         this._language = language;
+        this._isDigits = keyMap == "digits";
         this._table = Window_PhileasInput.table(language, keyMap);
         this._columnsNumber = Math.ceil(Math.sqrt(this._table.length));
         this._rowsNumber = Math.ceil(this._table.length / this._columnsNumber);
@@ -990,7 +1053,14 @@ Window_PhileasInput.prototype.cursorLeft = function(wrap) {
 };
 
 Window_PhileasInput.prototype.processCursorMove = function() {
-    Window_Selectable.prototype.processCursorMove.call(this);
+    if (this.isCursorMovable()) {
+        const lastIndex = this.index();
+
+        if (this.index() !== lastIndex) {
+            this.playCursorSound();
+        }
+    }
+
     this.updateCursor();
 };
 
@@ -1052,6 +1122,16 @@ Window_PhileasInput.prototype.keyDownHandler = function(event) {
         return;
     }
 
+    if (this._isDigits) {
+        let digit = event.keyCode - 48;
+
+        if (digit >= 0 && digit <= 9) {
+            this._addLetter(digit);
+        }
+
+        return;
+    }
+
     let letterCode = event.keyCode - 65;
 
     if (this._language == "ru") {
@@ -1065,7 +1145,10 @@ Window_PhileasInput.prototype.keyDownHandler = function(event) {
     }
 
     const letter = this._table[letterCode];
+    this._addLetter(letter);    
+};
 
+Window_PhileasInput.prototype._addLetter = function(letter) {
     if (this._editWindow.add(letter)) {
         this.playOkSound();
     } else {
