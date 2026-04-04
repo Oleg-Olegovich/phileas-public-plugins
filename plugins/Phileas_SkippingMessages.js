@@ -567,6 +567,7 @@
 
     let $seenCash = {}; // { tag: true }
     let $seenCashDirtiness = 0;
+    const commonEventIdByList = new WeakMap();
 
     setSkipOnCancel();
 
@@ -756,6 +757,10 @@
 //-----------------------------------------------------------------------------
 // Objects
 
+    Game_Interpreter.prototype.phileasStopSkipCommands = function() {
+        return [102, 103, 104];
+    };
+
     Game_Temp.prototype.phileasSaveMessageInterpreter = function(interpreter) {
         this._phileasMessageInterpreter = interpreter;
     };
@@ -764,24 +769,88 @@
         return this._phileasMessageInterpreter;
     };
 
-    Game_Interpreter.prototype.phileasGetCurrentTag = function() {
-        const eventId = this._eventId;
+    Game_Interpreter.prototype.makeCurrentShowTextUid = function() {
+        const info = this._eventSourceInfo;
+        const textCommandIndex = this._index;
 
-        if (this === $gameMap._interpreter) {
-            return `map:${$gameMap._mapId}:${this._depth}:${this._index}`;
-        }
-        
-        if (!eventId) {
-            return `common:${eventId}:${this._depth}:${this._index}`;
+        if (!info) {
+            return `unknown:text:${textCommandIndex}`;
         }
 
-        const pageId = $gameMap.event(eventId)._pageIndex;
-        return `event:${$gameMap._mapId}:${eventId}:${this._depth}:${pageId || 0}:${this._index}`;
+        if (info.type === "map") {
+            return `map:${info.mapId}:event:${info.eventId}:page:${info.pageIndex}:text:${textCommandIndex}`;
+        }
+
+        if (info.type === "common") {
+            return `common:${info.commonEventId}:text:${textCommandIndex}`;
+        }
+
+        return `unknown:text:${textCommandIndex}`;
     };
 
-    Game_Interpreter.prototype.phileasStopSkipCommands = function() {
-        return [102, 103, 104];
-    }
+    Game_Interpreter.prototype._phileasResolveEventSourceInfo = function(list, eventId) {
+        if (!list) {
+            return { type: "unknown" };
+        }
+
+        if (eventId > 0) {
+            const mapId = this._mapId || ($gameMap ? $gameMap.mapId() : 0);
+            return {
+                type: "map",
+                mapId,
+                eventId,
+                pageIndex: this._phileasFindPageIndexByList(eventId, list)
+            };
+        }
+
+        let commonEventId = commonEventIdByList.get(list);
+        if (!commonEventId) {
+            commonEventId = this._phileasFindCommonEventIdByList(list);
+            if (commonEventId > 0) {
+                commonEventIdByList.set(list, commonEventId);
+            }
+        }
+
+        if (commonEventId > 0) {
+            return {
+                type: "common",
+                commonEventId
+            };
+        }
+
+        return { type: "unknown" };
+    };
+
+    Game_Interpreter.prototype._phileasFindPageIndexByList = function(eventId, list) {
+        const eventData = $dataMap?.events?.[eventId];
+        if (!eventData?.pages) {
+            return -1;
+        }
+
+        for (let i = 0; i < eventData.pages.length; i++) {
+            if (eventData.pages[i] && eventData.pages[i].list === list) {
+                return i;
+            }
+        }
+
+        return -1;
+    };
+
+    Game_Interpreter.prototype._phileasFindCommonEventIdByList = function(list) {
+        const commonEvents = $dataCommonEvents;
+        if (!commonEvents) {
+            return 0;
+        }
+
+        for (let i = 1; i < commonEvents.length; i++) {
+            const ce = commonEvents[i];
+            if (ce && ce.list === list) {
+                return ce.id;
+            }
+        }
+
+        return 0;
+    };
 
 
 //-----------------------------------------------------------------------------
@@ -823,14 +892,14 @@
 // Windows
 
     Window_Message.prototype.phileasGetTag = function() {
-        const interpreter = $gameTemp.phileasGetMessageInterpreter();
+        const uid = $gameMessage.messageUid();
 
-        if (!interpreter) {
-            console.warn("Phileas_SkippingMessages: the message interpreter is not specified");
+        if (!uid) {
+            console.warn("Phileas_SkippingMessages: the message UID is null");
             return null;
         }
 
-        return interpreter.phileasGetCurrentTag();
+        return uid;
     };
 
 
@@ -933,32 +1002,64 @@
 // Windows
 
     if ($skipUnseenFeatureEnabled) {
-        const Origin_SceneManager_reloadGame = SceneManager.reloadGame;
+        const Original_SceneManager_reloadGame = SceneManager.reloadGame;
         SceneManager.reloadGame = function() {
             saveSeenCash();
-            Origin_SceneManager_reloadGame.call(this);
+            Original_SceneManager_reloadGame.call(this);
         };
 
-        const Origin_SceneManager_onSceneTerminate = SceneManager.onSceneTerminate;
+        const Original_SceneManager_onSceneTerminate = SceneManager.onSceneTerminate;
         SceneManager.onSceneTerminate = function() {
             saveSeenCash();
-            Origin_SceneManager_onSceneTerminate.call(this);
+            Original_SceneManager_onSceneTerminate.call(this);
         };
         
-        const Origin_SceneManager_terminate = SceneManager.terminate;
+        const Original_SceneManager_terminate = SceneManager.terminate;
         SceneManager.terminate = function() {
             saveSeenCash();
-            Origin_SceneManager_terminate.call(this);
+            Original_SceneManager_terminate.call(this);
         };
 
-        const Origin_Scene_Map_onMapLoaded = Scene_Map.prototype.onMapLoaded;
+        const Original_Scene_Map_onMapLoaded = Scene_Map.prototype.onMapLoaded;
         Scene_Map.prototype.onMapLoaded = function() {
             saveSeenCash();
-            Origin_Scene_Map_onMapLoaded.call(this);
+            Original_Scene_Map_onMapLoaded.call(this);
         };
 
         window.onbeforeunload = function() {
             saveSeenCash();
+        };
+
+        const Original_Game_Interpreter_clear = Game_Interpreter.prototype.clear;
+        Game_Interpreter.prototype.clear = function() {
+            Original_Game_Interpreter_clear.call(this);
+            this._eventSourceInfo = null;
+            this._currentShowTextUid = null;
+        };
+
+        const Original_Game_Interpreter_setup = Game_Interpreter.prototype.setup;
+        Game_Interpreter.prototype.setup = function(list, eventId) {
+            Original_Game_Interpreter_setup.call(this, list, eventId);
+            this._eventSourceInfo = this._phileasResolveEventSourceInfo(list, eventId);
+            this._currentShowTextUid = null;
+        };
+
+        const Original_Game_Interpreter_command101 = Game_Interpreter.prototype.command101;
+        Game_Interpreter.prototype.command101 = function(params) {
+            this._currentShowTextUid = this.makeCurrentShowTextUid();
+            $gameMessage._messageUid = this._currentShowTextUid;
+
+            return Original_Game_Interpreter_command101.call(this, params);
+        };
+
+        const Original_Game_Message_clear = Game_Message.prototype.clear;
+        Game_Message.prototype.clear = function() {
+            Original_Game_Message_clear.call(this);
+            this._messageUid = null;
+        };
+
+        Game_Message.prototype.messageUid = function() {
+            return this._messageUid;
         };
 
         const Original_isTriggered = Window_Message.prototype.isTriggered;
@@ -1029,9 +1130,9 @@
 //-----------------------------------------------------------------------------
 // Managers
 
-    const Origin_setupNewGame = DataManager.setupNewGame;
+    const Original_setupNewGame = DataManager.setupNewGame;
     DataManager.setupNewGame = function () {
-        Origin_setupNewGame.call(this);
+        Original_setupNewGame.call(this);
         $isFastMode = $defaultFastMode;
         $skipUnseenOn = $defaultSkipUnseen;
 
@@ -1040,9 +1141,9 @@
         }
     };
 
-    const Origin_makeSaveContents = DataManager.makeSaveContents;
+    const Original_makeSaveContents = DataManager.makeSaveContents;
     DataManager.makeSaveContents = function () {
-        let contents = Origin_makeSaveContents.call(this);
+        let contents = Original_makeSaveContents.call(this);
         contents.phileasSkippingMessages_skipEnabled = $skipEnabled;
         contents.phileasSkippingMessages_fastForwardEnabled = $fastForwardEnabled;
         contents.phileasSkippingMessages_isFastMode = $isFastMode;
@@ -1055,9 +1156,9 @@
         return contents;
     };
 
-    const Origin_extractSaveContents = DataManager.extractSaveContents;
+    const Original_extractSaveContents = DataManager.extractSaveContents;
     DataManager.extractSaveContents = function (contents) {
-        Origin_extractSaveContents.call(this, contents);
+        Original_extractSaveContents.call(this, contents);
         $skipEnabled = contents.phileasSkippingMessages_skipEnabled === false
             ? false
             : true;
