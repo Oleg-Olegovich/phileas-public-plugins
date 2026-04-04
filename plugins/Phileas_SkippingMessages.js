@@ -13,10 +13,12 @@
 //                           Fixed "skip only seen text" feature for parallel events
 //                           Added "skip to input" feature
 // 2026.February.2 Ver1.4.1 Fixed message skipping during battle
+// 2026.April.4 Ver1.4.2 Fixed "skip only seen text" feature
+//                       Data about seen text is saved more often
 
 /*:
  * @target MZ
- * @plugindesc v1.4.0 The plugin allows to skip messages by pressing any key
+ * @plugindesc v1.4.2 The plugin allows to skip messages by pressing any key
  * @author Phileas
  * 
  * 
@@ -144,7 +146,14 @@
  * @text Skip unseen switch
  * @type switch
  * @default 0
- * @desc If the switch is on, unseen text will be skipped.
+ * @desc If the switch is on, unseen text will be skipped
+ * 
+ * @param autoSkipUnseenFrequency
+ * @parent skipUnseenSection
+ * @text Autosave frequency
+ * @type number
+ * @default 0
+ * @desc How many times the data about the read text will be saved. If 0, auto-save is disabled
  * 
  *
  * @command setSkipKey
@@ -239,7 +248,7 @@
  * You can add an option to the settings menu using the Phileas_OptionsManager plugin!
  * 
  * In version 1.4.0, the function of skipping to the nearest input window was added:
- * срщшсуы, number input, or item selection. The function can be assigned
+ * choices, number input, or item selection. The function can be assigned
  * to a keyboard key or a button on the screen.
  * 
  *
@@ -260,7 +269,7 @@
  
 /*:ru
  * @target MZ
- * @plugindesc v1.4.0 Плагин позволяет пропускать сообщения нажатием любой клавиши
+ * @plugindesc v1.4.2 Плагин позволяет пропускать сообщения нажатием любой клавиши
  * @author Phileas
  * 
  * 
@@ -389,7 +398,14 @@
  * @text Переключатель пропуска непрочитанного
  * @type switch
  * @default 0
- * @desc Если переключатель включён, будет пропускаться непрочитанный текст.
+ * @desc Если переключатель включён, будет пропускаться непрочитанный текст
+ * 
+ * @param autoSkipUnseenFrequency
+ * @parent skipUnseenSection
+ * @text Частота автосохранения
+ * @type number
+ * @default 0
+ * @desc Раз в сколько сообщений будут сохраняться данные о прочитанном тексте. Если 0 - автосохранение отключено
  * 
  *
  * @command setSkipKey
@@ -524,7 +540,8 @@
     const $defaultFastMode = $parameters["defaultSkipSpeed"] == "Fast";
     const $skipUnseenFeatureEnabled = $parameters["skipUnseenFeatureEnabled"] == "true";
     const $defaultSkipUnseen = $parameters["defaultSkipUnseen"] == "true";
-    const $skipUnseenSwitch = Number($parameters["skipUnseenSwitch"]);
+    const $skipUnseenSwitch = Number($parameters["skipUnseenSwitch"] || 0);
+    const $autoSkipUnseenFrequency = Number($parameters["autoSkipUnseenFrequency"] || 0);
 
     const $fastForwardButton = {
         file: $parameters["fastForwardButtonFile"],
@@ -548,8 +565,8 @@
 
     let $skipToChoices = false;
 
-    // { mapId: { eventId: Set { commandId } } }
-    let seenCash = new Map();
+    let $seenCash = {}; // { tag: true }
+    let $seenCashDirtiness = 0;
 
     setSkipOnCancel();
 
@@ -695,77 +712,39 @@
         return $gameSwitches.value($skipUnseenSwitch);
     }
 
-    // tag: [mapId, eventId, commandId]
     function addSeenCash(tag) {
-        const mapId = tag[0];
-        const eventId = tag[1];
-        const commandId = tag[2];
-
-        if (seenCash.get(mapId) == undefined) {
-            seenCash.set(mapId, new Map());
+        if (!tag) {
+            return;
         }
 
-        const mapCash = seenCash.get(mapId);
+        $seenCash[tag] = true;
 
-        if (mapCash.get(eventId) == undefined) {
-            mapCash.set(eventId, new Set());
+        if ($autoSkipUnseenFrequency === 0) {
+            return;
         }
 
-        const eventCash = mapCash.get(eventId);
-        eventCash.add(commandId);
+        ++$seenCashDirtiness;
+
+        if ($seenCashDirtiness >= $autoSkipUnseenFrequency) {
+            saveSeenCash();
+        }
     }
 
     function checkSeenCash(tag) {
-        const mapId = tag[0];
-        const eventId = tag[1];
-        const commandId = tag[2];
-
-        const mapCash = seenCash.get(mapId);
-        if (mapCash == undefined) {
-            return false;
-        }
-
-        const eventCash = mapCash.get(eventId);
-
-        if (eventCash == undefined) {
-            return false;
-        }
-
-        return eventCash.has(commandId);
+        return tag
+            ? !!$seenCash[tag]
+            : false;
     }
 
     function saveSeenCash() {
-        const serialized = {};
-
-        for (const [key, mapCash] of seenCash.entries()) {
-            const serializedMapCash = {};
-
-            for (const [mapKey, setValue] of mapCash.entries()) {
-                serializedMapCash[mapKey] = Array.from(setValue);
-            }
-
-            serialized[key] = serializedMapCash
-        }
-
-        const json = JSON.stringify(serialized);
+        const json = JSON.stringify($seenCash);
         StorageManager.saveObject($seenCashFileName, json);
+        $seenCashDirtiness = 0;
     }
 
     function loadSeenCash() {
         StorageManager.loadObject($seenCashFileName).then(json => {
-            parsed = JSON.parse(json);
-            seenCash = new Map();
-
-            for (const [key, mapCash] of Object.entries(parsed)) {
-                const map = new Map();
-
-                for (const [mapKey, setValue] of Object.entries(mapCash)) {
-                    map.set(Number(mapKey), new Set(setValue));
-                }
-
-                seenCash.set(Number(key), map);
-            }
-
+            $seenCash = JSON.parse(json);
             return 0;
         })
         .catch(() => {
@@ -789,15 +768,15 @@
         const eventId = this._eventId;
 
         if (this === $gameMap._interpreter) {
-            return `map:${$gameMap._mapId}`;
+            return `map:${$gameMap._mapId}:${this._depth}:${this._index}`;
         }
         
         if (!eventId) {
-            return `common:${eventId}:${this._depth}`;
+            return `common:${eventId}:${this._depth}:${this._index}`;
         }
 
         const pageId = $gameMap.event(eventId)._pageIndex;
-        return `event:${$gameMap._mapId}:${eventId}:${this._depth}:${pageId || 0}`;
+        return `event:${$gameMap._mapId}:${eventId}:${this._depth}:${pageId || 0}:${this._index}`;
     };
 
     Game_Interpreter.prototype.phileasStopSkipCommands = function() {
@@ -843,21 +822,15 @@
 //-----------------------------------------------------------------------------
 // Windows
 
-    Window_Message.prototype.phileasGetEventId = function() {
-        const interpreter = $gameTemp.phileasGetMessageInterpreter();
-        return interpreter ? interpreter.eventId() : 0;
-    };
-    
-    Window_Message.prototype.phileasGetCommandId = function() {
-        const interpreter = $gameTemp.phileasGetMessageInterpreter();
-        return interpreter ? interpreter._index : 0;
-    };
-
     Window_Message.prototype.phileasGetTag = function() {
-        const mapId = $gameMap.mapId();
-        const eventId = this.phileasGetEventId();
-        const commandId = this.phileasGetCommandId();
-        return [mapId, eventId, commandId];
+        const interpreter = $gameTemp.phileasGetMessageInterpreter();
+
+        if (!interpreter) {
+            console.warn("Phileas_SkippingMessages: the message interpreter is not specified");
+            return null;
+        }
+
+        return interpreter.phileasGetCurrentTag();
     };
 
 
@@ -944,15 +917,15 @@
         return Game_Interpreter_currentCommand.call(this);
     };
 
-    const Game_Interpreter_command101 = Game_Interpreter.prototype.command101;
-    Game_Interpreter.prototype.command101 = function(params) {
-        const result = Game_Interpreter_command101.call(this, params);
+    const Game_Interpreter_executeCommand = Game_Interpreter.prototype.executeCommand;
+    Game_Interpreter.prototype.executeCommand = function() {
+        const command = this.currentCommand();
 
-        if (result) {
+        if (command) {
             $gameTemp.phileasSaveMessageInterpreter(this);
         }
 
-        return result;
+        return Game_Interpreter_executeCommand.call(this);
     };
 
 
@@ -960,10 +933,28 @@
 // Windows
 
     if ($skipUnseenFeatureEnabled) {
+        const Origin_SceneManager_reloadGame = SceneManager.reloadGame;
+        SceneManager.reloadGame = function() {
+            saveSeenCash();
+            Origin_SceneManager_reloadGame.call(this);
+        };
+
+        const Origin_SceneManager_onSceneTerminate = SceneManager.onSceneTerminate;
+        SceneManager.onSceneTerminate = function() {
+            saveSeenCash();
+            Origin_SceneManager_onSceneTerminate.call(this);
+        };
+        
         const Origin_SceneManager_terminate = SceneManager.terminate;
         SceneManager.terminate = function() {
             saveSeenCash();
             Origin_SceneManager_terminate.call(this);
+        };
+
+        const Origin_Scene_Map_onMapLoaded = Scene_Map.prototype.onMapLoaded;
+        Scene_Map.prototype.onMapLoaded = function() {
+            saveSeenCash();
+            Origin_Scene_Map_onMapLoaded.call(this);
         };
 
         window.onbeforeunload = function() {
@@ -1078,7 +1069,7 @@
             : contents.phileasSkippingMessages_isFastMode;
         $skipUnseenOn = contents.phileasSkippingMessages_skipUnseenOn === undefined
             ? $defaultSkipUnseen
-            : contents.phileasSkippingMessages_isFastMode;
+            : contents.phileasSkippingMessages_skipUnseenOn;
     };
 
     const SceneManager_onKeyDown = SceneManager.onKeyDown;
