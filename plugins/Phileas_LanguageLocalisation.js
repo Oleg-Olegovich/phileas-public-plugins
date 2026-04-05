@@ -19,10 +19,11 @@
 // 2025.March.15 Ver1.3.1 Added language selection menu text padding
 // 2025.April.06 Ver1.3.2 Added file filtering
 // 2025.May.06 Ver1.3.3 Fixed config loading
+// 2026.April.05 Ver1.3.4 Fixed processing of nested arrays
 
 /*:
  * @target MZ
- * @plugindesc v1.3.3 Language localizations of text in the game
+ * @plugindesc v1.3.4 Language localizations of text in the game
  * @author Phileas
  * 
  * @param option
@@ -349,7 +350,7 @@
 
 /*:ru
  * @target MZ
- * @plugindesc v1.3.3 Языковые локализации текста в игре
+ * @plugindesc v1.3.4 Языковые локализации текста в игре
  * @author Phileas
  * 
  * @param option
@@ -858,11 +859,13 @@ var Phileas_LanguageLocalization = Phileas_LanguageLocalization || {};
     function getLanguageDataArrayItem(data, textCode, arrayI) {
         const key = textCode.substring(0, arrayI);
 
-        if (!data.hasOwnProperty(key)) {
-            return textCode;
-        }
+        if (key != "") {
+            if (!data.hasOwnProperty(key)) {
+                return textCode;
+            }
 
-        data = data[key];
+            data = data[key]
+        }
 
         const arrayJ = textCode.indexOf("]");
         const id = Number(textCode.substring(arrayI + 1, arrayJ));
